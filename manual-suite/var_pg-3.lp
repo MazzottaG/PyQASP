@@ -1,0 +1,12 @@
+%@forall
+{p1(1..3)}.
+:-#count{X:p1(X)}<1.
+a(X)|nA(X):-p1(X).
+%@forall
+{p2(1..3)}.
+:-#count{X:p2(X)}<1.
+a(X)|nA(X):-p2(X).
+%@constraint
+{a(4..8)}.
+:-#count{X:a(X)}<1.
+:-a(Z),p1(X),p2(Y),Z=X+Y,Z>3.
