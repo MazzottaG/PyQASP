@@ -1,0 +1,17 @@
+%@forall
+{p1(1..6)}.
+:-#count{X:p1(X)}!=4.
+%@exists
+node(X):-p1(X).
+{edge(X,Y)}:-node(X),node(Y),Y!=X.
+:-#count{Y:edge(X,Y)}>2,node(X).
+%@forall
+{color(X,1);color(X,2);color(X,3)}:-node(X).
+:-#count{Y:color(X,Y)}!=1,node(X).
+%@constraint
+{start(X)}:-node(X).
+:-#count{X:start(X)}!=1.
+r(X):-start(X).
+r(X):-r(Y),edge(Y,X).
+rc(C):-r(X),color(X,C).
+:-#count{C:rc(C)}!=2.

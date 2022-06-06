@@ -67,7 +67,7 @@ class Parser:
 
             line = streamline.decode("utf-8")
             # print(line.rstrip())
-            #check whether current line is a comment containing mapping from asp symbol to sat variable
+            # check whether current line is a comment containing mapping from asp symbol to sat variable
             match = re.match(Parser.dimacsCommentMatch,line)
             if match:
                 sat_variable = int(match.group(1))
@@ -119,6 +119,7 @@ class Parser:
 
     def encodeProgram(self,currentRules,currentQuantifier):
         ASP_program = self.computeASPProgram(currentRules)
+        # print(ASP_program)
         self.computeCNF(ASP_program,currentQuantifier)
 
     def parse(self):
@@ -150,15 +151,6 @@ class Parser:
         #finalize qcir file
         self.qbfFormula.close(self.table)
 
-    def printPrograms(self):
-        counter=1
-        for p in self.programs:
-            print(f"program {counter}")
-            print(f"   {p.getQuantifier()}")
-            print(f"      {p.getPredicates()}")
-            counter+=1
-
-
 
 parser = argparse.ArgumentParser(description='QBF encoder')
 parser.add_argument('filename', metavar='file', type=str, help='Path to QASP file')
@@ -167,4 +159,9 @@ ns = parser.parse_args(sys.argv[1:])
 p=Parser(ns)
 p.parse()
 print(f"QCIR file built: {Parser.qbfFile}")
-ExternalCalls.callQuabs(Parser.qbfFile)
+outstream = ExternalCalls.callQuabs(Parser.qbfFile)
+line = outstream.readline()
+while line:
+    print(line)
+    line = outstream.readline()
+
