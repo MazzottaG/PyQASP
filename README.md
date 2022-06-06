@@ -1,5 +1,7 @@
 # PyQASP
 
 ## Running PyQASP Solver
-1. Use executable file into dist folder
-2. parser myprogram.qasp
+Download the executable file located into dist folder and run it
+```
+parser myprogram.qasp
+```
