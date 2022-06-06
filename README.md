@@ -5,6 +5,10 @@ Download the executable file located into dist folder and run it
 ```
 pyqasp myprogram.qasp
 ```
+use -h option to get available options
+```
+pyqasp -h 
+```
 ## Build Executable from source
 Executable file is generated using pyinstaller 
 ```
