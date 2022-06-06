@@ -3,19 +3,25 @@ import subprocess
 from Executors import ExternalCalls
 from Structures import SymbolTable,QCIRProgram,Quantifier
 from checker import CheckerCNF
+import os,sys,argparse
+
 class Parser:
 
     quantifiersMatching = r'\s*%@(forall|exists|constraint)\s*\n'
     dimacsCommentMatch = r'^c\s*(\d+)\s*(.*)\n'
     dimacsHeaderMatch = r'^p\scnf\s*\d+\s*\d*\n'
-    temporaryFilename="../resources/files/tmp.lp"
-    qbfFile="../resources/files/formula.qbf"
-    debugCNFFile = "../resources/files/cnf-debug.txt"
+    temporaryFilename=os.path.join(sys._MEIPASS,"resources","files","tmp.lp")
+    # qbfFile=os.path.join(sys._MEIPASS,"resources","files","formula.qbf")
+    output_folder="PyQASP-OUT"
+    qbfFile=os.path.join(output_folder,"formula.qbf")
+    debugCNFFile = os.path.join(sys._MEIPASS,"resources","files","cnf-debug.txt")
 
     def __init__(self, args):
         self.QASP_program = args.filename
         self.disjunctive = args.disjunctive
         self.table=SymbolTable()
+        if not os.path.exists(Parser.output_folder):
+            os.mkdir(Parser.output_folder)
         self.qbfFormula=QCIRProgram(Parser.qbfFile)
         # self.checker = CheckerCNF()
 
@@ -152,8 +158,7 @@ class Parser:
             print(f"      {p.getPredicates()}")
             counter+=1
 
-import sys
-import argparse
+
 
 parser = argparse.ArgumentParser(description='QBF encoder')
 parser.add_argument('filename', metavar='file', type=str, help='Path to QASP file')
@@ -161,3 +166,5 @@ parser.add_argument('-d','--disjunctive', action="store_true", help='sum the int
 ns = parser.parse_args(sys.argv[1:])
 p=Parser(ns)
 p.parse()
+print(f"QCIR file built: {Parser.qbfFile}")
+ExternalCalls.callQuabs(Parser.qbfFile)

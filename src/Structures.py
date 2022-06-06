@@ -1,5 +1,5 @@
 from Executors import ExternalCalls
-import warnings
+import warnings,os,sys
 
 class SymbolTable:
     
@@ -51,7 +51,7 @@ class Quantifier:
 
 class QCIRProgram:
 
-    tempQCIRFile="../resources/files/tmp.qcir"
+    tempQCIRFile=os.path.join(sys._MEIPASS,"resources","files","tmp.qcir")
     AndGate="and"
     OrGate="or"
     def __init__(self,filename):
