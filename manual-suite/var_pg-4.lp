@@ -6,7 +6,7 @@
 :-p1(X),p2(X).
 :-#count{X:p2(X)}<2.
 %@forall
-{p3(X+Y):p1(X),p2(Y)}.
+{p3(Z)}:-p1(X),p2(Y),Z=X+Y.
 :-#count{X:p3(X)}!=1.
 %@forall
 {p4(1..3)}.

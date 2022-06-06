@@ -11,17 +11,17 @@ class Parser:
     dimacsCommentMatch = r'^c\s*(\d+)\s*(.*)\n'
     dimacsHeaderMatch = r'^p\scnf\s*\d+\s*\d*\n'
     temporaryFilename=os.path.join(sys._MEIPASS,"resources","files","tmp.lp")
-    # qbfFile=os.path.join(sys._MEIPASS,"resources","files","formula.qbf")
-    output_folder="PyQASP-OUT"
-    qbfFile=os.path.join(output_folder,"formula.qbf")
+    qbfFile=os.path.join(sys._MEIPASS,"resources","files","formula.qbf")
+    # output_folder="PyQASP-OUT"
+    # qbfFile=os.path.join(output_folder,"formula.qbf")
     debugCNFFile = os.path.join(sys._MEIPASS,"resources","files","cnf-debug.txt")
 
     def __init__(self, args):
         self.QASP_program = args.filename
         self.disjunctive = args.disjunctive
         self.table=SymbolTable()
-        if not os.path.exists(Parser.output_folder):
-            os.mkdir(Parser.output_folder)
+        # if not os.path.exists(Parser.output_folder):
+        #     os.mkdir(Parser.output_folder)
         self.qbfFormula=QCIRProgram(Parser.qbfFile)
         # self.checker = CheckerCNF()
 
