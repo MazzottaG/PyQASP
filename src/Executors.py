@@ -15,7 +15,8 @@ class ExternalCalls:
     lp2normal=os.path.join(sys._MEIPASS,toolFold,"lp2normal-2.27")
     #lp2lp2=os.path.join(sys._MEIPASS,toolFold,"lp2lp2-1.23")
     lp2sat=os.path.join(sys._MEIPASS,toolFold,"lp2sat-1.24")
-
+    qbf_solvers={"quabs":quabs}
+    
     def callProgramParser(program):
         return subprocess.Popen([f"{ExternalCalls.asp_parser}",program],stdout=subprocess.PIPE).stdout
 
@@ -31,7 +32,9 @@ class ExternalCalls:
     def callFileAppend(source,destination):
         subprocess.getoutput(f"cat {source} >> {destination}")
 
-    def callQuabs(qcirFilename):
+    def callQuabs(qcirFilename,solver):
         print(f"Running quabs on {qcirFilename}")
-        return subprocess.Popen([ExternalCalls.quabs,qcirFilename],stdout=subprocess.PIPE).stdout
-        
+        if solver in ExternalCalls.qbf_solvers:
+            return subprocess.Popen([ExternalCalls.qbf_solvers[solver],qcirFilename],stdout=subprocess.PIPE).stdout
+        print(f"Unable to find solver {solver}")
+        return None

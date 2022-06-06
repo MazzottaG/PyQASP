@@ -12,6 +12,7 @@ class Parser:
     dimacsHeaderMatch = r'^p\scnf\s*\d+\s*\d*\n'
     temporaryFilename=os.path.join(sys._MEIPASS,"resources","files","tmp.lp")
     qbfFile=os.path.join(sys._MEIPASS,"resources","files","formula.qbf")
+
     # output_folder="PyQASP-OUT"
     # qbfFile=os.path.join(output_folder,"formula.qbf")
     debugCNFFile = os.path.join(sys._MEIPASS,"resources","files","cnf-debug.txt")
@@ -154,14 +155,21 @@ class Parser:
 
 parser = argparse.ArgumentParser(description='QBF encoder')
 parser.add_argument('filename', metavar='file', type=str, help='Path to QASP file')
-parser.add_argument('-d','--disjunctive', action="store_true", help='sum the integers (default: find the max)')
+parser.add_argument('-d','--disjunctive', action="store_true", help='required for disjunctive program')
+parser.add_argument('-pq','--print-qcir', dest="qcir_file",  type=str, action="store", help='output qcir filename')
+parser.add_argument('-s','--solver', dest="solver_name", type=str, action="store", help='available solvers : '+str(list(ExternalCalls.qbf_solvers.keys())))
 ns = parser.parse_args(sys.argv[1:])
+
+if ns.qcir_file:
+    Parser.qbfFile=ns.qcir_file
 p=Parser(ns)
 p.parse()
 print(f"QCIR file built: {Parser.qbfFile}")
-outstream = ExternalCalls.callQuabs(Parser.qbfFile)
-line = outstream.readline()
-while line:
-    print(line)
-    line = outstream.readline()
+if ns.solver_name: 
+    outstream = ExternalCalls.callQuabs(Parser.qbfFile,ns.solver_name)
+    if not outstream is None: 
+        line = outstream.readline()
+        while line:
+            print(line.decode("utf-8"))
+            line = outstream.readline()
 
