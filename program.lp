@@ -1,8 +1,0 @@
-%@exists
-{b(1..2)}.
-a(X):-b(X).
-%@forall
-{d(1..2)}.
-c(X,Y):-a(X),d(Y).
-%@constraint
-:-a(X),a(Y),c(X,Y).

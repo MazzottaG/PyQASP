@@ -1,1 +1,0 @@
-gringo program.lp | lpstrip | lp2normal2 | lpcat | lp2acyc | lp2sat | lingeling
