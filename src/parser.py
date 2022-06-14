@@ -9,30 +9,21 @@ class Parser:
 
     quantifiersMatching = r'\s*%@(forall|exists|constraint)\s*\n'
     dimacsCommentMatch = r'^c\s*(\d+)\s*(.*)\n'
-    dimacsHeaderMatch = r'^p\scnf\s*\d+\s*\d*\n'
+    dimacsHeaderMatch = r'^p\s(wcnf|cnf)\s*\d+\s*\d*\s*\d*\n'
     temporaryFilename=os.path.join(sys._MEIPASS,"resources","files","tmp.lp")
     qbfFile=os.path.join(sys._MEIPASS,"resources","files","formula.qbf")
-
-    # output_folder="PyQASP-OUT"
-    # qbfFile=os.path.join(output_folder,"formula.qbf")
-    debugCNFFile = os.path.join(sys._MEIPASS,"resources","files","cnf-debug.txt")
 
     def __init__(self, args):
         self.QASP_program = args.filename
         self.disjunctive = args.disjunctive
         self.table=SymbolTable()
-        # if not os.path.exists(Parser.output_folder):
-        #     os.mkdir(Parser.output_folder)
         self.qbfFormula=QCIRProgram(Parser.qbfFile)
-        # self.checker = CheckerCNF()
 
     def getPredicates(self,outstream):
         line=outstream.readline()
-        predicates=[]
+        predicates=set()
         while line:
-            predicate = line.decode("utf-8").rstrip()
-            if predicate not in predicates:
-                predicates.append(predicate)
+            predicates.add(line.decode("UTF-8").rstrip())
             line=outstream.readline()
         return predicates
 
@@ -41,16 +32,16 @@ class Parser:
         predicates = self.getPredicates(ExternalCalls.callProgramParser(currentRules))
         choicerule = "{"
         countDomainPredicate=0
-
         #adding existing predicate's domain
         for predicate in predicates:
             for atom in self.table.getPredicateDomain(predicate):
                 if countDomainPredicate>0:
-                    choicerule+=";"
+                   choicerule+=";"
                 choicerule+=atom
                 countDomainPredicate+=1
-        choicerule+="}."
+        choicerule+="}.\n"
         return currentRules if countDomainPredicate == 0 else currentRules+choicerule
+
     def saveProgramOnTmpFile(self,program):
         f=open(Parser.temporaryFilename,"w")
         f.write(program)
@@ -59,26 +50,23 @@ class Parser:
     def remapCNF(self,outstream,currentQuantifier):
         streamline=outstream.readline()
         substitution_function={}
-        #used to capture last id used by lp2sat
-        count=2
         quantifier=Quantifier(currentQuantifier)
         self.qbfFormula.buildCNF()
-        debugf=open(Parser.debugCNFFile,"a")
+        variables=""
         while streamline:
-
-            line = streamline.decode("utf-8")
-            # print(line.rstrip())
+            line = streamline.decode("UTF-8")
             # check whether current line is a comment containing mapping from asp symbol to sat variable
             match = re.match(Parser.dimacsCommentMatch,line)
             if match:
                 sat_variable = int(match.group(1))
                 atom = match.group(2)
-                #returns new id if it is a new atoms or already assigned id
-                variable = self.table.addSymbol(atom)
-                if variable != sat_variable:
-                    #sat_variable has to be replaced id stored in the symbol table
-                    substitution_function[sat_variable]=variable
-                count+=1
+                #returns new id if it is a new atoms otherwise already assigned id
+                variable,new = self.table.addSymbol(atom)
+                #sat_variable has to be replaced with id stored in the symbol table (it could be also the same)
+                substitution_function[sat_variable]=variable
+                if new:
+                    #adding new variable to quantified variables
+                    variables+=str(variable)+","
             else:
                 match = re.match(Parser.dimacsHeaderMatch,line)
                 if not match:
@@ -91,28 +79,32 @@ class Parser:
                             #skipping 0 delimiter in clauses
                             continue
                         currentVar = id_ if id_ >= 0 else -id_
-                        if (currentVar >= count or currentVar==1) and currentVar not in substitution_function:
+                        if currentVar not in substitution_function:
                             #auxiliary sat variable introduced by lp2sat and so we generate a new id for it
-                            substitution_function[currentVar]=self.table.addExtraSymbol()
+                            new_symbol=self.table.addExtraSymbol()
+                            substitution_function[currentVar]=new_symbol
+                            variables+=str(new_symbol)+","
+                        
+                        # substitution_function is defined forall symbols seen so far 
+                        trueid = substitution_function[currentVar] if id_ >= 0 else -substitution_function[currentVar] 
+                        buildClause += ","+str(trueid) if len(buildClause)>0 else str(trueid)
 
-                        trueVar = currentVar if currentVar not in substitution_function else substitution_function[currentVar]
-                        #variables in the whole cnf will be under current qualifier
-                        self.qbfFormula.addQuantifiedVar(trueVar)
-                        trueVar = trueVar if id_ >= 0 else -trueVar
-                        buildClause += " "+str(trueVar) if buildClause!="" else str(trueVar)
                     # if buildClause!="":
                     #     debugf.write(buildClause+"\n")
                     #     self.checker.addClause(line,buildClause)
                     # else:
                     #     warnings.warn(f"Warning: built empty clause")
                     #for each clause an or gate is added to final qbf formula
+                    
                     self.qbfFormula.addOrGate(buildClause,self.table)
 
             streamline=outstream.readline()
-        debugf.close()
-        # self.checker.checkAndClear()
+
         #finalizing current cnf
-        self.qbfFormula.builtCNF(self.table,quantifier)
+        if len(variables)>0:
+            variables=variables[:-1]
+
+        self.qbfFormula.builtCNF(self.table,quantifier,variables)
 
     def computeCNF(self,program,currentQuantifier):
         self.saveProgramOnTmpFile(program)
@@ -120,12 +112,10 @@ class Parser:
 
     def encodeProgram(self,currentRules,currentQuantifier):
         ASP_program = self.computeASPProgram(currentRules)
-        # print(ASP_program)
         self.computeCNF(ASP_program,currentQuantifier)
 
     def parse(self):
         f=open(self.QASP_program,"r")
-        print(f"Parsing {self.QASP_program}")
         currentQuantifier=None
         currentRules=""
         for line in f:
@@ -140,7 +130,7 @@ class Parser:
                 currentRules=""
             else:
                 if currentQuantifier != None:
-                    currentRules+=line.rstrip('\n')
+                    currentRules+=line
 
         #should it be necessarely a contraint ?
         if currentQuantifier != None:
@@ -162,14 +152,13 @@ ns = parser.parse_args(sys.argv[1:])
 
 if ns.qcir_file:
     Parser.qbfFile=ns.qcir_file
+
 p=Parser(ns)
 p.parse()
-print(f"QCIR file built: {Parser.qbfFile}")
 if ns.solver_name: 
-    outstream = ExternalCalls.callQuabs(Parser.qbfFile,ns.solver_name)
+    outstream = ExternalCalls.callSolver(Parser.qbfFile,ns.solver_name)
     if not outstream is None: 
         line = outstream.readline()
         while line:
-            print(line.decode("utf-8"))
+            print(line.decode("utf-8").rstrip())
             line = outstream.readline()
-
