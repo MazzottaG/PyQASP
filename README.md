@@ -16,6 +16,6 @@ Executable file is generated using pyinstaller
  ```
  From repository root run
  ```
- pyinstaller --onefile --add-data 'resources:resources' src/parser.py --name pyqasp
+ ./clean-install.bash pyqasp
  ```
- Produced executable is stored by default into dist folder
+ It cleans and build a new executable file that is stored by default into dist folder
