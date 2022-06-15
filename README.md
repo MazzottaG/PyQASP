@@ -3,7 +3,7 @@
 ## Running PyQASP Solver
 Download the executable file located into dist folder and run it
 ```
-pyqasp myprogram.qasp
+pyqasp -d -s quabs myprogram.qasp
 ```
 use -h option to get available options
 ```
