@@ -10,7 +10,7 @@ class ExternalCalls:
     # Otherwise 
     # gringo -o smodels program.lp | lp2normal2 -e | lp2sat
 
-    asp_parser=os.path.join(sys._MEIPASS,"resources","asp-parser","gringopredicate")
+    asp_parser=os.path.join(sys._MEIPASS,"resources","asp-parser","asp_parser")
     toolFold=os.path.join(sys._MEIPASS,"resources","old-tool")
     quabs=os.path.join(sys._MEIPASS,"resources","qbf_solvers","quabs")
     gringo=os.path.join(sys._MEIPASS,toolFold,"gringo")
@@ -18,13 +18,9 @@ class ExternalCalls:
     lp2normal=os.path.join(sys._MEIPASS,toolFold,"lp2normal-2.27")
     lp2sat=os.path.join(sys._MEIPASS,toolFold,"lp2sat-1.24")
     qbf_solvers={"quabs":[quabs]}
-    tmp_file=os.path.join(sys._MEIPASS,"resources","tmp.lp")
 
     def callProgramParser(program):
-        f=open(ExternalCalls.tmp_file,"w")
-        f.write(program)
-        f.close()
-        return subprocess.Popen([f"{ExternalCalls.asp_parser}",ExternalCalls.tmp_file],stdout=subprocess.PIPE).stdout
+        return subprocess.Popen([f"{ExternalCalls.asp_parser}",program],stdout=subprocess.PIPE).stdout
 
     def callGringoLp2Sat(filename,uselpshift=False):
         gringo = subprocess.Popen([f"{ExternalCalls.gringo}","-o","smodels",filename],stdout=subprocess.PIPE)
