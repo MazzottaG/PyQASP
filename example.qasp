@@ -5,4 +5,4 @@ a(X):-b(X).
 {d(1..2)}.
 c(X,Y):-a(X),d(Y).
 %@constraint
-:-a(X),a(Y),c(X,Y).
+:-a(X),a(Y),c(X,Y). 
