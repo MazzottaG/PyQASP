@@ -26,7 +26,11 @@ class ExternalCalls:
         gringo = subprocess.Popen([f"{ExternalCalls.gringo}","-o","smodels",filename],stdout=subprocess.PIPE)
         lpshift = None
         if uselpshift:
+            print("Using Lp2Shifth")
             lpshift = subprocess.Popen([f"{ExternalCalls.lpshift}"],stdin=gringo.stdout,stdout=subprocess.PIPE)
+        else:
+            print("Not Using Lp2Shifth")
+
         lp2normal = subprocess.Popen([f"{ExternalCalls.lp2normal}","-e"],stdin=lpshift.stdout if uselpshift  else gringo.stdout,stdout=subprocess.PIPE)
         lp2sat = subprocess.Popen([f"{ExternalCalls.lp2sat}"],stdin=lp2normal.stdout,stdout=subprocess.PIPE)
         return lp2sat.stdout
@@ -35,6 +39,6 @@ class ExternalCalls:
 
     def callSolver(qcirFilename,solver):
         if solver in ExternalCalls.qbf_solvers:
-            return subprocess.Popen(ExternalCalls.qbf_solvers[solver]+[qcirFilename],stdout=subprocess.PIPE).stdout
+            return subprocess.Popen(ExternalCalls.qbf_solvers[solver]+["--partial-assignment",qcirFilename],stdout=subprocess.PIPE).stdout
         print(f"Unable to find solver {solver}")
         return None

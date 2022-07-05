@@ -12,6 +12,7 @@ class Parser:
     dimacsHeaderMatch = r'^p\s(wcnf|cnf)\s*\d+\s*\d*\s*\d*\n'
     temporaryFilename=os.path.join(sys._MEIPASS,"resources","files","tmp.lp")
     qbfFile=os.path.join(sys._MEIPASS,"resources","files","formula.qbf")
+    DISJUNCTIVE_OPTION="--disjunctive"
 
     def __init__(self, args):
         self.QASP_program = args.filename
@@ -22,14 +23,20 @@ class Parser:
     def getPredicates(self,outstream):
         line=outstream.readline()
         predicates=set()
+        self.disjunctive=False
         while line:
-            predicates.add(line.decode("UTF-8").rstrip())
+            predicate = line.decode("UTF-8").rstrip()
+            if Parser.DISJUNCTIVE_OPTION not in predicate:
+                predicates.add(predicate)
+            else:
+                self.disjunctive=True
             line=outstream.readline()
         return predicates
 
     def computeASPProgram(self,currentRules):
         #get predicate names in currentRules
-        predicates = self.getPredicates(ExternalCalls.callProgramParser(currentRules))
+        self.saveProgramOnTmpFile(currentRules)
+        predicates = self.getPredicates(ExternalCalls.callProgramParser(self.temporaryFilename))
         choicerule = "{"
         countDomainPredicate=0
         #adding existing predicate's domain
@@ -160,5 +167,14 @@ if ns.solver_name:
     if not outstream is None: 
         line = outstream.readline()
         while line:
-            print(line.decode("utf-8").rstrip())
+            line = line.decode("utf-8").rstrip()
+            if line.startswith("V"):
+                model =[int(v) for v in line.split(" ")[1:-1]] 
+                print("{",end="")
+                for name,predSet in p.table.factory.items():
+                    for atom,var in predSet.items():
+                        if var in model:
+                            print(atom,end=" ")
+                print("}")
+            print(line)
             line = outstream.readline()
