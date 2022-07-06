@@ -1,9 +1,11 @@
-import re,warnings
+import re
 import subprocess
+import os,sys,argparse
+import logging
+
 from Executors import ExternalCalls
 from Structures import SymbolTable,QCIRProgram,Quantifier
 from checker import CheckerCNF
-import os,sys,argparse
 
 class Parser:
 
@@ -14,9 +16,9 @@ class Parser:
     qbfFile=os.path.join(sys._MEIPASS,"resources","files","formula.qbf")
     DISJUNCTIVE_OPTION="--disjunctive"
 
-    def __init__(self, args):
-        self.QASP_program = args.filename
-        self.disjunctive = args.disjunctive
+    def __init__(self, filename):
+        self.QASP_program = filename
+        self.disjunctive = False
         self.table=SymbolTable()
         self.qbfFormula=QCIRProgram(Parser.qbfFile)
 
@@ -31,6 +33,9 @@ class Parser:
             else:
                 self.disjunctive=True
             line=outstream.readline()
+        logging.info(f"\tCurrent program predicate: {predicates}")
+        logging.info(f"\tDisjunctive: {self.disjunctive}")
+            
         return predicates
 
     def computeASPProgram(self,currentRules):
@@ -47,6 +52,7 @@ class Parser:
                 choicerule+=atom
                 countDomainPredicate+=1
         choicerule+="}.\n"
+        logging.info(f"\tAdded previous domain choice: {choicerule}")
         return currentRules if countDomainPredicate == 0 else currentRules+choicerule
 
     def saveProgramOnTmpFile(self,program):
@@ -60,6 +66,8 @@ class Parser:
         quantifier=Quantifier(currentQuantifier)
         self.qbfFormula.buildCNF()
         variables=""
+        logging.info(f"\tRemapping CNF")
+
         while streamline:
             line = streamline.decode("UTF-8")
             # check whether current line is a comment containing mapping from asp symbol to sat variable
@@ -122,9 +130,11 @@ class Parser:
         self.computeCNF(ASP_program,currentQuantifier)
 
     def parse(self):
+        print(f"Parsing {self.QASP_program} ...")
         f=open(self.QASP_program,"r")
         currentQuantifier=None
         currentRules=""
+        programLevel=1
         for line in f:
             match = re.match(Parser.quantifiersMatching,line)
             if match:
@@ -132,6 +142,8 @@ class Parser:
                     if currentQuantifier == Quantifier.QConstraint:
                         print("Error: found new quantifier after constraint statement")
                         exit(180)
+                    logging.info(f"\tEncoding {currentQuantifier} program at level {programLevel}")
+                    programLevel+=1
                     self.encodeProgram(currentRules,currentQuantifier)
                 currentQuantifier=match.group(1)
                 currentRules=""
@@ -144,37 +156,70 @@ class Parser:
             if currentQuantifier != Quantifier.QConstraint:
                 print("Error: last quantified statement is not a constraint")
                 exit(180)
+            logging.info(f"\tEncoding {currentQuantifier} program at level {programLevel}")
+            programLevel+=1
             self.encodeProgram(currentRules,currentQuantifier)
         f.close()
         #finalize qcir file
+        logging.info(f"\tFinalizing QBF formula")
         self.qbfFormula.close(self.table)
 
+# error in warning in info in debug
 
 parser = argparse.ArgumentParser(description='QBF encoder')
 parser.add_argument('filename', metavar='file', type=str, help='Path to QASP file')
-parser.add_argument('-d','--disjunctive', action="store_true", help='required for disjunctive program')
-parser.add_argument('-pq','--print-qcir', dest="qcir_file",  type=str, action="store", help='output qcir filename')
-parser.add_argument('-s','--solver', dest="solver_name", type=str, action="store", help='available solvers : '+str(list(ExternalCalls.qbf_solvers.keys())))
-ns = parser.parse_args(sys.argv[1:])
+parser.add_argument('-v','--verbose', dest="debuglevel",  type=int, help='verbosity levels: 1 or 2')
+parser.add_argument('-err','--errorfile', dest="logfile",  type=str, help='Path of file used for collecting stderr')
+parser.add_argument('-s','--solver', dest="solvername",  type=str, help='available solvers : '+str(list(ExternalCalls.qbf_solvers.keys())))
+parser.add_argument('-pq','--print-qcir', dest="qcir_file",  type=str, help='output qcir filename')
+
+ns = parser.parse_args()
+
+qasp_file = ns.filename
 
 if ns.qcir_file:
     Parser.qbfFile=ns.qcir_file
 
-p=Parser(ns)
+solver = "quabs"
+if ns.solvername:
+    solver = ns.solvername
+LEVELS = {1:logging.INFO,2:logging.DEBUG}
+DEBUG_LEVEL = logging.WARNING
+if ns.debuglevel:
+    DEBUG_LEVEL = LEVELS[ns.debuglevel]
+logging.basicConfig(format='%(message)s',level=DEBUG_LEVEL)
+if ns.logfile:
+    ExternalCalls.error_log_file=ns.logfile
+
+p=Parser(qasp_file)
 p.parse()
-if ns.solver_name: 
-    outstream = ExternalCalls.callSolver(Parser.qbfFile,ns.solver_name)
-    if not outstream is None: 
+print(f"Start solving with {solver} ...")
+outstream = ExternalCalls.callSolver(Parser.qbfFile,solver)
+if not outstream is None: 
+    line = outstream.readline()
+    unsat=False
+    while line:
+        line = line.decode("utf-8").rstrip()
+
+        if line.startswith("V"):
+            model =[int(v) for v in line.split(" ")[1:-1]] 
+            qasp_models=[]
+
+            for name,predSet in p.table.factory.items():
+                for atom,var in predSet.items():
+                    if var in model:
+                        qasp_models.append(atom)
+            print("Answer:")
+            print(". ".join(qasp_models))
+
+        elif line.endswith("UNSAT"):
+            unsat=True
+
         line = outstream.readline()
-        while line:
-            line = line.decode("utf-8").rstrip()
-            if line.startswith("V"):
-                model =[int(v) for v in line.split(" ")[1:-1]] 
-                print("{",end="")
-                for name,predSet in p.table.factory.items():
-                    for atom,var in predSet.items():
-                        if var in model:
-                            print(atom,end=" ")
-                print("}")
-            print(line)
-            line = outstream.readline()
+    
+    if unsat:
+        print("UNSATISFIABLE")
+    else:
+        print("SATISFIABLE")
+
+    

@@ -1,5 +1,5 @@
 from Executors import ExternalCalls
-import warnings,os,sys
+import os,sys,logging
 
 class SymbolTable:
     
@@ -88,7 +88,9 @@ class QCIRProgram:
             if quantifier.quantifierName in Quantifier.types:
 
                 if buildingQuantifier!="":
+                    logging.info(f"\tCurrent variables: {buildingQuantifier}")
                     buildingQuantifier=quantifier.quantifierName+"("+buildingQuantifier+")\n"
+
                     #printing quantifier statement in final qcir file 
                     f=open(self.finalQCIRFile,"a")
                     f.write(buildingQuantifier)
@@ -96,7 +98,7 @@ class QCIRProgram:
                     #storing quantifier type
                     self.quantifiers.append(quantifier)
                 else:
-                    warnings.warn("quantifier with no variable")
+                    logging.warning("quantifier with no variable")
             
             fi = table.addExtraSymbol()
             #storing variable that represent fi_i
@@ -110,6 +112,7 @@ class QCIRProgram:
             
     def close(self,table:SymbolTable):
         #all cnf have been processed
+        logging.info(f"\tComputing phi_c")
 
         #building fi_c from right to left
         fi_index=len(self.subformulaIds)-1
@@ -130,7 +133,6 @@ class QCIRProgram:
             currentGate=newGate
 
         self.tmpQCIRFileHandler.close()
-
         #defining the output variable fi_c 
         fi_c=currentGate
         f = open(self.finalQCIRFile,"a")
@@ -139,7 +141,6 @@ class QCIRProgram:
         f.close()
         #append al gate statments to final qcir file
         ExternalCalls.callFileAppend(QCIRProgram.tempQCIRFile,self.finalQCIRFile)
-            
+        logging.info(f"\tQCIR Completed")
 
-            
 
