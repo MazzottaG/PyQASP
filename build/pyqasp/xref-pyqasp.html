@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta charset="UTF-8">
-    <title>modulegraph cross reference for parser.py, pyi_rth_subprocess.py</title>
+    <title>modulegraph cross reference for main.py, pyi_rth_subprocess.py</title>
     <style>
       .node { padding: 0.5em 0 0.5em; border-top: thin grey dotted; }
       .moduletype { font: smaller italic }
@@ -11,21 +11,23 @@
     </style>
   </head>
   <body>
-    <h1>modulegraph cross reference for parser.py, pyi_rth_subprocess.py</h1>
+    <h1>modulegraph cross reference for main.py, pyi_rth_subprocess.py</h1>
 
 <div class="node">
-  <a name="parser.py"></a>
-  <a target="code" href="/home/giuseppe/TestPyQASP/PyQASP/src/parser.py" type="text/plain"><tt>parser.py</tt></a>
+  <a name="main.py"></a>
+  <a target="code" href="/home/giuseppe/TestPyQASP/PyQASP/src/main.py" type="text/plain"><tt>main.py</tt></a>
 <span class="moduletype">Script</span>  <div class="import">
 imports:
-    <a href="#Executors">Executors</a>
+    <a href="#AspParser">AspParser</a>
+ &#8226;   <a href="#Builder">Builder</a>
+ &#8226;   <a href="#Option">Option</a>
+ &#8226;   <a href="#Solver">Solver</a>
  &#8226;   <a href="#Structures">Structures</a>
  &#8226;   <a href="#_bootlocale">_bootlocale</a>
  &#8226;   <a href="#_collections_abc">_collections_abc</a>
  &#8226;   <a href="#_weakrefset">_weakrefset</a>
  &#8226;   <a href="#abc">abc</a>
  &#8226;   <a href="#argparse">argparse</a>
- &#8226;   <a href="#checker">checker</a>
  &#8226;   <a href="#codecs">codecs</a>
  &#8226;   <a href="#collections">collections</a>
  &#8226;   <a href="#collections.abc">collections.abc</a>
@@ -155,22 +157,19 @@ imports:
  &#8226;   <a href="#encodings.zlib_codec">encodings.zlib_codec</a>
  &#8226;   <a href="#enum">enum</a>
  &#8226;   <a href="#functools">functools</a>
+ &#8226;   <a href="#grounder">grounder</a>
  &#8226;   <a href="#heapq">heapq</a>
  &#8226;   <a href="#io">io</a>
  &#8226;   <a href="#keyword">keyword</a>
  &#8226;   <a href="#linecache">linecache</a>
  &#8226;   <a href="#locale">locale</a>
- &#8226;   <a href="#logging">logging</a>
  &#8226;   <a href="#operator">operator</a>
- &#8226;   <a href="#os">os</a>
  &#8226;   <a href="#pyi_rth_subprocess.py">pyi_rth_subprocess.py</a>
  &#8226;   <a href="#re">re</a>
  &#8226;   <a href="#reprlib">reprlib</a>
  &#8226;   <a href="#sre_compile">sre_compile</a>
  &#8226;   <a href="#sre_constants">sre_constants</a>
  &#8226;   <a href="#sre_parse">sre_parse</a>
- &#8226;   <a href="#subprocess">subprocess</a>
- &#8226;   <a href="#sys">sys</a>
  &#8226;   <a href="#tokenize">tokenize</a>
  &#8226;   <a href="#traceback">traceback</a>
  &#8226;   <a href="#types">types</a>
@@ -193,7 +192,7 @@ imports:
   </div>
   <div class="import">
 imported by:
-    <a href="#parser.py">parser.py</a>
+    <a href="#main.py">main.py</a>
 
   </div>
 
@@ -224,11 +223,50 @@ imported by:
 </div>
 
 <div class="node">
+  <a name="AspParser"></a>
+  <a target="code" href="/home/giuseppe/TestPyQASP/PyQASP/src/AspParser.py" type="text/plain"><tt>AspParser</tt></a>
+<span class="moduletype">SourceModule</span>  <div class="import">
+imports:
+    <a href="#Builder">Builder</a>
+ &#8226;   <a href="#Option">Option</a>
+ &#8226;   <a href="#Structures">Structures</a>
+ &#8226;   <a href="#grounder">grounder</a>
+
+  </div>
+  <div class="import">
+imported by:
+    <a href="#main.py">main.py</a>
+
+  </div>
+
+</div>
+
+<div class="node">
+  <a name="Builder"></a>
+  <a target="code" href="/home/giuseppe/TestPyQASP/PyQASP/src/Builder.py" type="text/plain"><tt>Builder</tt></a>
+<span class="moduletype">SourceModule</span>  <div class="import">
+imports:
+    <a href="#Executors">Executors</a>
+ &#8226;   <a href="#Option">Option</a>
+ &#8226;   <a href="#Structures">Structures</a>
+
+  </div>
+  <div class="import">
+imported by:
+    <a href="#AspParser">AspParser</a>
+ &#8226;   <a href="#main.py">main.py</a>
+
+  </div>
+
+</div>
+
+<div class="node">
   <a name="Executors"></a>
   <a target="code" href="/home/giuseppe/TestPyQASP/PyQASP/src/Executors.py" type="text/plain"><tt>Executors</tt></a>
 <span class="moduletype">SourceModule</span>  <div class="import">
 imports:
-    <a href="#logging">logging</a>
+    <a href="#Option">Option</a>
+ &#8226;   <a href="#logging">logging</a>
  &#8226;   <a href="#os">os</a>
  &#8226;   <a href="#subprocess">subprocess</a>
  &#8226;   <a href="#sys">sys</a>
@@ -236,8 +274,50 @@ imports:
   </div>
   <div class="import">
 imported by:
-    <a href="#Structures">Structures</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+    <a href="#Builder">Builder</a>
+ &#8226;   <a href="#Solver">Solver</a>
+ &#8226;   <a href="#Structures">Structures</a>
+ &#8226;   <a href="#grounder">grounder</a>
+
+  </div>
+
+</div>
+
+<div class="node">
+  <a name="Option"></a>
+  <a target="code" href="/home/giuseppe/TestPyQASP/PyQASP/src/Option.py" type="text/plain"><tt>Option</tt></a>
+<span class="moduletype">SourceModule</span>  <div class="import">
+imports:
+    <a href="#os">os</a>
+ &#8226;   <a href="#sys">sys</a>
+
+  </div>
+  <div class="import">
+imported by:
+    <a href="#AspParser">AspParser</a>
+ &#8226;   <a href="#Builder">Builder</a>
+ &#8226;   <a href="#Executors">Executors</a>
+ &#8226;   <a href="#Solver">Solver</a>
+ &#8226;   <a href="#grounder">grounder</a>
+ &#8226;   <a href="#main.py">main.py</a>
+
+  </div>
+
+</div>
+
+<div class="node">
+  <a name="Solver"></a>
+  <a target="code" href="/home/giuseppe/TestPyQASP/PyQASP/src/Solver.py" type="text/plain"><tt>Solver</tt></a>
+<span class="moduletype">SourceModule</span>  <div class="import">
+imports:
+    <a href="#Executors">Executors</a>
+ &#8226;   <a href="#Option">Option</a>
+ &#8226;   <a href="#Structures">Structures</a>
+
+  </div>
+  <div class="import">
+imported by:
+    <a href="#main.py">main.py</a>
 
   </div>
 
@@ -256,7 +336,10 @@ imports:
   </div>
   <div class="import">
 imported by:
-    <a href="#parser.py">parser.py</a>
+    <a href="#AspParser">AspParser</a>
+ &#8226;   <a href="#Builder">Builder</a>
+ &#8226;   <a href="#Solver">Solver</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -305,7 +388,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#locale">locale</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -435,8 +518,8 @@ imported by:
  &#8226;   <a href="#collections.abc">collections.abc</a>
  &#8226;   <a href="#contextlib">contextlib</a>
  &#8226;   <a href="#locale">locale</a>
+ &#8226;   <a href="#main.py">main.py</a>
  &#8226;   <a href="#os">os</a>
- &#8226;   <a href="#parser.py">parser.py</a>
  &#8226;   <a href="#pathlib">pathlib</a>
  &#8226;   <a href="#random">random</a>
  &#8226;   <a href="#types">types</a>
@@ -979,8 +1062,8 @@ imports:
   <div class="import">
 imported by:
     <a href="#_py_abc">_py_abc</a>
+ &#8226;   <a href="#main.py">main.py</a>
  &#8226;   <a href="#multiprocessing.process">multiprocessing.process</a>
- &#8226;   <a href="#parser.py">parser.py</a>
  &#8226;   <a href="#threading">threading</a>
  &#8226;   <a href="#weakref">weakref</a>
 
@@ -1028,10 +1111,10 @@ imported by:
  &#8226;   <a href="#importlib.metadata">importlib.metadata</a>
  &#8226;   <a href="#inspect">inspect</a>
  &#8226;   <a href="#io">io</a>
+ &#8226;   <a href="#main.py">main.py</a>
  &#8226;   <a href="#multiprocessing.reduction">multiprocessing.reduction</a>
  &#8226;   <a href="#numbers">numbers</a>
  &#8226;   <a href="#os">os</a>
- &#8226;   <a href="#parser.py">parser.py</a>
  &#8226;   <a href="#selectors">selectors</a>
  &#8226;   <a href="#typing">typing</a>
 
@@ -1057,15 +1140,14 @@ imports:
   <div class="import">
 imported by:
     <a href="#calendar">calendar</a>
- &#8226;   <a href="#checker">checker</a>
  &#8226;   <a href="#code">code</a>
  &#8226;   <a href="#dis">dis</a>
  &#8226;   <a href="#doctest">doctest</a>
  &#8226;   <a href="#gzip">gzip</a>
  &#8226;   <a href="#http.server">http.server</a>
  &#8226;   <a href="#inspect">inspect</a>
+ &#8226;   <a href="#main.py">main.py</a>
  &#8226;   <a href="#nntplib">nntplib</a>
- &#8226;   <a href="#parser.py">parser.py</a>
  &#8226;   <a href="#tarfile">tarfile</a>
  &#8226;   <a href="#tokenize">tokenize</a>
  &#8226;   <a href="#unittest.main">unittest.main</a>
@@ -1234,24 +1316,6 @@ imported by:
 </div>
 
 <div class="node">
-  <a name="checker"></a>
-  <a target="code" href="/home/giuseppe/TestPyQASP/PyQASP/src/checker.py" type="text/plain"><tt>checker</tt></a>
-<span class="moduletype">SourceModule</span>  <div class="import">
-imports:
-    <a href="#argparse">argparse</a>
- &#8226;   <a href="#re">re</a>
- &#8226;   <a href="#sys">sys</a>
-
-  </div>
-  <div class="import">
-imported by:
-    <a href="#parser.py">parser.py</a>
-
-  </div>
-
-</div>
-
-<div class="node">
   <a name="codecs"></a>
   <a target="code" href="/usr/lib/python3.8/codecs.py" type="text/plain"><tt>codecs</tt></a>
 <span class="moduletype">SourceModule</span>  <div class="import">
@@ -1388,7 +1452,7 @@ imported by:
  &#8226;   <a href="#encodings.uu_codec">encodings.uu_codec</a>
  &#8226;   <a href="#encodings.zlib_codec">encodings.zlib_codec</a>
  &#8226;   <a href="#lib2to3.pgen2.tokenize">lib2to3.pgen2.tokenize</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
  &#8226;   <a href="#pickle">pickle</a>
  &#8226;   <a href="#plistlib">plistlib</a>
  &#8226;   <a href="#tokenize">tokenize</a>
@@ -1440,11 +1504,11 @@ imported by:
  &#8226;   <a href="#inspect">inspect</a>
  &#8226;   <a href="#lib2to3.btm_matcher">lib2to3.btm_matcher</a>
  &#8226;   <a href="#lib2to3.refactor">lib2to3.refactor</a>
+ &#8226;   <a href="#main.py">main.py</a>
  &#8226;   <a href="#multiprocessing.heap">multiprocessing.heap</a>
  &#8226;   <a href="#multiprocessing.pool">multiprocessing.pool</a>
  &#8226;   <a href="#multiprocessing.queues">multiprocessing.queues</a>
  &#8226;   <a href="#nntplib">nntplib</a>
- &#8226;   <a href="#parser.py">parser.py</a>
  &#8226;   <a href="#pkgutil">pkgutil</a>
  &#8226;   <a href="#platform">platform</a>
  &#8226;   <a href="#pprint">pprint</a>
@@ -1485,7 +1549,7 @@ imported by:
  &#8226;   <a href="#http.client">http.client</a>
  &#8226;   <a href="#inspect">inspect</a>
  &#8226;   <a href="#logging">logging</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
  &#8226;   <a href="#selectors">selectors</a>
  &#8226;   <a href="#test.support">test.support</a>
  &#8226;   <a href="#tracemalloc">tracemalloc</a>
@@ -1594,8 +1658,8 @@ imported by:
 imported by:
     <a href="#_pickle">_pickle</a>
  &#8226;   <a href="#copy">copy</a>
+ &#8226;   <a href="#main.py">main.py</a>
  &#8226;   <a href="#multiprocessing.reduction">multiprocessing.reduction</a>
- &#8226;   <a href="#parser.py">parser.py</a>
  &#8226;   <a href="#pickle">pickle</a>
  &#8226;   <a href="#re">re</a>
 
@@ -2388,7 +2452,7 @@ imported by:
  &#8226;   <a href="#encodings.uu_codec">encodings.uu_codec</a>
  &#8226;   <a href="#encodings.zlib_codec">encodings.zlib_codec</a>
  &#8226;   <a href="#locale">locale</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -2406,7 +2470,7 @@ imports:
 imported by:
     <a href="#encodings">encodings</a>
  &#8226;   <a href="#locale">locale</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -2424,7 +2488,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -2443,7 +2507,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -2463,7 +2527,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -2483,7 +2547,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -2502,7 +2566,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -2520,7 +2584,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -2538,7 +2602,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -2556,7 +2620,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -2574,7 +2638,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -2592,7 +2656,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -2610,7 +2674,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -2628,7 +2692,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -2646,7 +2710,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -2664,7 +2728,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -2682,7 +2746,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -2700,7 +2764,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -2718,7 +2782,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -2736,7 +2800,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -2754,7 +2818,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -2772,7 +2836,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -2790,7 +2854,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -2808,7 +2872,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -2826,7 +2890,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -2844,7 +2908,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -2862,7 +2926,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -2880,7 +2944,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -2898,7 +2962,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -2916,7 +2980,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -2934,7 +2998,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -2952,7 +3016,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -2970,7 +3034,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -2988,7 +3052,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -3006,7 +3070,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -3024,7 +3088,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -3042,7 +3106,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -3060,7 +3124,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -3078,7 +3142,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -3096,7 +3160,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -3114,7 +3178,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -3132,7 +3196,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -3150,7 +3214,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -3168,7 +3232,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -3186,7 +3250,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -3206,7 +3270,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -3226,7 +3290,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -3246,7 +3310,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -3266,7 +3330,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -3286,7 +3350,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -3306,7 +3370,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -3326,7 +3390,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -3346,7 +3410,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -3366,7 +3430,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -3386,7 +3450,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -3405,7 +3469,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -3423,7 +3487,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -3443,7 +3507,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -3464,7 +3528,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -3484,7 +3548,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -3504,7 +3568,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -3524,7 +3588,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -3544,7 +3608,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -3564,7 +3628,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -3584,7 +3648,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -3604,7 +3668,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -3622,7 +3686,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -3640,7 +3704,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -3658,7 +3722,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -3676,7 +3740,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -3694,7 +3758,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -3712,7 +3776,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -3730,7 +3794,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -3748,7 +3812,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -3766,7 +3830,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -3784,7 +3848,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -3802,7 +3866,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -3820,7 +3884,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -3838,7 +3902,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -3856,7 +3920,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -3874,7 +3938,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -3894,7 +3958,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -3912,7 +3976,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -3930,7 +3994,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -3948,7 +4012,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -3966,7 +4030,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -3984,7 +4048,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -4002,7 +4066,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -4020,7 +4084,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -4038,7 +4102,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -4056,7 +4120,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -4074,7 +4138,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -4092,7 +4156,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -4110,7 +4174,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -4128,7 +4192,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -4146,7 +4210,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -4164,7 +4228,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -4182,7 +4246,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -4200,7 +4264,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -4218,7 +4282,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -4236,7 +4300,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -4254,7 +4318,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -4272,7 +4336,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -4292,7 +4356,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -4310,7 +4374,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -4329,7 +4393,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -4349,7 +4413,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -4369,7 +4433,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -4389,7 +4453,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -4407,7 +4471,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -4425,7 +4489,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -4443,7 +4507,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -4462,7 +4526,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -4480,7 +4544,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -4498,7 +4562,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -4517,7 +4581,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -4535,7 +4599,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -4553,7 +4617,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -4571,7 +4635,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -4589,7 +4653,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -4607,7 +4671,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -4627,7 +4691,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -4646,7 +4710,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#encodings">encodings</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -4667,7 +4731,7 @@ imported by:
     <a href="#asyncio.constants">asyncio.constants</a>
  &#8226;   <a href="#http">http</a>
  &#8226;   <a href="#inspect">inspect</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
  &#8226;   <a href="#plistlib">plistlib</a>
  &#8226;   <a href="#py_compile">py_compile</a>
  &#8226;   <a href="#re">re</a>
@@ -4792,10 +4856,10 @@ imported by:
  &#8226;   <a href="#inspect">inspect</a>
  &#8226;   <a href="#linecache">linecache</a>
  &#8226;   <a href="#locale">locale</a>
+ &#8226;   <a href="#main.py">main.py</a>
  &#8226;   <a href="#multiprocessing.reduction">multiprocessing.reduction</a>
  &#8226;   <a href="#multiprocessing.shared_memory">multiprocessing.shared_memory</a>
  &#8226;   <a href="#operator">operator</a>
- &#8226;   <a href="#parser.py">parser.py</a>
  &#8226;   <a href="#pathlib">pathlib</a>
  &#8226;   <a href="#pickle">pickle</a>
  &#8226;   <a href="#pkgutil">pkgutil</a>
@@ -4926,6 +4990,26 @@ imported by:
 </div>
 
 <div class="node">
+  <a name="grounder"></a>
+  <a target="code" href="/home/giuseppe/TestPyQASP/PyQASP/src/grounder.py" type="text/plain"><tt>grounder</tt></a>
+<span class="moduletype">SourceModule</span>  <div class="import">
+imports:
+    <a href="#Executors">Executors</a>
+ &#8226;   <a href="#Option">Option</a>
+ &#8226;   <a href="#re">re</a>
+ &#8226;   <a href="#sys">sys</a>
+
+  </div>
+  <div class="import">
+imported by:
+    <a href="#AspParser">AspParser</a>
+ &#8226;   <a href="#main.py">main.py</a>
+
+  </div>
+
+</div>
+
+<div class="node">
   <a name="grp"></a>
   <tt>grp</tt> <span class="moduletype"><i>(builtin module)</i></span>  <div class="import">
 imported by:
@@ -5005,7 +5089,7 @@ imported by:
  &#8226;   <a href="#asyncio.queues">asyncio.queues</a>
  &#8226;   <a href="#collections">collections</a>
  &#8226;   <a href="#difflib">difflib</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
  &#8226;   <a href="#queue">queue</a>
 
   </div>
@@ -5329,12 +5413,12 @@ imported by:
  &#8226;   <a href="#lib2to3.refactor">lib2to3.refactor</a>
  &#8226;   <a href="#logging">logging</a>
  &#8226;   <a href="#lzma">lzma</a>
+ &#8226;   <a href="#main.py">main.py</a>
  &#8226;   <a href="#multiprocessing.connection">multiprocessing.connection</a>
  &#8226;   <a href="#multiprocessing.popen_forkserver">multiprocessing.popen_forkserver</a>
  &#8226;   <a href="#multiprocessing.popen_spawn_posix">multiprocessing.popen_spawn_posix</a>
  &#8226;   <a href="#multiprocessing.reduction">multiprocessing.reduction</a>
  &#8226;   <a href="#os">os</a>
- &#8226;   <a href="#parser.py">parser.py</a>
  &#8226;   <a href="#pathlib">pathlib</a>
  &#8226;   <a href="#pdb">pdb</a>
  &#8226;   <a href="#pickle">pickle</a>
@@ -5409,7 +5493,7 @@ imported by:
 <span class="moduletype">SourceModule</span>  <div class="import">
 imported by:
     <a href="#collections">collections</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -5432,7 +5516,7 @@ imported by:
  &#8226;   <a href="#bdb">bdb</a>
  &#8226;   <a href="#doctest">doctest</a>
  &#8226;   <a href="#inspect">inspect</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
  &#8226;   <a href="#pdb">pdb</a>
  &#8226;   <a href="#traceback">traceback</a>
  &#8226;   <a href="#tracemalloc">tracemalloc</a>
@@ -5467,7 +5551,7 @@ imported by:
  &#8226;   <a href="#_strptime">_strptime</a>
  &#8226;   <a href="#calendar">calendar</a>
  &#8226;   <a href="#gettext">gettext</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
  &#8226;   <a href="#test.support">test.support</a>
  &#8226;   <a href="#xml.etree.ElementTree">xml.etree.ElementTree</a>
 
@@ -5509,7 +5593,6 @@ imported by:
  &#8226;   <a href="#lib2to3.refactor">lib2to3.refactor</a>
  &#8226;   <a href="#logging.handlers">logging.handlers</a>
  &#8226;   <a href="#multiprocessing.util">multiprocessing.util</a>
- &#8226;   <a href="#parser.py">parser.py</a>
  &#8226;   <a href="#unittest.case">unittest.case</a>
 
   </div>
@@ -5696,7 +5779,7 @@ imported by:
  &#8226;   <a href="#importlib.metadata">importlib.metadata</a>
  &#8226;   <a href="#inspect">inspect</a>
  &#8226;   <a href="#lib2to3.refactor">lib2to3.refactor</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
  &#8226;   <a href="#pathlib">pathlib</a>
  &#8226;   <a href="#typing">typing</a>
 
@@ -5756,6 +5839,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#Executors">Executors</a>
+ &#8226;   <a href="#Option">Option</a>
  &#8226;   <a href="#Structures">Structures</a>
  &#8226;   <a href="#_osx_support">_osx_support</a>
  &#8226;   <a href="#argparse">argparse</a>
@@ -5825,7 +5909,6 @@ imported by:
  &#8226;   <a href="#netrc">netrc</a>
  &#8226;   <a href="#ntpath">ntpath</a>
  &#8226;   <a href="#optparse">optparse</a>
- &#8226;   <a href="#parser.py">parser.py</a>
  &#8226;   <a href="#pathlib">pathlib</a>
  &#8226;   <a href="#pdb">pdb</a>
  &#8226;   <a href="#pkgutil">pkgutil</a>
@@ -6148,7 +6231,6 @@ imported by:
  &#8226;   <a href="#_strptime">_strptime</a>
  &#8226;   <a href="#argparse">argparse</a>
  &#8226;   <a href="#base64">base64</a>
- &#8226;   <a href="#checker">checker</a>
  &#8226;   <a href="#configparser">configparser</a>
  &#8226;   <a href="#csv">csv</a>
  &#8226;   <a href="#ctypes._aix">ctypes._aix</a>
@@ -6174,6 +6256,7 @@ imported by:
  &#8226;   <a href="#ftplib">ftplib</a>
  &#8226;   <a href="#gettext">gettext</a>
  &#8226;   <a href="#glob">glob</a>
+ &#8226;   <a href="#grounder">grounder</a>
  &#8226;   <a href="#html">html</a>
  &#8226;   <a href="#http.client">http.client</a>
  &#8226;   <a href="#http.cookiejar">http.cookiejar</a>
@@ -6184,8 +6267,8 @@ imported by:
  &#8226;   <a href="#locale">locale</a>
  &#8226;   <a href="#logging">logging</a>
  &#8226;   <a href="#logging.handlers">logging.handlers</a>
+ &#8226;   <a href="#main.py">main.py</a>
  &#8226;   <a href="#nntplib">nntplib</a>
- &#8226;   <a href="#parser.py">parser.py</a>
  &#8226;   <a href="#pathlib">pathlib</a>
  &#8226;   <a href="#pdb">pdb</a>
  &#8226;   <a href="#pickle">pickle</a>
@@ -6233,7 +6316,7 @@ imported by:
  &#8226;   <a href="#bdb">bdb</a>
  &#8226;   <a href="#collections">collections</a>
  &#8226;   <a href="#functools">functools</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
  &#8226;   <a href="#pydoc">pydoc</a>
 
   </div>
@@ -6441,7 +6524,7 @@ imports:
   </div>
   <div class="import">
 imported by:
-    <a href="#parser.py">parser.py</a>
+    <a href="#main.py">main.py</a>
  &#8226;   <a href="#re">re</a>
 
   </div>
@@ -6458,7 +6541,7 @@ imports:
   </div>
   <div class="import">
 imported by:
-    <a href="#parser.py">parser.py</a>
+    <a href="#main.py">main.py</a>
  &#8226;   <a href="#re">re</a>
  &#8226;   <a href="#sre_compile">sre_compile</a>
  &#8226;   <a href="#sre_parse">sre_parse</a>
@@ -6479,7 +6562,7 @@ imports:
   </div>
   <div class="import">
 imported by:
-    <a href="#parser.py">parser.py</a>
+    <a href="#main.py">main.py</a>
  &#8226;   <a href="#re">re</a>
  &#8226;   <a href="#sre_compile">sre_compile</a>
 
@@ -6664,7 +6747,6 @@ imported by:
  &#8226;   <a href="#http.server">http.server</a>
  &#8226;   <a href="#multiprocessing.util">multiprocessing.util</a>
  &#8226;   <a href="#os">os</a>
- &#8226;   <a href="#parser.py">parser.py</a>
  &#8226;   <a href="#platform">platform</a>
  &#8226;   <a href="#pydoc">pydoc</a>
  &#8226;   <a href="#pyi_rth_subprocess.py">pyi_rth_subprocess.py</a>
@@ -6680,6 +6762,7 @@ imported by:
   <tt>sys</tt> <span class="moduletype"><i>(builtin module)</i></span>  <div class="import">
 imported by:
     <a href="#Executors">Executors</a>
+ &#8226;   <a href="#Option">Option</a>
  &#8226;   <a href="#Structures">Structures</a>
  &#8226;   <a href="#_bootlocale">_bootlocale</a>
  &#8226;   <a href="#_collections_abc">_collections_abc</a>
@@ -6698,7 +6781,6 @@ imported by:
  &#8226;   <a href="#base64">base64</a>
  &#8226;   <a href="#bdb">bdb</a>
  &#8226;   <a href="#calendar">calendar</a>
- &#8226;   <a href="#checker">checker</a>
  &#8226;   <a href="#cmd">cmd</a>
  &#8226;   <a href="#code">code</a>
  &#8226;   <a href="#codecs">codecs</a>
@@ -6735,6 +6817,7 @@ imported by:
  &#8226;   <a href="#getpass">getpass</a>
  &#8226;   <a href="#gettext">gettext</a>
  &#8226;   <a href="#glob">glob</a>
+ &#8226;   <a href="#grounder">grounder</a>
  &#8226;   <a href="#gzip">gzip</a>
  &#8226;   <a href="#http.server">http.server</a>
  &#8226;   <a href="#importlib">importlib</a>
@@ -6770,7 +6853,6 @@ imported by:
  &#8226;   <a href="#ntpath">ntpath</a>
  &#8226;   <a href="#optparse">optparse</a>
  &#8226;   <a href="#os">os</a>
- &#8226;   <a href="#parser.py">parser.py</a>
  &#8226;   <a href="#pathlib">pathlib</a>
  &#8226;   <a href="#pdb">pdb</a>
  &#8226;   <a href="#pickle">pickle</a>
@@ -7068,7 +7150,7 @@ imported by:
     <a href="#importlib._bootstrap_external">importlib._bootstrap_external</a>
  &#8226;   <a href="#inspect">inspect</a>
  &#8226;   <a href="#linecache">linecache</a>
- &#8226;   <a href="#parser.py">parser.py</a>
+ &#8226;   <a href="#main.py">main.py</a>
  &#8226;   <a href="#pdb">pdb</a>
  &#8226;   <a href="#pydoc">pydoc</a>
 
@@ -7098,12 +7180,12 @@ imported by:
  &#8226;   <a href="#doctest">doctest</a>
  &#8226;   <a href="#http.cookiejar">http.cookiejar</a>
  &#8226;   <a href="#logging">logging</a>
+ &#8226;   <a href="#main.py">main.py</a>
  &#8226;   <a href="#multiprocessing.managers">multiprocessing.managers</a>
  &#8226;   <a href="#multiprocessing.pool">multiprocessing.pool</a>
  &#8226;   <a href="#multiprocessing.process">multiprocessing.process</a>
  &#8226;   <a href="#multiprocessing.queues">multiprocessing.queues</a>
  &#8226;   <a href="#multiprocessing.util">multiprocessing.util</a>
- &#8226;   <a href="#parser.py">parser.py</a>
  &#8226;   <a href="#pdb">pdb</a>
  &#8226;   <a href="#py_compile">py_compile</a>
  &#8226;   <a href="#pydoc">pydoc</a>
@@ -7167,8 +7249,8 @@ imported by:
  &#8226;   <a href="#importlib">importlib</a>
  &#8226;   <a href="#importlib.util">importlib.util</a>
  &#8226;   <a href="#inspect">inspect</a>
+ &#8226;   <a href="#main.py">main.py</a>
  &#8226;   <a href="#multiprocessing.spawn">multiprocessing.spawn</a>
- &#8226;   <a href="#parser.py">parser.py</a>
  &#8226;   <a href="#pickle">pickle</a>
  &#8226;   <a href="#pkgutil">pkgutil</a>
  &#8226;   <a href="#pprint">pprint</a>
@@ -7432,13 +7514,13 @@ imported by:
  &#8226;   <a href="#inspect">inspect</a>
  &#8226;   <a href="#locale">locale</a>
  &#8226;   <a href="#logging">logging</a>
+ &#8226;   <a href="#main.py">main.py</a>
  &#8226;   <a href="#multiprocessing.forkserver">multiprocessing.forkserver</a>
  &#8226;   <a href="#multiprocessing.managers">multiprocessing.managers</a>
  &#8226;   <a href="#multiprocessing.pool">multiprocessing.pool</a>
  &#8226;   <a href="#multiprocessing.resource_tracker">multiprocessing.resource_tracker</a>
  &#8226;   <a href="#nntplib">nntplib</a>
  &#8226;   <a href="#os">os</a>
- &#8226;   <a href="#parser.py">parser.py</a>
  &#8226;   <a href="#pkgutil">pkgutil</a>
  &#8226;   <a href="#plistlib">plistlib</a>
  &#8226;   <a href="#pydoc">pydoc</a>
@@ -7495,11 +7577,11 @@ imported by:
  &#8226;   <a href="#copy">copy</a>
  &#8226;   <a href="#functools">functools</a>
  &#8226;   <a href="#logging">logging</a>
+ &#8226;   <a href="#main.py">main.py</a>
  &#8226;   <a href="#multiprocessing.dummy">multiprocessing.dummy</a>
  &#8226;   <a href="#multiprocessing.queues">multiprocessing.queues</a>
  &#8226;   <a href="#multiprocessing.sharedctypes">multiprocessing.sharedctypes</a>
  &#8226;   <a href="#multiprocessing.util">multiprocessing.util</a>
- &#8226;   <a href="#parser.py">parser.py</a>
  &#8226;   <a href="#tempfile">tempfile</a>
  &#8226;   <a href="#unittest.signals">unittest.signals</a>
  &#8226;   <a href="#xml.sax.expatreader">xml.sax.expatreader</a>

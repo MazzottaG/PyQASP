@@ -1,0 +1,194 @@
+from Executors import ExternalCalls
+import sys,re
+from Option import LPARSE_FORMAT,FILE_UTIL
+
+class BasicGrounder:
+    zeroLine = r'0'
+    
+    def __init__(self):
+        self.input=FILE_UTIL.TO_GROUND_PROGRAM_FILE
+        self.output=FILE_UTIL.GROUND_PROGRAM_FILE
+        self.prop = ProgramProperties()
+        self.model = WellFoundedModel()
+    
+    def reset(self):
+        self.input=FILE_UTIL.TO_GROUND_PROGRAM_FILE
+        self.output=FILE_UTIL.GROUND_PROGRAM_FILE
+        self.prop = ProgramProperties()
+        self.model = WellFoundedModel()
+
+    def ground(self):
+        print("DEBUG: Basic Grounder called")
+
+    def readWellFounded(self,stdout):
+        return None
+
+    def readLParse(self,stdout,fileHandler):
+        self.prop.setCoherent(True)
+        line = self.readWellFounded(stdout)
+        if line is None:
+            print("No well-found model used")
+            line = stdout.readline().decode("UTF-8").strip()
+        self.prop.setDisjunctive(False)
+        programEnded = False
+        while line:
+            match = re.match(BasicGrounder.zeroLine,line)
+            if match:
+                programEnded=True
+            elif not programEnded:
+                lparseRule = [int(x) for x in line.split(LPARSE_FORMAT.SEPARATOR)]
+                if lparseRule[LPARSE_FORMAT.RULE_TYPE_INDEX] == LPARSE_FORMAT.DISJCUNTIVE_RULE:
+                    self.prop.setDisjunctive(True)
+                elif lparseRule[LPARSE_FORMAT.RULE_TYPE_INDEX] == LPARSE_FORMAT.SIMPLE_RULE and lparseRule[LPARSE_FORMAT.ONE_HEAD_ATOM_INDEX] == 1 and lparseRule[LPARSE_FORMAT.BODY_SIZE_INDEX] == 0:
+                    self.prop.setCoherent(False)
+            fileHandler.write(line+"\n")
+            line = stdout.readline().decode("UTF-8").strip()
+        return
+
+    def printProps(self):
+        self.prop.print()
+
+    def getWellFounded(self):
+        return self.model
+    
+    def getProps(self):
+        return self.prop
+
+class GringoWapper(BasicGrounder):
+    
+    def __init__(self):
+        super().__init__()
+
+    def ground(self):
+        print("Using Gringo")
+        f = open(self.output,"w")
+        super().readLParse(ExternalCalls.callGringo(self.input),f)
+        f.close()
+
+
+class IDLVWapper(BasicGrounder):
+    
+    def __init__(self):
+        super().__init__()
+
+    def ground(self):
+        print("Using IDLV")
+        f = open(self.output,"w")
+        super().readLParse(ExternalCalls.callIDLV(self.input),f)
+        f.close()
+
+
+class ProgramProperties:
+
+    def __init__(self):
+        self.disjunctive=None
+        self.onlyChoice=None
+        self.coherent=None
+
+    def setDisjunctive(self,disj : bool):
+        self.disjunctive = disj
+    
+    def setOnlyChoice(self,choice : bool):
+        self.onlyChoice = choice
+    
+    def setCoherent(self,coherent : bool):
+        self.coherent = coherent
+    
+    def isCoherent(self):
+        if self.coherent is None:
+            print("Warning: coherence properties not defined")
+        return self.coherent
+
+    def isDisjunctive(self):
+        if self.disjunctive is None:
+            print("Warning: disjunctive properties not defined")
+        return self.disjunctive
+
+    def isOnlyChoice(self):
+        if self.onlyChoice is None:
+            print("Warning: onlyChoice properties not defined")
+        return self.onlyChoice
+    def print(self):
+        print(f"disjunctive: {self.disjunctive}")
+        print(f"coherent: {self.coherent}")
+        print(f"onlyChoice: {self.onlyChoice}")
+
+class WellFoundedModel:
+    
+    TRUE = 0
+    UNDEFINED = 1
+    FALSE = 2
+    LABELS = ["True","Undef","False"]
+    def __init__(self):
+        self.model=[[],[],[]]
+    
+    def save(self,truth,atoms):
+        if truth not in [WellFoundedModel.TRUE,WellFoundedModel.UNDEFINED,WellFoundedModel.FALSE]:
+            print(f"Error unable to saver {atoms} for truth value {truth}")
+            return
+        self.model[truth]=atoms
+    
+    def getTrue(self):
+        return self.model[WellFoundedModel.TRUE]
+    
+    def getUndefined(self):
+        return self.model[WellFoundedModel.UNDEFINED]
+    
+    def getFalse(self):
+        return self.model[WellFoundedModel.FALSE]
+
+    def __str__(self):
+        out=[]
+        for i in [WellFoundedModel.TRUE,WellFoundedModel.UNDEFINED,WellFoundedModel.FALSE]:
+            out.append(f"{WellFoundedModel.LABELS[i]} {self.model[i]}")
+        return "\n".join(out)
+    
+        
+class DLV2Wapper(BasicGrounder):
+    
+    def __init__(self):
+        super().__init__()
+
+    preaspIncoherent = r'1 1 0 0\s*\n'
+    wellfoundedFormat = [[r'Start WellFounded Model\n',False],[r'True: \{(.*)\}\n',True],[r'Undefined: \{(.*)\}\n',True],[r'False: \{(.*)\}\n',True],[r'End WellFounded Model\n',False]]
+    wellfoundedOrder = [WellFoundedModel.TRUE,WellFoundedModel.UNDEFINED,WellFoundedModel.FALSE]
+
+    def readWellFounded(self,stdout):
+        line = stdout.readline().decode("UTF-8")
+        if not line:
+            print("Error empty stdout reading wellfounded model")
+            sys.exit(180)
+
+        match_incoherent = re.match(DLV2Wapper.preaspIncoherent,line)
+        if match_incoherent:
+            self.prop.setCoherent(False)
+            return line
+
+        readLines=0
+        for reg,read in DLV2Wapper.wellfoundedFormat:
+            match = re.match(reg,line)
+            if match:
+                if read:
+                    group = match.group(1)
+                    atoms =  []
+                    if len(group) > 0:
+                        atoms = group.split(", ")
+
+                    self.model.save(DLV2Wapper.wellfoundedOrder[readLines],atoms)
+                    readLines+=1
+            else:
+                print(f"Error: not expected line reading wellfounded {line.strip()}")
+                sys.exit(180)
+    
+            line = stdout.readline().decode("UTF-8")
+            if not line:
+                print("Error: missing lines reading wellfounded")
+                sys.exit(180)
+        return line
+
+    def ground(self):
+        stdout = ExternalCalls.callDLV2(self.input)
+        f=open(self.output,"w")
+        super().readLParse(stdout,f)
+        f.close()
+

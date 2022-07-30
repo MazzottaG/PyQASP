@@ -1,5 +1,6 @@
 %@forall
-{p1(1..6)}.
+dp1(1..6).
+{p1(X):dp1(X)}.
 :-#count{X:p1(X)}!=4.
 %@exists
 node(X):-p1(X).
