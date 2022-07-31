@@ -23,9 +23,18 @@ class FILE_UTIL:
     # DEFAULT_PATH                = ""
     ASP_PARSER_PATH             = os.path.join(DEFAULT_PATH,"resources","asp-parser","asp_parser") 
     TOOL_FOLDER_PATH            = os.path.join(DEFAULT_PATH,"resources","old-tool")
+    
     QUABS_PATH                  = os.path.join(DEFAULT_PATH,"resources","qbf_solvers","quabs")
+    DEPQBF_PATH                 = os.path.join(TOOL_FOLDER_PATH,"depqbf")
+    RAREQS_NN_PATH              = os.path.join(TOOL_FOLDER_PATH,"rareqs-nn")
+    
+    QCIR_CONV_PATH              = os.path.join(TOOL_FOLDER_PATH,"qcir-conv.py")
+    BLOQQER37_PATH              = os.path.join(TOOL_FOLDER_PATH,"bloqqer37")
+    FMLA_PATH                   = os.path.join(TOOL_FOLDER_PATH,"fmla")
+    
     GRINGO_PATH                 = os.path.join(TOOL_FOLDER_PATH,"gringo")        
     DLV2_PATH                   = os.path.join(TOOL_FOLDER_PATH,"dlv2")          
+    
     LPSHIFT_PATH                = os.path.join(TOOL_FOLDER_PATH,"lpshift-1.4")   
     LP2NORMAL_PATH              = os.path.join(TOOL_FOLDER_PATH,"lp2normal-2.27")
     LP2SAT_PATH                 = os.path.join(TOOL_FOLDER_PATH,"lp2sat-1.24")   
@@ -38,6 +47,7 @@ class FILE_UTIL:
     GATES_PROGRAM_FILE          = os.path.join(FILES_FOLDER_PATH,"builder.qcir")
     
     LOG_ERROR                   = os.path.join(FILES_FOLDER_PATH,"log.err")
+
     
 class DIMACS_FORMAT:
     DIMACS_COMMENT_VAR_INDEX    = 1
@@ -63,7 +73,8 @@ class QASP_FORMAT:
 class REGEX_UTIL:
     QASP_QUANTIFIER             = r'\s*%@(forall|exists|constraint)\s*\n'
     QCIR_QUANTIFIER             = r'(forall|exists|constraint)\((.*)\)\n'
-    QCIR_GATE                = r'\d+=(or|and)\((.*)\)\n'
+    QCIR_GATE                   = r'\d+=(or|and)\((.*)\)\n'
+    RAREQS_OUT                  = r's cnf (0|1)\n'
 
 class ASP_PARSER_FORMAT:
     HEAD_PREDICATE_PREFIX       = 0
@@ -74,3 +85,11 @@ class QUABS_OUTPUT:
     SAT                         = "SAT"
     UNSAT                       = "UNSAT"
     MODEL_START                 = "V"
+
+class RAREQS_OUTPUT:
+    SAT                         = "1"
+    UNSAT                       = "0"
+
+class PYQASP_OUTPUT:
+    SAT                         = "SATISFIABLE"
+    UNSAT                       = "UNSATISFIABLE"

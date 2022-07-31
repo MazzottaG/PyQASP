@@ -7,7 +7,9 @@ from Solver import *
 import argparse
 
 SOLVERS = {
-    "quabs":Quabs()
+    "quabs":Quabs(),
+    "depqbf":Depqbf(),
+    "rareqs":Rareqs()
 }
 GROUNDERS = {
     "gringo":GringoWapper(),
@@ -40,6 +42,8 @@ if ns.groundername:
         print("Error: Unable to find grounder")
         sys.exit(180)
     grounder = GROUNDERS[ns.groundername]
+
+grounder.printName()
 
 ExternalCalls.LOG_FILE_HANDLER = open(FILE_UTIL.LOG_ERROR,"w")
 symbols = SymbolTable()

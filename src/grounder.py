@@ -10,12 +10,16 @@ class BasicGrounder:
         self.output=FILE_UTIL.GROUND_PROGRAM_FILE
         self.prop = ProgramProperties()
         self.model = WellFoundedModel()
+        self.usingWellFounded=False
     
     def reset(self):
         self.input=FILE_UTIL.TO_GROUND_PROGRAM_FILE
         self.output=FILE_UTIL.GROUND_PROGRAM_FILE
         self.prop = ProgramProperties()
         self.model = WellFoundedModel()
+    
+    def printName(self):
+        print("Empty Grounder")
 
     def ground(self):
         print("DEBUG: Basic Grounder called")
@@ -27,7 +31,8 @@ class BasicGrounder:
         self.prop.setCoherent(True)
         line = self.readWellFounded(stdout)
         if line is None:
-            print("No well-found model used")
+            if self.usingWellFounded:
+                print("No well-found model used")
             line = stdout.readline().decode("UTF-8").strip()
         self.prop.setDisjunctive(False)
         programEnded = False
@@ -60,11 +65,12 @@ class GringoWapper(BasicGrounder):
         super().__init__()
 
     def ground(self):
-        print("Using Gringo")
         f = open(self.output,"w")
         super().readLParse(ExternalCalls.callGringo(self.input),f)
         f.close()
 
+    def printName(self):
+        print("Gringo Grounder")
 
 class IDLVWapper(BasicGrounder):
     
@@ -72,11 +78,12 @@ class IDLVWapper(BasicGrounder):
         super().__init__()
 
     def ground(self):
-        print("Using IDLV")
         f = open(self.output,"w")
         super().readLParse(ExternalCalls.callIDLV(self.input),f)
         f.close()
 
+    def printName(self):
+        print("IDLV Grounder")
 
 class ProgramProperties:
 
@@ -148,6 +155,7 @@ class DLV2Wapper(BasicGrounder):
     
     def __init__(self):
         super().__init__()
+        self.usingWellFounded=True
 
     preaspIncoherent = r'1 1 0 0\s*\n'
     wellfoundedFormat = [[r'Start WellFounded Model\n',False],[r'True: \{(.*)\}\n',True],[r'Undefined: \{(.*)\}\n',True],[r'False: \{(.*)\}\n',True],[r'End WellFounded Model\n',False]]
@@ -185,10 +193,12 @@ class DLV2Wapper(BasicGrounder):
                 print("Error: missing lines reading wellfounded")
                 sys.exit(180)
         return line
-
+    
     def ground(self):
         stdout = ExternalCalls.callDLV2(self.input)
         f=open(self.output,"w")
         super().readLParse(stdout,f)
         f.close()
 
+    def printName(self):
+        print("IDLV + WellFounded")

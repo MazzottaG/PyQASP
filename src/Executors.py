@@ -43,3 +43,20 @@ class ExternalCalls:
 
     def callSolver(cmd:list):
         return subprocess.Popen(cmd,stdout=subprocess.PIPE,stderr=ExternalCalls.LOG_FILE_HANDLER).stdout
+
+    def callSolverPipeline(cmds: list):
+        steps = []
+        # print("Executing: "," | ".join([" ".join(cmd) for cmd in cmds]))
+        for cmd in cmds:
+            currentProc = None
+            if len(steps) > 0:
+                currentProc = subprocess.Popen(cmd,stdin=steps[-1].stdout,stdout=subprocess.PIPE,stderr=ExternalCalls.LOG_FILE_HANDLER)
+            else:
+                currentProc = subprocess.Popen(cmd,stdout=subprocess.PIPE,stderr=ExternalCalls.LOG_FILE_HANDLER)
+            steps.append(currentProc)
+        
+        if len(steps) <= 0:
+            print("Error: empty solving pipeline")
+            sys.exit(180)
+
+        return steps[-1].stdout

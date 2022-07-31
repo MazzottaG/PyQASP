@@ -1,0 +1,7 @@
+Done reading file, 0.0014 sec
+Done prenexing, 0.0020 sec
+Done CombineSimplify ( 2 combined, 19 gates elim, 18 mono lits elim), 0.0041 sec
+Done CombineSimplify ( 0 combined, 53 gates elim,  0 mono lits elim), 0.0056 sec
+Done CombineSimplify ( 1 combined, 17 gates elim,  0 mono lits elim), 0.0067 sec
+Done CombineSimplify ( 0 combined, 42 gates elim,  0 mono lits elim), 0.0076 sec
+**Problem is trivially false.**

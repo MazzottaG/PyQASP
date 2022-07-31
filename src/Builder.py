@@ -18,7 +18,7 @@ class QCIRBuilder:
         phi = self.symbols.addExtraSymbol()
         self.subformulas.append(phi)
         self.quantifiers.append(QASP_FORMAT.QEXISTS)
-        self.gatesFileHandler.write(f"{phi}=or()\n")
+        self.gatesFileHandler.write(f"{phi} = or( )\n")
         
     def addCnf(self,wellfounded,properties,level,quantifier):
         builder = CNFBuilder(wellfounded,properties,self.symbols,level,self.gatesFileHandler)
@@ -50,7 +50,7 @@ class QCIRBuilder:
                     op = QCIR_FORMAT.OR_GATE
 
                 gate = self.symbols.addExtraSymbol()
-                self.gatesFileHandler.write(f"{gate}={op}({phi},{currentGate})\n")
+                self.gatesFileHandler.write(f"{gate} = {op}({phi},{currentGate})\n")
                 currentGate=gate
             out_var = currentGate
         
@@ -104,12 +104,12 @@ class CNFBuilder:
             clause.append(str(sign * self.variableMapping[sat_var]))
         gate = self.symbolTable.addExtraSymbol()
         clause = ",".join(clause)
-        self.gatesFileHandler.write(f"{gate}={QCIR_FORMAT.OR_GATE}({clause})\n")
+        self.gatesFileHandler.write(f"{gate} = {QCIR_FORMAT.OR_GATE}({clause})\n")
         self.gates.append(str(gate))
     
     def addUnitClause(self,lit):
         gate = self.symbolTable.addExtraSymbol()
-        self.gatesFileHandler.write(f"{gate}={QCIR_FORMAT.OR_GATE}({str(lit)})\n")
+        self.gatesFileHandler.write(f"{gate} = {QCIR_FORMAT.OR_GATE}({str(lit)})\n")
         self.gates.append(str(gate))
     
     def assign(self,atoms,truth):
@@ -142,4 +142,4 @@ class CNFBuilder:
 
         self.phi = self.symbolTable.addExtraSymbol()
         gates = ",".join(self.gates)
-        self.gatesFileHandler.write(f"{self.phi}={QCIR_FORMAT.AND_GATE}({gates})\n")
+        self.gatesFileHandler.write(f"{self.phi} = {QCIR_FORMAT.AND_GATE}({gates})\n")
