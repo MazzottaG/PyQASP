@@ -1,4 +1,2 @@
 
-:- unstable, not nonPref.
-{nonPref}.
-{unstable}.
+:- #count{ X : inClique(X) } < K,bound(K).  

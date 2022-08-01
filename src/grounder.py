@@ -37,8 +37,11 @@ class BasicGrounder:
         self.prop.setDisjunctive(False)
         if DEFAULT_PROPERTIES.ONLY_CHOICE:
             self.prop.setOnlyChoice(True)
+        self.prop.setEmpty(True)
+
         programEnded = False
         atomTableEnded = False
+        
         while line:
             match = re.match(BasicGrounder.zeroLine,line)
             if match:
@@ -48,6 +51,7 @@ class BasicGrounder:
             elif not programEnded:
                 match = re.match(r'1 1 1 0 1\n{0,1}',line)
                 if not match:
+                    self.prop.setEmpty(False)
                     lparseRule = [int(x) for x in line.split(LPARSE_FORMAT.SEPARATOR)]
                     if lparseRule[LPARSE_FORMAT.RULE_TYPE_INDEX] == LPARSE_FORMAT.DISJCUNTIVE_RULE:
                         self.prop.setDisjunctive(True)
@@ -109,6 +113,7 @@ class ProgramProperties:
         self.disjunctive=None
         self.onlyChoice=None
         self.coherent=None
+        self.empty=None
 
     def setDisjunctive(self,disj : bool):
         self.disjunctive = disj
@@ -119,10 +124,18 @@ class ProgramProperties:
     def setCoherent(self,coherent : bool):
         self.coherent = coherent
     
+    def setEmpty(self,empty : bool):
+        self.empty = empty
+    
     def isCoherent(self):
         if self.coherent is None:
             print("Warning: coherence properties not defined")
         return self.coherent
+    
+    def isEmpty(self):
+        if self.empty is None:
+            print("Warning: coherence properties not defined")
+        return self.empty
 
     def isDisjunctive(self):
         if self.disjunctive is None:

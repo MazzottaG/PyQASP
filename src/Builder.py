@@ -20,30 +20,33 @@ class QCIRBuilder:
         self.subformulas.append(phi)
         self.quantifiers.append(QASP_FORMAT.QEXISTS)
         self.gatesFileHandler.write(f"{phi} = or( )\n")
-        
-    def addEmptyCnf(self,wellfounded,properties,level,quantifier,currentDomainFacts):
-        self.subformulas.append(builder.getPhi())
+    
+    def addVerum(self,quantifier):
+        phi = self.symbols.addExtraSymbol()
+        self.subformulas.append(phi)
         self.quantifiers.append(quantifier)
-        quant = QCIR_FORMAT.EXISTS
-        if quantifier != QASP_FORMAT.QCONSTRAINT:
-            quant = quantifier
-        vars_ = ",".join([str(x) for x in builder.getFreshVariables()])
-        self.qbfFileHandler.write(f"{quant}({vars_})\n")
+        self.gatesFileHandler.write(f"{phi} = and( )\n")
     
     def addCnf(self,wellfounded,properties,level,quantifier,currentDomainFacts):
-        builder = CNFBuilder(wellfounded,properties,self.symbols,level,self.gatesFileHandler)
-        built = builder.buildCurrentCNF(currentDomainFacts)
-        currentPhi = None
-        if built:
-            currentPhi = builder.getPhi()
-        self.subformulas.append(currentPhi)
-        self.quantifiers.append(quantifier)
-        quant = QCIR_FORMAT.EXISTS
-        if quantifier != QASP_FORMAT.QCONSTRAINT:
-            quant = quantifier
-        vars_ = ",".join([str(x) for x in builder.getFreshVariables()])
-        self.qbfFileHandler.write(f"{quant}({vars_})\n")
         
+        # current program is coherent 
+        if properties.isEmpty() == False:
+            builder = CNFBuilder(wellfounded,properties,self.symbols,level,self.gatesFileHandler)
+            built = builder.buildCurrentCNF(currentDomainFacts)
+            currentPhi = None
+            if built:
+                currentPhi = builder.getPhi()
+            self.subformulas.append(currentPhi)
+            self.quantifiers.append(quantifier)
+            quant = QCIR_FORMAT.EXISTS
+            if quantifier != QASP_FORMAT.QCONSTRAINT:
+                quant = quantifier
+            vars_ = ",".join([str(x) for x in builder.getFreshVariables()])
+            self.qbfFileHandler.write(f"{quant}({vars_})\n")
+        else:
+            print("Warning: empty program found at level",level)
+            self.addVerum(quantifier)
+
     def finalize(self):
         out_var = None
         if len(self.subformulas) == 0:
