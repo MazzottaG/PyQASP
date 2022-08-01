@@ -1,6 +1,7 @@
-from Option import FILE_UTIL,DIMACS_FORMAT,QCIR_FORMAT,QASP_FORMAT
+from Option import FILE_UTIL,DIMACS_FORMAT,QCIR_FORMAT,QASP_FORMAT,DEFAULT_PROPERTIES
 from Executors import ExternalCalls
 from Structures import SymbolTable
+import sys
 
 class QCIRBuilder:
     
@@ -20,10 +21,22 @@ class QCIRBuilder:
         self.quantifiers.append(QASP_FORMAT.QEXISTS)
         self.gatesFileHandler.write(f"{phi} = or( )\n")
         
+    def addEmptyCnf(self,wellfounded,properties,level,quantifier,currentDomainFacts):
+        self.subformulas.append(builder.getPhi())
+        self.quantifiers.append(quantifier)
+        quant = QCIR_FORMAT.EXISTS
+        if quantifier != QASP_FORMAT.QCONSTRAINT:
+            quant = quantifier
+        vars_ = ",".join([str(x) for x in builder.getFreshVariables()])
+        self.qbfFileHandler.write(f"{quant}({vars_})\n")
+    
     def addCnf(self,wellfounded,properties,level,quantifier,currentDomainFacts):
         builder = CNFBuilder(wellfounded,properties,self.symbols,level,self.gatesFileHandler)
-        builder.buildCurrentCNF(currentDomainFacts)
-        self.subformulas.append(builder.getPhi())
+        built = builder.buildCurrentCNF(currentDomainFacts)
+        currentPhi = None
+        if built:
+            currentPhi = builder.getPhi()
+        self.subformulas.append(currentPhi)
         self.quantifiers.append(quantifier)
         quant = QCIR_FORMAT.EXISTS
         if quantifier != QASP_FORMAT.QCONSTRAINT:
@@ -44,6 +57,8 @@ class QCIRBuilder:
             currentGate = self.subformulas[-1]
             for i in range(len(self.subformulas)-2,-1,-1):
                 phi = self.subformulas[i]
+                if phi is None:
+                    continue
                 op = QCIR_FORMAT.AND_GATE
                 if self.quantifiers[i] == QASP_FORMAT.QFORALL:
                     phi = -phi
@@ -79,6 +94,12 @@ class CNFBuilder:
 
     def getPhi(self):
         return self.phi
+
+    def addAtom(self,atom):
+        var, lev, truth = self.symbolTable.addSymbol(atom,self.level)
+        
+        if lev == self.level:
+            self.freshVariables.add(str(var))
 
     def readAtom(self,fields):
         sat_var = int(fields[DIMACS_FORMAT.DIMACS_COMMENT_VAR_INDEX])
@@ -129,6 +150,17 @@ class CNFBuilder:
         if disjunctive == None:
             print("Error: disjunctive properties is missing")
             sys.exit(180)
+        if DEFAULT_PROPERTIES.ONLY_CHOICE:
+            onlyChoice = self.prop.isOnlyChoice()
+            if onlyChoice == None:
+                print("Error: onlyChoice properties is missing")
+                sys.exit(180)
+            else:
+                if onlyChoice and self.model.onlyUndef():
+                    for atom in self.model.getUndefined():
+                        self.addAtom(atom)
+                    return False
+        
         stdout = ExternalCalls.callPipeline(FILE_UTIL.GROUND_PROGRAM_FILE,disjunctive)
         line=stdout.readline().decode("UTF-8").strip()
         while line:
@@ -144,3 +176,4 @@ class CNFBuilder:
         self.phi = self.symbolTable.addExtraSymbol()
         gates = ",".join(self.gates)
         self.gatesFileHandler.write(f"{self.phi} = {QCIR_FORMAT.AND_GATE}({gates})\n")
+        return True

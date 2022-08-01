@@ -43,7 +43,6 @@ class QASPParser:
             if quantifier != QASP_FORMAT.QFORALL:
                 self.qcirBuilder.addFalsum()
             return False
-        
         self.qcirBuilder.addCnf(self.grounder.getWellFounded(),self.grounder.getProps(),level,quantifier,self.currentDomainFacts)
         return True    
     

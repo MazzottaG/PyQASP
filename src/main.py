@@ -1,5 +1,5 @@
 from grounder import *
-from Option import FILE_UTIL,QASP_FORMAT
+from Option import FILE_UTIL,QASP_FORMAT,DEFAULT_PROPERTIES
 from Builder import QCIRBuilder
 from Structures import SymbolTable
 from AspParser import QASPParser
@@ -28,8 +28,13 @@ argparser.add_argument('-err','--errorfile', dest="logfile",  type=str, help='Pa
 argparser.add_argument('-g','--grounder', dest="groundername",  type=str, help='available grounders : '+str(GROUNDERS_DESC))
 argparser.add_argument('-s','--solver', dest="solvername",  type=str, help='available solvers : '+str(list(SOLVERS.keys())))
 argparser.add_argument('-pq','--print-qcir', dest="qcir_file",  type=str, help='output qcir filename')
+argparser.add_argument('--no-choice-opt', dest="disable_choice_check", default=False, action='store_true')
 
 ns = argparser.parse_args()
+
+if ns.disable_choice_check:
+    DEFAULT_PROPERTIES.ONLY_CHOICE = False
+
 if ns.qcir_file:
     FILE_UTIL.QBF_PROGRAM_FILE=ns.qcir_file
 

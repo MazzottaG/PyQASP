@@ -93,3 +93,6 @@ class RAREQS_OUTPUT:
 class PYQASP_OUTPUT:
     SAT                         = "SATISFIABLE"
     UNSAT                       = "UNSATISFIABLE"
+
+class DEFAULT_PROPERTIES:
+    ONLY_CHOICE                 = True

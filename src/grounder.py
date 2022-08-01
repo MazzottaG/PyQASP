@@ -1,6 +1,6 @@
 from Executors import ExternalCalls
 import sys,re
-from Option import LPARSE_FORMAT,FILE_UTIL
+from Option import LPARSE_FORMAT,FILE_UTIL,REGEX_UTIL,DEFAULT_PROPERTIES
 
 class BasicGrounder:
     zeroLine = r'0'
@@ -35,17 +35,35 @@ class BasicGrounder:
                 print("No well-found model used")
             line = stdout.readline().decode("UTF-8").strip()
         self.prop.setDisjunctive(False)
+        if DEFAULT_PROPERTIES.ONLY_CHOICE:
+            self.prop.setOnlyChoice(True)
         programEnded = False
+        atomTableEnded = False
         while line:
             match = re.match(BasicGrounder.zeroLine,line)
             if match:
+                if programEnded:
+                    atomTableEnded = True
                 programEnded=True
             elif not programEnded:
-                lparseRule = [int(x) for x in line.split(LPARSE_FORMAT.SEPARATOR)]
-                if lparseRule[LPARSE_FORMAT.RULE_TYPE_INDEX] == LPARSE_FORMAT.DISJCUNTIVE_RULE:
-                    self.prop.setDisjunctive(True)
-                elif lparseRule[LPARSE_FORMAT.RULE_TYPE_INDEX] == LPARSE_FORMAT.SIMPLE_RULE and lparseRule[LPARSE_FORMAT.ONE_HEAD_ATOM_INDEX] == 1 and lparseRule[LPARSE_FORMAT.BODY_SIZE_INDEX] == 0:
-                    self.prop.setCoherent(False)
+                match = re.match(r'1 1 1 0 1\n{0,1}',line)
+                if not match:
+                    lparseRule = [int(x) for x in line.split(LPARSE_FORMAT.SEPARATOR)]
+                    if lparseRule[LPARSE_FORMAT.RULE_TYPE_INDEX] == LPARSE_FORMAT.DISJCUNTIVE_RULE:
+                        self.prop.setDisjunctive(True)
+                        if DEFAULT_PROPERTIES.ONLY_CHOICE:
+                            self.prop.setOnlyChoice(False)
+                    elif lparseRule[LPARSE_FORMAT.RULE_TYPE_INDEX] == LPARSE_FORMAT.SIMPLE_RULE and lparseRule[LPARSE_FORMAT.ONE_HEAD_ATOM_INDEX] == 1 and lparseRule[LPARSE_FORMAT.BODY_SIZE_INDEX] == 0:
+                        self.prop.setCoherent(False)
+                    
+                    if lparseRule[LPARSE_FORMAT.RULE_TYPE_INDEX] != LPARSE_FORMAT.CHOICE_RULE or lparseRule[LPARSE_FORMAT.BODY_SIZE_INDEX+lparseRule[LPARSE_FORMAT.HEAD_LENGHT_INDEX]] > 0:
+                        if DEFAULT_PROPERTIES.ONLY_CHOICE:
+                            self.prop.setOnlyChoice(False)
+            elif not atomTableEnded and not self.usingWellFounded:
+                varStr, atom = line.split(LPARSE_FORMAT.SEPARATOR)
+                self.model.addUndef(atom)
+                    
+
             fileHandler.write(line+"\n")
             line = stdout.readline().decode("UTF-8").strip()
         return
@@ -134,7 +152,13 @@ class WellFoundedModel:
             print(f"Error unable to saver {atoms} for truth value {truth}")
             return
         self.model[truth]=atoms
-    
+
+    def addUndef(self,atom):
+        self.model[WellFoundedModel.UNDEFINED].append(atom)
+
+    def onlyUndef(self):
+        return len(self.model[WellFoundedModel.TRUE]) == 0 and len(self.model[WellFoundedModel.FALSE])==0
+
     def getTrue(self):
         return self.model[WellFoundedModel.TRUE]
     
