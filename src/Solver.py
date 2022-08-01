@@ -10,6 +10,7 @@ class OutputBuilder:
         while line:
             print(line)
             line = stdout.readline().decode("UTF-8").strip()
+            
 class RareqsOutputBuilder(OutputBuilder):
     
     def printOuput(self,symbolTable:SymbolTable,isFirstForall,stdout):

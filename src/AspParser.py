@@ -10,6 +10,7 @@ class QASPParser:
         self.symbols = symbolTable
         self.qcirBuilder = QCIRBuilder(self.symbols)
         self.grounder = grounder
+        self.currentDomainFacts = []
     
     def addDomains(self,fileHandler):
         fileHandler.close()
@@ -26,7 +27,10 @@ class QASPParser:
                 var,level = data
                 truth = self.symbols.getTruthValue(var)
                 if truth == SymbolTable.TRUE:
-                    fileHandler.write(f"{atom}.\n")    
+                    fileHandler.write(f"{atom}.\n")
+                    while len(self.currentDomainFacts)<=var:
+                        self.currentDomainFacts.append(False)
+                    self.currentDomainFacts[var] = True
                 elif truth == SymbolTable.UNDEF:
                     fileHandler.write("{"+atom+"}.\n")
             line = stdout.readline().decode("UTF-8").strip()
@@ -40,7 +44,7 @@ class QASPParser:
                 self.qcirBuilder.addFalsum()
             return False
         
-        self.qcirBuilder.addCnf(self.grounder.getWellFounded(),self.grounder.getProps(),level,quantifier)
+        self.qcirBuilder.addCnf(self.grounder.getWellFounded(),self.grounder.getProps(),level,quantifier,self.currentDomainFacts)
         return True    
     
     def parse(self):
@@ -62,6 +66,7 @@ class QASPParser:
                         exit(180)
                     if currentQuantifier == newQuantifier:
                         continue
+
                     self.addDomains(toGroundFileHandler)
                     toGroundFileHandler.close()
                     if not self.transform(level,currentQuantifier):
@@ -70,14 +75,20 @@ class QASPParser:
                     level+=1
                 toGroundFileHandler = open(FILE_UTIL.TO_GROUND_PROGRAM_FILE,"w")
                 currentQuantifier=newQuantifier
-            else:
+                self.currentDomainFacts=[]
+                
+            elif currentQuantifier != None:
                 toGroundFileHandler.write(f"{line}")
+            else:
+                print(f"Skipping not quantifed rule {line}")
+
             
         if not stop:
             if currentQuantifier == QASP_FORMAT.QCONSTRAINT:
                 self.addDomains(toGroundFileHandler)
                 toGroundFileHandler.close()
                 self.transform(level,currentQuantifier)
+                self.currentDomainFacts=[]
             else:
                 print("Error: Missing Constraint")
                 sys.exit(180)

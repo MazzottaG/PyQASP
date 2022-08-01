@@ -1,14 +1,4 @@
-:-match(X,Y),W=X+Y,W>=Z,c(Z).
-{c(1)}.
-{c(2)}.
-{c(3)}.
-{c(4)}.
-{match(1,1)}.
-{match(1,2)}.
-{match(1,3)}.
-{match(2,1)}.
-{match(2,2)}.
-{match(2,3)}.
-{match(3,1)}.
-{match(3,2)}.
-{match(3,3)}.
+
+:- unstable, not nonPref.
+{nonPref}.
+{unstable}.

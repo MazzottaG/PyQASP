@@ -20,9 +20,9 @@ class QCIRBuilder:
         self.quantifiers.append(QASP_FORMAT.QEXISTS)
         self.gatesFileHandler.write(f"{phi} = or( )\n")
         
-    def addCnf(self,wellfounded,properties,level,quantifier):
+    def addCnf(self,wellfounded,properties,level,quantifier,currentDomainFacts):
         builder = CNFBuilder(wellfounded,properties,self.symbols,level,self.gatesFileHandler)
-        builder.buildCurrentCNF()
+        builder.buildCurrentCNF(currentDomainFacts)
         self.subformulas.append(builder.getPhi())
         self.quantifiers.append(quantifier)
         quant = QCIR_FORMAT.EXISTS
@@ -112,18 +112,19 @@ class CNFBuilder:
         self.gatesFileHandler.write(f"{gate} = {QCIR_FORMAT.OR_GATE}({str(lit)})\n")
         self.gates.append(str(gate))
     
-    def assign(self,atoms,truth):
+    def assign(self,atoms,truth,currentDomainFacts):
         for atom in atoms:
             var,level = self.symbolTable.assign(atom,truth,self.level)
             if level == self.level:
                 self.freshVariables.add(str(var) if var >=0 else str(-var))
-            self.addUnitClause(var)
+            if truth != self.symbolTable.TRUE or var >= len(currentDomainFacts) or currentDomainFacts[var]==False:
+                self.addUnitClause(var)
 
-    def addWellFoundedClauses(self):
-        self.assign(self.model.getTrue(),SymbolTable.TRUE)
-        self.assign(self.model.getFalse(),SymbolTable.FALSE)
+    def addWellFoundedClauses(self,currentDomainFacts):
+        self.assign(self.model.getTrue(),SymbolTable.TRUE,currentDomainFacts)
+        self.assign(self.model.getFalse(),SymbolTable.FALSE,currentDomainFacts)
 
-    def buildCurrentCNF(self):
+    def buildCurrentCNF(self,currentDomainFacts):
         disjunctive = self.prop.isDisjunctive()
         if disjunctive == None:
             print("Error: disjunctive properties is missing")
@@ -138,7 +139,7 @@ class CNFBuilder:
                 else:
                     self.readClause(fields)
             line=stdout.readline().decode("UTF-8").strip()
-        self.addWellFoundedClauses()
+        self.addWellFoundedClauses(currentDomainFacts)
 
         self.phi = self.symbolTable.addExtraSymbol()
         gates = ",".join(self.gates)
