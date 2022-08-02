@@ -4,8 +4,16 @@ from Builder import QCIRBuilder
 from Structures import SymbolTable
 from AspParser import QASPParser
 from Solver import *
-import argparse
+import argparse,signal
 
+ExternalCalls.LOG_FILE_HANDLER = None
+def handler(signum, frame):
+    print('Sig term', signum)
+    if not ExternalCalls.LOG_FILE_HANDLER is None:
+        ExternalCalls.LOG_FILE_HANDLER.close() 
+    sys.exit(180)
+    
+signal.signal(signal.SIGTERM, handler)
 SOLVERS = {
     "quabs":Quabs(),
     "depqbf":Depqbf(),
