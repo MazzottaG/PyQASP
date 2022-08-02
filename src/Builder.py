@@ -32,7 +32,7 @@ class QCIRBuilder:
         # current program is coherent 
         if properties.isEmpty() == False:
             builder = CNFBuilder(wellfounded,properties,self.symbols,level,self.gatesFileHandler)
-            built = builder.buildCurrentCNF(currentDomainFacts)
+            built = builder.buildCurrentCNF(currentDomainFacts,quantifier == QASP_FORMAT.QCONSTRAINT)
             currentPhi = None
             if built:
                 currentPhi = builder.getPhi()
@@ -42,7 +42,8 @@ class QCIRBuilder:
             if quantifier != QASP_FORMAT.QCONSTRAINT:
                 quant = quantifier
             vars_ = ",".join([str(x) for x in builder.getFreshVariables()])
-            self.qbfFileHandler.write(f"{quant}({vars_})\n")
+            if len(vars_)>0:
+                self.qbfFileHandler.write(f"{quant}({vars_})\n")
         else:
             print("Warning: empty program found at level",level)
             self.addVerum(quantifier)
@@ -148,12 +149,12 @@ class CNFBuilder:
         self.assign(self.model.getTrue(),SymbolTable.TRUE,currentDomainFacts)
         self.assign(self.model.getFalse(),SymbolTable.FALSE,currentDomainFacts)
 
-    def buildCurrentCNF(self,currentDomainFacts):
+    def buildCurrentCNF(self,currentDomainFacts,isConstraint):
         disjunctive = self.prop.isDisjunctive()
         if disjunctive == None:
             print("Error: disjunctive properties is missing")
             sys.exit(180)
-        if DEFAULT_PROPERTIES.ONLY_CHOICE:
+        if DEFAULT_PROPERTIES.ONLY_CHOICE and not isConstraint:
             onlyChoice = self.prop.isOnlyChoice()
             if onlyChoice == None:
                 print("Error: onlyChoice properties is missing")
