@@ -73,7 +73,7 @@ class QASP_FORMAT:
 class REGEX_UTIL:
     QASP_QUANTIFIER             = r'\s*%@(forall|exists|constraint)\s*\n'
     QCIR_QUANTIFIER             = r'(forall|exists|constraint)\((.*)\)\n'
-    QCIR_GATE                   = r'\d+=(or|and)\((.*)\)\n'
+    QCIR_GATE                   = r'\d+ = (or|and)\((.*)\)\n'
     RAREQS_OUT                  = r's cnf (0|1)\n'
 
 class ASP_PARSER_FORMAT:
@@ -96,3 +96,4 @@ class PYQASP_OUTPUT:
 
 class DEFAULT_PROPERTIES:
     ONLY_CHOICE                 = True
+    SKIP_QCIR_CONV_FOR_QDIMACS  = True

@@ -2,6 +2,53 @@ from Option import FILE_UTIL,DIMACS_FORMAT,QCIR_FORMAT,QASP_FORMAT,DEFAULT_PROPE
 from Executors import ExternalCalls
 from Structures import SymbolTable
 import sys
+class QCIRProps:
+    def __init__(self):
+        self.clauseCount=0
+        self.quiteCNF=True
+        self.variablesCount=0
+        self.levelsCount=0
+        self.lastSymbol=0
+
+    def printProps(self):
+        print("clauseCount    :",self.clauseCount)
+        print("quiteCNF       :",self.quiteCNF)
+        print("variablesCount :",self.variablesCount)
+        print("levelsCount    :",self.levelsCount)
+        print("lastSymbol     :",self.lastSymbol)
+
+    def incrementClauses(self,newClauses: int):
+        self.clauseCount+=newClauses
+    
+    def setQuiteCnf(self,quite : bool):
+        self.quiteCNF=quite
+    
+    def setVariablesCount(self,vars_: int):
+        self.variablesCount=vars_
+    
+    def setLevelsCount(self,levels: int):
+        self.levelsCount=levels
+    
+    def setLastSymbo(self,lastSymbol: int):
+        self.lastSymbol=lastSymbol
+
+    def addLevel(self):
+        self.levelsCount+=1
+
+    def isQuiteCnf(self):
+        return self.quiteCNF
+
+    def getClausesCount(self):
+        return self.clauseCount
+
+    def getVariablesCount(self):
+        return self.variablesCount
+    
+    def getLevelsCount(self):
+        return self.levelsCount
+    
+    def getLastSymbol(self):
+        return self.lastSymbol
 
 class QCIRBuilder:
     
@@ -9,6 +56,8 @@ class QCIRBuilder:
         self.subformulas=[]
         self.quantifiers=[]
         self.symbols = symbolTable
+
+        self.props = QCIRProps()
         
         self.qbfFileHandler = open(FILE_UTIL.QBF_PROGRAM_FILE,"w")
         self.qbfFileHandler.write(f"{QCIR_FORMAT.HEADER}\n")
@@ -16,6 +65,8 @@ class QCIRBuilder:
         self.gatesFileHandler = open(FILE_UTIL.GATES_PROGRAM_FILE,"w")
     
     def addFalsum(self):
+        # used for incoherent programs
+        # incoherent forall stops the cnf at previous level
         phi = self.symbols.addExtraSymbol()
         self.subformulas.append(phi)
         self.quantifiers.append(QASP_FORMAT.QEXISTS)
@@ -24,6 +75,8 @@ class QCIRBuilder:
     def addVerum(self,quantifier):
         phi = self.symbols.addExtraSymbol()
         self.subformulas.append(phi)
+        if quantifier == QASP_FORMAT.QFORALL:
+            self.props.setQuiteCnf(False)
         self.quantifiers.append(quantifier)
         self.gatesFileHandler.write(f"{phi} = and( )\n")
     
@@ -35,24 +88,35 @@ class QCIRBuilder:
             built = builder.buildCurrentCNF(currentDomainFacts,quantifier == QASP_FORMAT.QCONSTRAINT)
             currentPhi = None
             if built:
+                if quantifier == QASP_FORMAT.QFORALL:
+                    self.props.setQuiteCnf(False)
+                self.props.incrementClauses(builder.getClausesCount())
                 currentPhi = builder.getPhi()
             self.subformulas.append(currentPhi)
             self.quantifiers.append(quantifier)
             quant = QCIR_FORMAT.EXISTS
             if quantifier != QASP_FORMAT.QCONSTRAINT:
                 quant = quantifier
+                
+                    
             vars_ = ",".join([str(x) for x in builder.getFreshVariables()])
             if len(vars_)>0:
                 self.qbfFileHandler.write(f"{quant}({vars_})\n")
         else:
             print("Warning: empty program found at level",level)
             self.addVerum(quantifier)
+    
+    def getProps(self):
+        return self.props
 
     def finalize(self):
+        symbolsCount = self.symbols.getSymbolsCount()
+        self.props.setLastSymbo(symbolsCount)
         out_var = None
         if len(self.subformulas) == 0:
             print("Error: empty program")
             sys.exit(0)
+        self.props.addLevel()
         if len(self.subformulas) == 1:
             out_var = self.subformulas[-1]
             if self.quantifiers[-1] == QASP_FORMAT.QFORALL:
@@ -63,8 +127,10 @@ class QCIRBuilder:
                 phi = self.subformulas[i]
                 if phi is None:
                     continue
+                self.props.addLevel()
                 op = QCIR_FORMAT.AND_GATE
                 if self.quantifiers[i] == QASP_FORMAT.QFORALL:
+                    self.quiteCNF = False
                     phi = -phi
                     op = QCIR_FORMAT.OR_GATE
 
@@ -73,6 +139,8 @@ class QCIRBuilder:
                 currentGate=gate
             out_var = currentGate
         
+        self.props.setVariablesCount(symbolsCount - self.props.getClausesCount() - self.props.getLevelsCount())
+
         self.gatesFileHandler.close()
         self.qbfFileHandler.write(f"{QCIR_FORMAT.OUTPUT}({out_var})\n")
         self.qbfFileHandler.close()
@@ -93,6 +161,9 @@ class CNFBuilder:
         self.freshVariables = set()
         self.phi=None
     
+    def getClausesCount(self):
+        return len(self.gates)
+
     def getFreshVariables(self):
         return self.freshVariables
 

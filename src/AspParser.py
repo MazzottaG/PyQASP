@@ -45,7 +45,8 @@ class QASPParser:
             return False
         self.qcirBuilder.addCnf(self.grounder.getWellFounded(),self.grounder.getProps(),level,quantifier,self.currentDomainFacts)
         return True    
-    
+    def getQcirProps(self):
+        return self.qcirBuilder.getProps()
     def parse(self):
         print(f"Parsing {self.qasp_filename} ...")
 

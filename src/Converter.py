@@ -1,7 +1,7 @@
 from Option import FILE_UTIL,QCIR_FORMAT,REGEX_UTIL,QDIMACS_FORMAT
 import re
 
-class QCIRAndsToQDIMACS:
+class QCIRCnfToQDIMACS:
     
     def __init__(self):
         self.currentQuantifier = None

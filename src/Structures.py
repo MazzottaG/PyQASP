@@ -62,6 +62,10 @@ class SymbolTable:
     
     def getFactory(self):
         return self.factory
+    
+    def getSymbolsCount(self):
+        return self.idCounter - 2
+    
     def getCounter(self):
         return self.idCounter
     def print(self):

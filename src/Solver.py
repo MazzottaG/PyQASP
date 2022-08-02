@@ -1,6 +1,7 @@
 from Executors import ExternalCalls
-from Option import FILE_UTIL,QUABS_OUTPUT,REGEX_UTIL,RAREQS_OUTPUT,PYQASP_OUTPUT
+from Option import FILE_UTIL,QUABS_OUTPUT,REGEX_UTIL,RAREQS_OUTPUT,PYQASP_OUTPUT,DEFAULT_PROPERTIES
 from Structures import SymbolTable
+from Converter import QCIRCnfToQDIMACS
 import re
 
 class OutputBuilder:
@@ -74,7 +75,7 @@ class Solver:
         print("Output ...")
         self.outputBuilder.printOuput(symbolTable,isFirstForall,stdout)
     
-    def solve(self,symbolTable:SymbolTable,isFirstForall):
+    def solve(self,symbolTable:SymbolTable,isFirstForall,qcirProps):
         print("Solving ...")
 class Rareqs(Solver):
     # public final static ShellCommand RARE_QS_COMMAND_TEMPLATE = new ShellCommand(
@@ -84,8 +85,8 @@ class Rareqs(Solver):
         super().__init__()
         self.outputBuilder = RareqsOutputBuilder()
     
-    def solve(self,symbolTable:SymbolTable,isFirstForall):
-        super().solve(symbolTable,isFirstForall)
+    def solve(self,symbolTable:SymbolTable,isFirstForall,qcirProps):
+        super().solve(symbolTable,isFirstForall,qcirProps)
         cmds = [
             [FILE_UTIL.QCIR_CONV_PATH,FILE_UTIL.QBF_PROGRAM_FILE,"-prenex","-write-gq"],
             [FILE_UTIL.RAREQS_NN_PATH, "-"]]
@@ -100,13 +101,23 @@ class Depqbf(Solver):
     def __init__(self):
         super().__init__()
     
-    def solve(self,symbolTable:SymbolTable,isFirstForall):
-        super().solve(symbolTable,isFirstForall)
-        cmds = [
-            [FILE_UTIL.QCIR_CONV_PATH,FILE_UTIL.QBF_PROGRAM_FILE,"-prenex"],
-            [FILE_UTIL.FMLA_PATH,"-","-read-qcir","-write-dimacs"],
-            [FILE_UTIL.BLOQQER37_PATH],
-            [FILE_UTIL.DEPQBF_PATH]]
+    def solve(self,symbolTable:SymbolTable,isFirstForall,qcirProps):
+        super().solve(symbolTable,isFirstForall,qcirProps)
+        cmds = []
+        if DEFAULT_PROPERTIES.SKIP_QCIR_CONV_FOR_QDIMACS and qcirProps.isQuiteCnf():
+            QCIRCnfToQDIMACS().translate(qcirProps.getLastSymbol(),qcirProps.getClausesCount(),qcirProps.getLevelsCount())
+            cmds = [
+                [FILE_UTIL.BLOQQER37_PATH,FILE_UTIL.QDIMACS_PROGRAM_FILE],
+                [FILE_UTIL.DEPQBF_PATH]
+            ]
+        else:
+            cmds = [
+                [FILE_UTIL.QCIR_CONV_PATH,FILE_UTIL.QBF_PROGRAM_FILE,"-prenex"],
+                [FILE_UTIL.FMLA_PATH,"-","-read-qcir","-write-dimacs"],
+                [FILE_UTIL.BLOQQER37_PATH],
+                [FILE_UTIL.DEPQBF_PATH]
+            ]
+
         stdout = ExternalCalls.callSolverPipeline(cmds)
         self.outputBuilder.printOuput(symbolTable,isFirstForall,stdout)
 
@@ -116,7 +127,7 @@ class Quabs(Solver):
         super().__init__()
         self.outputBuilder = QuabsOutputBuilder()
 
-    def solve(self,symbolTable:SymbolTable,isFirstForall):
-        super().solve(symbolTable,isFirstForall)
+    def solve(self,symbolTable:SymbolTable,isFirstForall,qcirProps):
+        super().solve(symbolTable,isFirstForall,qcirProps)
         stdout = ExternalCalls.callSolver([FILE_UTIL.QUABS_PATH,"--partial-assignment",FILE_UTIL.QBF_PROGRAM_FILE])
         self.outputBuilder.printOuput(symbolTable,isFirstForall,stdout)
