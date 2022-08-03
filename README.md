@@ -5,8 +5,9 @@ Download the executable file located into dist folder and run it
 ```
 pyqasp myprogram.qasp
 ```
-Notice that rareqs and depqbf solvers require python interpreter to be installed on your machine
-use -h option to get available options
+###### Notice that rareqs and depqbf solvers require python interpreter to be installed on your machine
+
+Use -h option to get available options
 ```
 pyqasp -h 
 ```
