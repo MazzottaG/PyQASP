@@ -90,6 +90,10 @@ class RAREQS_OUTPUT:
     SAT                         = "1"
     UNSAT                       = "0"
 
+class DEPQBF_OUTPUT:
+    SAT                         = "SAT"
+    UNSAT                       = "UNSAT"
+
 class PYQASP_OUTPUT:
     SAT                         = "SATISFIABLE"
     UNSAT                       = "UNSATISFIABLE"

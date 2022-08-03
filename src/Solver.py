@@ -1,5 +1,5 @@
 from Executors import ExternalCalls
-from Option import FILE_UTIL,QUABS_OUTPUT,REGEX_UTIL,RAREQS_OUTPUT,PYQASP_OUTPUT,DEFAULT_PROPERTIES
+from Option import FILE_UTIL,QUABS_OUTPUT,REGEX_UTIL,RAREQS_OUTPUT,PYQASP_OUTPUT,DEFAULT_PROPERTIES,DEPQBF_OUTPUT
 from Structures import SymbolTable
 from Converter import QCIRCnfToQDIMACS
 import re
@@ -8,10 +8,22 @@ class OutputBuilder:
     
     def printOuput(self,symbolTable:SymbolTable,isFirstForall,stdout):
         line = stdout.readline().decode("UTF-8").strip()
+        sat = False
+        unsat = False
         while line:
-            print(line)
+            if DEPQBF_OUTPUT.UNSAT in line:
+                unsat = True
+            elif DEPQBF_OUTPUT.SAT in line:
+                sat=True
             line = stdout.readline().decode("UTF-8").strip()
-            
+        
+        if sat:
+            print(PYQASP_OUTPUT.SAT)
+        elif unsat:
+            print(PYQASP_OUTPUT.UNSAT)
+        else:
+            print("No answer found")
+
 class RareqsOutputBuilder(OutputBuilder):
     
     def printOuput(self,symbolTable:SymbolTable,isFirstForall,stdout):
