@@ -3,9 +3,11 @@
 ## Running PyQASP Solver
 Download the executable file located into dist folder and run it
 ```
-pyqasp -d -s quabs myprogram.qasp
+pyqasp myprogram.qasp
 ```
-use -h option to get available options
+#### Notice: rareqs and depqbf solvers require python interpreter to be installed on your machine
+
+Use -h option to get available options
 ```
 pyqasp -h 
 ```
