@@ -70,6 +70,7 @@ class QCIRBuilder:
         phi = self.symbols.addExtraSymbol()
         self.subformulas.append(phi)
         self.quantifiers.append(QASP_FORMAT.QEXISTS)
+        self.props.incrementClauses(1)
         self.gatesFileHandler.write(f"{phi} = or( )\n")
     
     def addVerum(self,quantifier):

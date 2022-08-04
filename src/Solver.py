@@ -36,9 +36,8 @@ class RareqsOutputBuilder(OutputBuilder):
             if match:
                 if match.group(1) == RAREQS_OUTPUT.SAT:
                     print(PYQASP_OUTPUT.SAT)
-                else:
+                elif match.group(1) == RAREQS_OUTPUT.UNSAT:
                     print(PYQASP_OUTPUT.UNSAT)
-                return
             line = stdout.readline().decode("UTF-8")
             
 class QuabsOutputBuilder(OutputBuilder):
