@@ -84,7 +84,7 @@ class QCIRBuilder:
     def addCnf(self,wellfounded,properties,level,quantifier,currentDomainFacts):
         
         # current program is coherent 
-        if properties.isEmpty() == False:
+        if properties.isEmpty() == False or not wellfounded.isEmpty():
             builder = CNFBuilder(wellfounded,properties,self.symbols,level,self.gatesFileHandler)
             built = builder.buildCurrentCNF(currentDomainFacts,quantifier == QASP_FORMAT.QCONSTRAINT)
             currentPhi = None

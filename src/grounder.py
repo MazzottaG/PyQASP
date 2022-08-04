@@ -165,6 +165,12 @@ class WellFoundedModel:
             print(f"Error unable to saver {atoms} for truth value {truth}")
             return
         self.model[truth]=atoms
+    
+    def isEmpty(self):
+        for component in self.model:
+            if len(component)>0:
+                return False
+        return True
 
     def addUndef(self,atom):
         self.model[WellFoundedModel.UNDEFINED].append(atom)
