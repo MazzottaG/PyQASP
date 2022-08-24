@@ -39,6 +39,7 @@ class SymbolTable:
     def addSymbol(self,atom,level):
         
         predicate = atom.split("(")[0]
+
         if predicate not in self.factory:
             self.factory[predicate]={}
         if atom not in self.factory[predicate]:
@@ -70,3 +71,10 @@ class SymbolTable:
         return self.idCounter
     def print(self):
         print("Factory: ",self.factory)
+    def __str__(self):
+        table=[]
+        for predicate in self.factory:
+            for atom in self.factory[predicate]:
+                var,level = self.factory[predicate][atom]
+                table.append(f"{var}:\"{atom}\"")
+        return ",".join(table)

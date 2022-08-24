@@ -114,9 +114,13 @@ class ProgramProperties:
         self.onlyChoice=None
         self.coherent=None
         self.empty=None
+        self.tight=None
 
     def setDisjunctive(self,disj : bool):
         self.disjunctive = disj
+    
+    def setTight(self,tight : bool):
+        self.tight = tight
     
     def setOnlyChoice(self,choice : bool):
         self.onlyChoice = choice
@@ -146,6 +150,12 @@ class ProgramProperties:
         if self.onlyChoice is None:
             print("Warning: onlyChoice properties not defined")
         return self.onlyChoice
+
+    def isTight(self):
+        if self.tight is None:
+            print("Warning: tight properties not defined")
+        return self.tight
+
     def print(self):
         print(f"disjunctive: {self.disjunctive}")
         print(f"coherent: {self.coherent}")
@@ -171,7 +181,7 @@ class WellFoundedModel:
             if len(component)>0:
                 return False
         return True
-
+        
     def addUndef(self,atom):
         self.model[WellFoundedModel.UNDEFINED].append(atom)
 

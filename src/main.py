@@ -14,6 +14,8 @@ def handler(signum, frame):
     sys.exit(180)
     
 signal.signal(signal.SIGTERM, handler)
+#signal.signal(signal.SIGKILL, handler)
+
 SOLVERS = {
     "quabs":Quabs(),
     "depqbf":Depqbf(),
@@ -38,6 +40,7 @@ argparser.add_argument('-s','--solver', dest="solvername",  type=str, help='avai
 argparser.add_argument('-pq','--print-qcir', dest="qcir_file",  type=str, help='output qcir filename')
 argparser.add_argument('--no-choice-opt', dest="disable_choice_check", default=False, action='store_true')
 argparser.add_argument('--no-direct-cnf', dest="disable_skip_conv", default=False, action='store_true')
+argparser.add_argument('--stats', dest="stats", default=False, action='store_true',help="print encoded qbf formula's statistics")
 
 ns = argparser.parse_args()
 
@@ -46,6 +49,9 @@ if ns.disable_choice_check:
 
 if ns.disable_skip_conv:
     DEFAULT_PROPERTIES.SKIP_QCIR_CONV_FOR_QDIMACS = False
+
+if ns.stats:
+    DEFAULT_PROPERTIES.PRINT_STATS = True
 
 if ns.qcir_file:
     FILE_UTIL.QBF_PROGRAM_FILE=ns.qcir_file
@@ -66,13 +72,14 @@ ExternalCalls.LOG_FILE_HANDLER = open(FILE_UTIL.LOG_ERROR,"w")
 symbols = SymbolTable()
 parser = QASPParser(ns.filename,symbols,grounder)
 parser.parse()
-
+# print(symbols)
 solver = SOLVERS["quabs"]
 if ns.solvername:
     if ns.solvername not in SOLVERS:
         print("Error: Unable to find solver")
         sys.exit(180)
     solver = SOLVERS[ns.solvername]
-
+if DEFAULT_PROPERTIES.PRINT_STATS:
+    parser.getQcirProps().printProps()
 solver.solve(symbols,parser.isFirstForall(),parser.getQcirProps())
 ExternalCalls.LOG_FILE_HANDLER.close()

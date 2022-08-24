@@ -22,9 +22,10 @@ class FILE_UTIL:
     DEFAULT_PATH                = sys._MEIPASS
     # DEFAULT_PATH                = ""
     ASP_PARSER_PATH             = os.path.join(DEFAULT_PATH,"resources","asp-parser","asp_parser") 
-    TOOL_FOLDER_PATH            = os.path.join(DEFAULT_PATH,"resources","old-tool")
+    OLD_TOOL_FOLDER_PATH            = os.path.join(DEFAULT_PATH,"resources","old-tool")
+    TOOL_FOLDER_PATH            = os.path.join(DEFAULT_PATH,"resources","tools")
     
-    QUABS_PATH                  = os.path.join(DEFAULT_PATH,"resources","qbf_solvers","quabs")
+    QUABS_PATH                  = os.path.join(TOOL_FOLDER_PATH,"quabs")
     DEPQBF_PATH                 = os.path.join(TOOL_FOLDER_PATH,"depqbf")
     RAREQS_NN_PATH              = os.path.join(TOOL_FOLDER_PATH,"rareqs-nn")
     
@@ -35,9 +36,14 @@ class FILE_UTIL:
     GRINGO_PATH                 = os.path.join(TOOL_FOLDER_PATH,"gringo")        
     DLV2_PATH                   = os.path.join(TOOL_FOLDER_PATH,"dlv2")          
     
-    LPSHIFT_PATH                = os.path.join(TOOL_FOLDER_PATH,"lpshift-1.4")   
-    LP2NORMAL_PATH              = os.path.join(TOOL_FOLDER_PATH,"lp2normal-2.27")
-    LP2SAT_PATH                 = os.path.join(TOOL_FOLDER_PATH,"lp2sat-1.24")   
+    OLD_LPSHIFT_PATH                = os.path.join(TOOL_FOLDER_PATH,"lpshift-1.4")   
+    OLD_LP2NORMAL_PATH              = os.path.join(TOOL_FOLDER_PATH,"lp2normal-2.27")
+    OLD_LP2SAT_PATH                 = os.path.join(TOOL_FOLDER_PATH,"lp2sat-1.24")   
+
+    LPSHIFT_PATH                = os.path.join(TOOL_FOLDER_PATH,"lpshift")   
+    LP2NORMAL_PATH              = os.path.join(TOOL_FOLDER_PATH,"lp2normal2")
+    LP2SAT_PATH                 = os.path.join(TOOL_FOLDER_PATH,"lp2sat")   
+    LP2ACYC_PATH                = os.path.join(TOOL_FOLDER_PATH,"lp2acyc")   
 
     FILES_FOLDER_PATH           = os.path.join(DEFAULT_PATH,"resources","files")
     TO_GROUND_PROGRAM_FILE      = os.path.join(FILES_FOLDER_PATH,"subprogram.asp")
@@ -79,6 +85,7 @@ class REGEX_UTIL:
 class ASP_PARSER_FORMAT:
     HEAD_PREDICATE_PREFIX       = 0
     NO_HEAD_PREDICATE_PREFIX    = 1
+    TIGHT_PROP_PREFIX           = 2
     SEPARATOR                   = ":"
 
 class QUABS_OUTPUT:
@@ -101,3 +108,4 @@ class PYQASP_OUTPUT:
 class DEFAULT_PROPERTIES:
     ONLY_CHOICE                 = True
     SKIP_QCIR_CONV_FOR_QDIMACS  = True
+    PRINT_STATS                 = False

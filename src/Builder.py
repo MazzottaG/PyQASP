@@ -81,11 +81,11 @@ class QCIRBuilder:
         self.quantifiers.append(quantifier)
         self.gatesFileHandler.write(f"{phi} = and( )\n")
     
-    def addCnf(self,wellfounded,properties,level,quantifier,currentDomainFacts):
+    def addCnf(self,wellfounded,properties,level,quantifier,currentDomainFacts,predicates):
         
         # current program is coherent 
         if properties.isEmpty() == False or not wellfounded.isEmpty():
-            builder = CNFBuilder(wellfounded,properties,self.symbols,level,self.gatesFileHandler)
+            builder = CNFBuilder(wellfounded,properties,self.symbols,level,self.gatesFileHandler,predicates)
             built = builder.buildCurrentCNF(currentDomainFacts,quantifier == QASP_FORMAT.QCONSTRAINT)
             currentPhi = None
             if built:
@@ -151,7 +151,7 @@ class QCIRBuilder:
         return self.quantifiers[0] == QASP_FORMAT.QFORALL
 class CNFBuilder:
     
-    def __init__(self,wellfounded,properties,symbolTable: SymbolTable,level,fileHandler):
+    def __init__(self,wellfounded,properties,symbolTable: SymbolTable,level,fileHandler,predicates):
         self.level = level
         self.model=wellfounded
         self.prop=properties
@@ -161,6 +161,7 @@ class CNFBuilder:
         self.gates = []
         self.freshVariables = set()
         self.phi=None
+        self.predicates=predicates
     
     def getClausesCount(self):
         return len(self.gates)
@@ -179,13 +180,21 @@ class CNFBuilder:
 
     def readAtom(self,fields):
         sat_var = int(fields[DIMACS_FORMAT.DIMACS_COMMENT_VAR_INDEX])
-        var, lev, truth = self.symbolTable.addSymbol(fields[DIMACS_FORMAT.DIMACS_COMMENT_ATOM_INDEX],self.level)
-        
-        if sat_var not in self.variableMapping:
-            self.variableMapping[sat_var]=var
-        
-        if lev == self.level:
-            self.freshVariables.add(str(var))
+        atom = fields[DIMACS_FORMAT.DIMACS_COMMENT_ATOM_INDEX]
+        if atom.split("(")[0] in self.predicates:
+            var, lev, truth = self.symbolTable.addSymbol(atom,self.level)
+            
+            if sat_var not in self.variableMapping:
+                self.variableMapping[sat_var]=var
+            
+            if lev == self.level:
+                self.freshVariables.add(str(var))
+        else:
+            if sat_var not in self.variableMapping:
+                var = self.symbolTable.addExtraSymbol()
+                self.variableMapping[sat_var]=var
+                self.freshVariables.add(str(var))
+            
 
     def readClause(self,fields,remap=True):
         clause = []
@@ -214,6 +223,7 @@ class CNFBuilder:
             var,level = self.symbolTable.assign(atom,truth,self.level)
             if level == self.level:
                 self.freshVariables.add(str(var) if var >=0 else str(-var))
+                
             if truth != self.symbolTable.TRUE or var >= len(currentDomainFacts) or currentDomainFacts[var]==False:
                 self.addUnitClause(var)
 
@@ -226,6 +236,10 @@ class CNFBuilder:
         if disjunctive == None:
             print("Error: disjunctive properties is missing")
             sys.exit(180)
+        tight = self.prop.isTight()
+        if tight == None:
+            print("Error: tight properties is missing")
+            sys.exit(180)
         if DEFAULT_PROPERTIES.ONLY_CHOICE and not isConstraint:
             onlyChoice = self.prop.isOnlyChoice()
             if onlyChoice == None:
@@ -237,7 +251,7 @@ class CNFBuilder:
                         self.addAtom(atom)
                     return False
         
-        stdout = ExternalCalls.callPipeline(FILE_UTIL.GROUND_PROGRAM_FILE,disjunctive)
+        stdout = ExternalCalls.callPipeline(FILE_UTIL.GROUND_PROGRAM_FILE,disjunctive,tight)
         line=stdout.readline().decode("UTF-8").strip()
         while line:
             fields = line.split(" ")

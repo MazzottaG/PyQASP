@@ -25,7 +25,7 @@ class ExternalCalls:
     def callProgramParser():
         return subprocess.Popen([f"{FILE_UTIL.ASP_PARSER_PATH}",FILE_UTIL.TO_GROUND_PROGRAM_FILE],stdout=subprocess.PIPE,stderr=ExternalCalls.LOG_FILE_HANDLER).stdout
 
-    def callPipeline(filename,uselpshift=False):
+    def callOldPipeline(filename,uselpshift=False):
         if uselpshift:
             logging.info(f"\tUsing Lp2Shifth")
             lpshift = subprocess.Popen([f"{FILE_UTIL.LPSHIFT_PATH}",filename],stdout=subprocess.PIPE,stderr=ExternalCalls.LOG_FILE_HANDLER)
@@ -37,6 +37,31 @@ class ExternalCalls:
             lp2normal = subprocess.Popen([f"{FILE_UTIL.LP2NORMAL_PATH}","-e",filename],stdout=subprocess.PIPE,stderr=ExternalCalls.LOG_FILE_HANDLER)
             lp2sat = subprocess.Popen([f"{FILE_UTIL.LP2SAT_PATH}"],stdin=lp2normal.stdout,stdout=subprocess.PIPE,stderr=ExternalCalls.LOG_FILE_HANDLER)
             return lp2sat.stdout
+    
+    def callPipeline(filename,uselpshift=False,tight=False):
+        lpshift   = None
+        lp2normal = None
+        lp2acyc   = None
+        lp2sat    = None
+        
+        if uselpshift:
+            logging.info(f"\tUsing Lp2Shifth")
+            lpshift = subprocess.Popen([f"{FILE_UTIL.LPSHIFT_PATH}",filename],stdout=subprocess.PIPE,stderr=ExternalCalls.LOG_FILE_HANDLER)
+            lp2normal = subprocess.Popen([f"{FILE_UTIL.LP2NORMAL_PATH}","-e"],stdin=lpshift.stdout,stdout=subprocess.PIPE,stderr=ExternalCalls.LOG_FILE_HANDLER)
+        else:
+            logging.info(f"\tNo Lp2Shifth")
+            lp2normal = subprocess.Popen([f"{FILE_UTIL.LP2NORMAL_PATH}","-e",filename],stdout=subprocess.PIPE,stderr=ExternalCalls.LOG_FILE_HANDLER)
+        if tight:
+            logging.info(f"\tNo Lp2Acyc")
+            lp2sat = subprocess.Popen([f"{FILE_UTIL.LP2SAT_PATH}","-b"],stdin=lp2normal.stdout,stdout=subprocess.PIPE,stderr=ExternalCalls.LOG_FILE_HANDLER)
+            #lp2sat = subprocess.Popen([f"{FILE_UTIL.LP2SAT_PATH}"],stdin=lp2normal.stdout,stdout=subprocess.PIPE,stderr=ExternalCalls.LOG_FILE_HANDLER)
+        else:
+            logging.info(f"\tUsing Lp2Acyc")
+            lp2acyc = subprocess.Popen([f"{FILE_UTIL.LP2ACYC_PATH}"],stdin=lp2normal.stdout,stdout=subprocess.PIPE,stderr=ExternalCalls.LOG_FILE_HANDLER)
+            lp2sat = subprocess.Popen([f"{FILE_UTIL.LP2SAT_PATH}","-b"],stdin=lp2acyc.stdout,stdout=subprocess.PIPE,stderr=ExternalCalls.LOG_FILE_HANDLER)
+            #lp2sat = subprocess.Popen([f"{FILE_UTIL.LP2SAT_PATH}"],stdin=lp2acyc.stdout,stdout=subprocess.PIPE,stderr=ExternalCalls.LOG_FILE_HANDLER)
+
+        return lp2sat.stdout
 
     def callFileAppend(source,destination):
         subprocess.getoutput(f"cat {source} >> {destination}")
