@@ -2,6 +2,7 @@ from Structures import SymbolTable
 from Builder import QCIRBuilder
 from grounder import *
 from Option import FILE_UTIL,REGEX_UTIL,QASP_FORMAT,ASP_PARSER_FORMAT
+import subprocess
 
 class QASPParser:
 
@@ -78,7 +79,7 @@ class QASPParser:
 
                     predicates = self.addDomains(toGroundFileHandler)
                     toGroundFileHandler.close()
-                    
+
                     if not self.transform(level,currentQuantifier,predicates):
                         stop=True
                         break
