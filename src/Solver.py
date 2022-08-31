@@ -88,6 +88,7 @@ class Solver:
     
     def solve(self,symbolTable:SymbolTable,isFirstForall,qcirProps):
         print("Solving ...")
+        
 class Rareqs(Solver):
     # public final static ShellCommand RARE_QS_COMMAND_TEMPLATE = new ShellCommand(
 	# 		"%s $file -prenex -write-gq | %s -",

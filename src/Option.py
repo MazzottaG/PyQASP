@@ -21,8 +21,10 @@ class LPARSE_FORMAT:
 class FILE_UTIL:
     DEFAULT_PATH                = sys._MEIPASS
     # DEFAULT_PATH                = ""
-    ASP_PARSER_PATH             = os.path.join(DEFAULT_PATH,"resources","asp-parser","asp_parser") 
-    OLD_TOOL_FOLDER_PATH            = os.path.join(DEFAULT_PATH,"resources","old-tool")
+    ASP_PARSER_PATH             = os.path.join(DEFAULT_PATH,"resources","asp-parser","batch-parser") 
+    ASP_RULE_PARSER_PATH        = os.path.join(DEFAULT_PATH,"resources","asp-parser","ParserByRule") 
+    ASP_PROGRAM_PARSER_PATH     = os.path.join(DEFAULT_PATH,"resources","asp-parser","ProgramParser") 
+    OLD_TOOL_FOLDER_PATH        = os.path.join(DEFAULT_PATH,"resources","old-tool")
     TOOL_FOLDER_PATH            = os.path.join(DEFAULT_PATH,"resources","tools")
     
     QUABS_PATH                  = os.path.join(TOOL_FOLDER_PATH,"quabs")

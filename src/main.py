@@ -4,7 +4,7 @@ from Builder import QCIRBuilder
 from Structures import SymbolTable
 from AspParser import QASPParser
 from Solver import *
-import argparse,signal
+import argparse,signal,subprocess
 
 ExternalCalls.LOG_FILE_HANDLER = None
 def handler(signum, frame):
@@ -41,6 +41,7 @@ argparser.add_argument('-pq','--print-qcir', dest="qcir_file",  type=str, help='
 argparser.add_argument('--no-choice-opt', dest="disable_choice_check", default=False, action='store_true')
 argparser.add_argument('--no-direct-cnf', dest="disable_skip_conv", default=False, action='store_true')
 argparser.add_argument('--stats', dest="stats", default=False, action='store_true',help="print encoded qbf formula's statistics")
+argparser.add_argument('-e', "--encoder-only", dest="encode", default=False, action='store_true',help="disable solver usage and print qcir on stdout")
 
 ns = argparser.parse_args()
 
@@ -73,6 +74,9 @@ symbols = SymbolTable()
 parser = QASPParser(ns.filename,symbols,grounder)
 parser.parse()
 # print(symbols)
+if ns.encode:
+    print(subprocess.getoutput(f"cat {FILE_UTIL.QBF_PROGRAM_FILE}"))
+    sys.exit(0)
 solver = SOLVERS["quabs"]
 if ns.solvername:
     if ns.solvername not in SOLVERS:
