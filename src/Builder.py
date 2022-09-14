@@ -1,7 +1,7 @@
 from Option import FILE_UTIL,DIMACS_FORMAT,QCIR_FORMAT,QASP_FORMAT,DEFAULT_PROPERTIES
 from Executors import ExternalCalls
 from Structures import SymbolTable
-import sys
+import sys,time
 class QCIRProps:
     def __init__(self):
         self.clauseCount=0
@@ -87,6 +87,7 @@ class QCIRBuilder:
         if properties.isEmpty() == False or not wellfounded.isEmpty():
             builder = CNFBuilder(wellfounded,properties,self.symbols,level,self.gatesFileHandler,predicates)
             built = builder.buildCurrentCNF(currentDomainFacts,quantifier == QASP_FORMAT.QCONSTRAINT)
+            
             currentPhi = None
             if built:
                 if quantifier == QASP_FORMAT.QFORALL:
@@ -250,7 +251,6 @@ class CNFBuilder:
                     for atom in self.model.getUndefined():
                         self.addAtom(atom)
                     return False
-        
         stdout = ExternalCalls.callPipeline(FILE_UTIL.GROUND_PROGRAM_FILE,disjunctive,tight)
         line=stdout.readline().decode("UTF-8").strip()
         while line:
@@ -262,7 +262,7 @@ class CNFBuilder:
                     self.readClause(fields)
             line=stdout.readline().decode("UTF-8").strip()
         self.addWellFoundedClauses(currentDomainFacts)
-
+        
         self.phi = self.symbolTable.addExtraSymbol()
         gates = ",".join(self.gates)
         self.gatesFileHandler.write(f"{self.phi} = {QCIR_FORMAT.AND_GATE}({gates})\n")

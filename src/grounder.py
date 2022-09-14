@@ -226,6 +226,7 @@ class DLV2Wapper(BasicGrounder):
             return line
 
         readLines=0
+    
         for reg,read in DLV2Wapper.wellfoundedFormat:
             match = re.match(reg,line)
             if match:
@@ -245,6 +246,7 @@ class DLV2Wapper(BasicGrounder):
             if not line:
                 print("Error: missing lines reading wellfounded")
                 sys.exit(180)
+
         return line
     
     def ground(self):
