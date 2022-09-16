@@ -34,6 +34,17 @@ class ASPCore2Listener(ParseTreeListener):
         self.head=[]
         self.body=[]
         self.graph={}
+    
+    def addPredicate(self,predicate,head:bool):
+        predId=None
+        try:
+            predId = self.predicatesToId[predicate]
+        except KeyError:
+            self.predicatesToId[predicate]=self.predicateCount
+            predId = self.predicateCount
+            self.predicateCount+=1
+        if head:
+            self.headPredicates.add(predicate)
 
     def visitTerminal(self, node:TerminalNode):
         
@@ -51,7 +62,7 @@ class ASPCore2Listener(ParseTreeListener):
                 self.predicateCount+=1
 
             if self.readingDisjunction or self.readingChoiceHead:
-                self.headPredicates.add(str(node))
+                self.headPredicates.add(predicate)
                 self.head.append(predId)
             elif not self.foundNegation:
                 self.body.append(predId)

@@ -8,10 +8,11 @@ from antlr4 import *
 from parsing.ASPCore2Lexer import ASPCore2Lexer
 from parsing.ASPCore2Parser import ASPCore2Parser
 from parsing.ASPCore2Listener import ASPCore2Listener
-import scc 
+import scc,re
 
 class QASPParser:
-
+    FACT_REGEX = r'^([a-z][a-zA-Z0-9]*)\(.*\)\.'
+    PROPOSITION_CHOICE_REGEX = r'^\{([a-z][a-zA-Z0-9]*(;[a-z][a-zA-Z0-9]*)*)\}\.'
     def __init__(self,filename,symbolTable: SymbolTable,grounder):
         self.qasp_filename = filename
         self.symbols = symbolTable
@@ -20,14 +21,38 @@ class QASPParser:
         self.currentDomainFacts = []
         self.currentTightProgram = None
         self.listener = ASPCore2Listener(ASPCore2Parser.NAF)
+        self.program=[]
+        self.threshold=100
+
+    def parseRule(self,rule):
+        if len(rule.strip())>0:
+
+            match = re.match(QASPParser.PROPOSITION_CHOICE_REGEX,rule)
+            if match:
+                for prop_atom in match.group(1).split(";"):
+                    self.listener.addPredicate(prop_atom,True)
+                return
+
+            match = re.match(QASPParser.FACT_REGEX,rule)
+            if match:
+                self.listener.addPredicate(match.group(1),True)
+                return
+
+            self.program.append(rule)
+            if len(self.program) == self.threshold:
+                self.parseProgram()
+                
+
     
-    def parseRule(self,line):
-        input_stream = InputStream(line)
-        lexer = ASPCore2Lexer(input_stream)
-        stream = CommonTokenStream(lexer)
-        parser = ASPCore2Parser(stream)
-        parser.addParseListener(self.listener)
-        parser.program()
+    def parseProgram(self):
+        if len(self.program) > 0:
+            input_stream = InputStream("\n".join(self.program))
+            lexer = ASPCore2Lexer(input_stream)
+            stream = CommonTokenStream(lexer)
+            parser = ASPCore2Parser(stream)
+            parser.addParseListener(self.listener)
+            parser.program()
+            self.program = []
 
     def addDomainsInternal(self,fileHandler):
         currentPredicates=[]
@@ -100,7 +125,9 @@ class QASPParser:
                         exit(180)
                     if currentQuantifier == newQuantifier:
                         continue
-
+                    
+                    self.parseProgram()
+                    # print("Encoding Level",level)
                     predicates = self.addDomainsInternal(toGroundFileHandler)
                     toGroundFileHandler.close()
                     if not self.transform(level,currentQuantifier,predicates):
@@ -121,6 +148,8 @@ class QASPParser:
             
         if not stop:
             if currentQuantifier == QASP_FORMAT.QCONSTRAINT:
+                self.parseProgram()
+                print("Encoding Level",level)
                 predicates=self.addDomainsInternal(toGroundFileHandler)
                 toGroundFileHandler.close()
                 self.transform(level,currentQuantifier,predicates)
