@@ -1,0 +1,18 @@
+input = """
+arc(a,b,2).
+arc(a,c,3).
+arc(b,d,3).
+arc(c,d,2).
+arc(d,a,2).
+
+% maxint is deliberately set too large to detect wrong minima.
+
+path(X,Y,C) :- arc(X,Y,C).
+path(X,Y,C) :- arc(X,Z,C1), path(Z,Y,C2), C = C1 + C2,C<100.
+
+minpath(X,Y,C) :- path(X,Y,C), C = #min{ C1: path(X,Y,C1) }.
+
+"""
+output = """
+{arc(a,b,2), arc(a,c,3), arc(b,d,3), arc(c,d,2), arc(d,a,2), minpath(a,a,7), minpath(a,b,2), minpath(a,c,3), minpath(a,d,5), minpath(b,a,5), minpath(b,b,7), minpath(b,c,8), minpath(b,d,3), minpath(c,a,4), minpath(c,b,6), minpath(c,c,7), minpath(c,d,2), minpath(d,a,2), minpath(d,b,4), minpath(d,c,5), minpath(d,d,7), path(a,a,14), path(a,a,21), path(a,a,28), path(a,a,35), path(a,a,42), path(a,a,49), path(a,a,56), path(a,a,63), path(a,a,7), path(a,a,70), path(a,a,77), path(a,a,84), path(a,a,91), path(a,a,98), path(a,b,16), path(a,b,2), path(a,b,23), path(a,b,30), path(a,b,37), path(a,b,44), path(a,b,51), path(a,b,58), path(a,b,65), path(a,b,72), path(a,b,79), path(a,b,86), path(a,b,9), path(a,b,93), path(a,c,10), path(a,c,17), path(a,c,24), path(a,c,3), path(a,c,31), path(a,c,38), path(a,c,45), path(a,c,52), path(a,c,59), path(a,c,66), path(a,c,73), path(a,c,80), path(a,c,87), path(a,c,94), path(a,d,12), path(a,d,19), path(a,d,26), path(a,d,33), path(a,d,40), path(a,d,47), path(a,d,5), path(a,d,54), path(a,d,61), path(a,d,68), path(a,d,75), path(a,d,82), path(a,d,89), path(a,d,96), path(b,a,12), path(b,a,19), path(b,a,26), path(b,a,33), path(b,a,40), path(b,a,47), path(b,a,5), path(b,a,54), path(b,a,61), path(b,a,68), path(b,a,75), path(b,a,82), path(b,a,89), path(b,a,96), path(b,b,14), path(b,b,21), path(b,b,28), path(b,b,35), path(b,b,42), path(b,b,49), path(b,b,56), path(b,b,63), path(b,b,7), path(b,b,70), path(b,b,77), path(b,b,84), path(b,b,91), path(b,b,98), path(b,c,15), path(b,c,22), path(b,c,29), path(b,c,36), path(b,c,43), path(b,c,50), path(b,c,57), path(b,c,64), path(b,c,71), path(b,c,78), path(b,c,8), path(b,c,85), path(b,c,92), path(b,c,99), path(b,d,10), path(b,d,17), path(b,d,24), path(b,d,3), path(b,d,31), path(b,d,38), path(b,d,45), path(b,d,52), path(b,d,59), path(b,d,66), path(b,d,73), path(b,d,80), path(b,d,87), path(b,d,94), path(c,a,11), path(c,a,18), path(c,a,25), path(c,a,32), path(c,a,39), path(c,a,4), path(c,a,46), path(c,a,53), path(c,a,60), path(c,a,67), path(c,a,74), path(c,a,81), path(c,a,88), path(c,a,95), path(c,b,13), path(c,b,20), path(c,b,27), path(c,b,34), path(c,b,41), path(c,b,48), path(c,b,55), path(c,b,6), path(c,b,62), path(c,b,69), path(c,b,76), path(c,b,83), path(c,b,90), path(c,b,97), path(c,c,14), path(c,c,21), path(c,c,28), path(c,c,35), path(c,c,42), path(c,c,49), path(c,c,56), path(c,c,63), path(c,c,7), path(c,c,70), path(c,c,77), path(c,c,84), path(c,c,91), path(c,c,98), path(c,d,16), path(c,d,2), path(c,d,23), path(c,d,30), path(c,d,37), path(c,d,44), path(c,d,51), path(c,d,58), path(c,d,65), path(c,d,72), path(c,d,79), path(c,d,86), path(c,d,9), path(c,d,93), path(d,a,16), path(d,a,2), path(d,a,23), path(d,a,30), path(d,a,37), path(d,a,44), path(d,a,51), path(d,a,58), path(d,a,65), path(d,a,72), path(d,a,79), path(d,a,86), path(d,a,9), path(d,a,93), path(d,b,11), path(d,b,18), path(d,b,25), path(d,b,32), path(d,b,39), path(d,b,4), path(d,b,46), path(d,b,53), path(d,b,60), path(d,b,67), path(d,b,74), path(d,b,81), path(d,b,88), path(d,b,95), path(d,c,12), path(d,c,19), path(d,c,26), path(d,c,33), path(d,c,40), path(d,c,47), path(d,c,5), path(d,c,54), path(d,c,61), path(d,c,68), path(d,c,75), path(d,c,82), path(d,c,89), path(d,c,96), path(d,d,14), path(d,d,21), path(d,d,28), path(d,d,35), path(d,d,42), path(d,d,49), path(d,d,56), path(d,d,63), path(d,d,7), path(d,d,70), path(d,d,77), path(d,d,84), path(d,d,91), path(d,d,98)}
+"""

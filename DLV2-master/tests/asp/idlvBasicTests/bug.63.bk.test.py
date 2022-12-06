@@ -1,0 +1,6 @@
+input = """
+true.
+"""
+output = """
+{true}
+"""
