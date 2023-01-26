@@ -21,7 +21,8 @@ class LPARSE_FORMAT:
 class FILE_UTIL:
     DEFAULT_PATH                = sys._MEIPASS
     # DEFAULT_PATH                = ""
-    ASP_PARSER_PATH             = os.path.join(DEFAULT_PATH,"resources","asp-parser","batch-parser") 
+    ASP_PARSER_PATH             = os.path.join(DEFAULT_PATH,"resources","asp-parser","aspToJson") 
+    # ASP_PARSER_PATH             = os.path.join(DEFAULT_PATH,"resources","asp-parser","ruleToJson") 
     ASP_RULE_PARSER_PATH        = os.path.join(DEFAULT_PATH,"resources","asp-parser","ParserByRule") 
     ASP_PROGRAM_PARSER_PATH     = os.path.join(DEFAULT_PATH,"resources","asp-parser","ProgramParser") 
     OLD_TOOL_FOLDER_PATH        = os.path.join(DEFAULT_PATH,"resources","old-tool")
@@ -48,11 +49,13 @@ class FILE_UTIL:
     LP2ACYC_PATH                = os.path.join(TOOL_FOLDER_PATH,"lp2acyc")   
 
     FILES_FOLDER_PATH           = os.path.join(DEFAULT_PATH,"resources","files")
+    ASP_PARSER_FILE             = os.path.join(FILES_FOLDER_PATH,"parsing.asp")
     TO_GROUND_PROGRAM_FILE      = os.path.join(FILES_FOLDER_PATH,"subprogram.asp")
     GROUND_PROGRAM_FILE         = os.path.join(FILES_FOLDER_PATH,"subprogram.lparse")
     QBF_PROGRAM_FILE            = os.path.join(FILES_FOLDER_PATH,"formula.qcir")
     QDIMACS_PROGRAM_FILE        = os.path.join(FILES_FOLDER_PATH,"formula.qdimacs")
     GATES_PROGRAM_FILE          = os.path.join(FILES_FOLDER_PATH,"builder.qcir")
+    QCIR_SUB_FORMULA_PREFIX     = os.path.join(FILES_FOLDER_PATH,"subformula")
     
     LOG_ERROR                   = os.path.join(FILES_FOLDER_PATH,"log.err")
 
@@ -79,6 +82,7 @@ class QASP_FORMAT:
     QCONSTRAINT                 = "constraint"
 
 class REGEX_UTIL:
+
     QASP_QUANTIFIER             = r'\s*%@(forall|exists|constraint)\s*\n'
     QCIR_QUANTIFIER             = r'(forall|exists|constraint)\((.*)\)\n'
     QCIR_GATE                   = r'\d+ = (or|and)\((.*)\)\n'
@@ -108,6 +112,7 @@ class PYQASP_OUTPUT:
     UNSAT                       = "UNSATISFIABLE"
 
 class DEFAULT_PROPERTIES:
+    GUESS_CHECK                 = False
     ONLY_CHOICE                 = True
     SKIP_QCIR_CONV_FOR_QDIMACS  = True
     PRINT_STATS                 = False

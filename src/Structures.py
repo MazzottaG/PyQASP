@@ -2,6 +2,7 @@ from Executors import ExternalCalls
 import os,sys,logging
 
 class SymbolTable:
+
     TRUE=1
     UNDEF=0
     FALSE=-1
@@ -23,6 +24,7 @@ class SymbolTable:
         lev=0
         if predicate not in self.factory:
             self.factory[predicate]={}
+            
         if atom not in self.factory[predicate]:
             self.factory[predicate][atom]=[self.idCounter,level]
             added=True
@@ -34,26 +36,29 @@ class SymbolTable:
             var,lev = self.factory[predicate][atom]
             self.idToAtom[var]=value
 
-        return [var,lev] if value == SymbolTable.TRUE else [-var,lev]
+        return [var,lev] if value != SymbolTable.FALSE else [-var,lev]
 
     def addSymbol(self,atom,level):
         
         predicate = atom.split("(")[0]
-
+        added=False
         if predicate not in self.factory:
             self.factory[predicate]={}
+
         if atom not in self.factory[predicate]:
+            added=True
             self.factory[predicate][atom] = [self.idCounter,level]
             self.idToAtom.append(SymbolTable.UNDEF)
             self.idCounter+=1
         
         id_,lev = self.factory[predicate][atom]
-        return (id_,lev,self.idToAtom[id_])
+        return (id_,lev,self.idToAtom[id_],added)
 
     def getPredicateDomain(self,predicate):
-        if predicate in self.factory:
+        try:
             return self.factory[predicate].items()
-        return {}
+        except:
+            return {}.items()
     
     def getTruthValue(self,id_):
         return self.idToAtom[id_]

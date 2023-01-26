@@ -1,0 +1,116 @@
+let Pi be 
+    E P1 V P2 E P3 : C
+
+let WM(P2)=<T_2,F_2,U_2>
+let WM(P3)=<T_3,F_3,U_3>
+
+let a in U_2 and T_3
+
+if exists M in SM(P2) s.t. a not in M 
+    then P3 is unsat and so M cannot be model of Pi
+    
+
+let a in T_2
+    this means that for every M in SM(P2), a in M 
+    So Pi is coherent iff exists M1 in SM(P3) s.t. a in M1 
+
+
+exists 1,2,3
+forall 4,5,6   %wf(forall) = <True={5},Undef={}>
+exists 7,8,9,unsat
+
+cnf3=( (5) and (7,9) )
+phi_c=cnf1 and cnf3
+
+siccome 5 è true viene aggiunto nell'ultimo programma come fatto originando una clausola unitaria 
+essendo 5 quantificato universalmente e non essendoci cnf2 per 5 = false l'exists fallisce 
+
+soluzioni
+    calcolo il wellfounded senza il programma da spingere giu e se non genera nessun certamente vero cnf2 viene skippata
+    calcolo il wellfounded per l'intero programma forall e i certamente veri vengono aggiunti al programma successivo in questo modo:
+        c,unsat per ogni clausola c
+        a1,...,an,-unsat dove a1, ..., an sono i certamente veri
+
+
+
+
+
+:-T_2,F_2,unsat
+
+%@exists
+colour(1..5).
+{node(1..5)}.
+{arc(X,Y):node(X),node(Y),X!=Y}.
+
+nodeCount(X):-X=#count{Y:node(Y)}.
+:-node(X),nodeCount(C) #count{Y:arc(X,Y)}>=C.
+
+%@forall
+
+assign ( X , C ) | notAssign ( X , C ) :- node ( X ) , colour ( C ) .
+:- node ( X ) , #count { C : assign ( X , C ) } = 0 .
+:- arc ( X , Y ) , assign ( X , C ) , assign ( Y , C ) , X != Y .
+
+%@constraint
+
+r ( X , Y ) :- arc ( X , Y ) .
+r ( X , Z ) :- r ( X , Y ) , arc ( Y , Z ) .
+
+:-assign(X,C),assign(Y,C),X<Y, not r(X,Y).
+
+
+Rewritten
+    |
+    |
+    |
+   \ /
+    .
+
+%@exists
+colour(1..5).
+{node(1..5)}.
+{arc(X,Y):node(X),node(Y),X!=Y}.
+
+nodeCount(X):-X=#count{Y:node(Y)}.
+:-node(X),nodeCount(C) #count{Y:arc(X,Y)}>=C.
+
+%@forall
+
+assign ( X , C ) | notAssign ( X , C ) :- node ( X ) , colour ( C ) .
+
+
+%@constraint
+
+unsat_1 :- node ( X ) , #count { C : assign ( X , C ) } = 0, c1 .
+unsat_1 :- arc ( X , Y ) , assign ( X , C ) , assign ( Y , C ) , X != Y , c2.
+a(X):-b(X).
+
+r ( X , Y ) :- arc ( X , Y ).
+r ( X , Z ) :- r ( X , Y ) , arc ( Y , Z ) .
+
+:-assign(X,C),assign(Y,C),X<Y, not r(X,Y), not unsat_1.
+
+
+
+forall Pi
+
+    let SPi be the maximal subprogram that we could forward to the next level
+    let R = Pi\SPi
+
+    R does not contain constraints 
+    if WF(interface(R)) can be simplified then 
+        R is a stratified normal programs that contains some choice rule R = NR U ChR where NR = {r in R| r is not a choice rule} ChR = {r in R| r is a choice rule}
+        and WF(interface(R)) solve NR
+
+        Pi' = SPi U NR
+
+        ro(Pi',Pi+1) = { r in Pi' | r is a normal rule} U { unsat_i:-Hr forall r in Pi' r is a constraint}
+                       { Hr:-Br, not unsat_i forall r in Pi+1 }
+        
+        P = ro(Pi',Pi+1)
+
+        interface(NR) is a subset of interface(P)
+        wf(P U interface(p)) solve NR and so 
+            
+            if P is incoherent it means that non constraints from Pi are failed otherwise they derive unsat that disable satisfies all rule in Pi+1 and so 
+                unsat is false and this means that the current model is a model of Pi and no model of Pi+1 exists

@@ -19,9 +19,9 @@ class OutputBuilder:
         
         if sat:
             print(PYQASP_OUTPUT.SAT)
-        elif unsat:
+        if unsat:
             print(PYQASP_OUTPUT.UNSAT)
-        else:
+        if not sat and not unsat:
             print("No answer found")
 
 class RareqsOutputBuilder(OutputBuilder):
@@ -116,18 +116,19 @@ class Depqbf(Solver):
     def solve(self,symbolTable:SymbolTable,isFirstForall,qcirProps):
         super().solve(symbolTable,isFirstForall,qcirProps)
         cmds = []
+        # if True and qcirProps.isQuiteCnf():
         if DEFAULT_PROPERTIES.SKIP_QCIR_CONV_FOR_QDIMACS and qcirProps.isQuiteCnf():
             QCIRCnfToQDIMACS().translate(qcirProps.getLastSymbol(),qcirProps.getClausesCount(),qcirProps.getLevelsCount())
             cmds = [
                 [FILE_UTIL.BLOQQER37_PATH,FILE_UTIL.QDIMACS_PROGRAM_FILE],
-                [FILE_UTIL.DEPQBF_PATH]
+                [FILE_UTIL.DEPQBF_PATH,"--qdo"]
             ]
         else:
             cmds = [
                 [FILE_UTIL.QCIR_CONV_PATH,FILE_UTIL.QBF_PROGRAM_FILE,"-prenex"],
                 [FILE_UTIL.FMLA_PATH,"-","-read-qcir","-write-dimacs"],
                 [FILE_UTIL.BLOQQER37_PATH],
-                [FILE_UTIL.DEPQBF_PATH]
+                [FILE_UTIL.DEPQBF_PATH,"--qdo"]
             ]
 
         stdout = ExternalCalls.callSolverPipeline(cmds)
