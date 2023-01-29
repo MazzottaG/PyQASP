@@ -54,6 +54,7 @@ class SubProgramParser:
     
     def __init__(self,qaspFilename,debug,cmd):
         self.programCount = 0
+        self.currentQuantifier = None
         self.qaspFile = qaspFilename
         self.stopEncoding=False
         
@@ -86,7 +87,8 @@ class SubProgramParser:
                 rule=json.loads("{\"0\":"+field[1]+"}")["0"]
                 parsedProgram.addParsedRule(rule[0],rule[1],rule[2])
                 parsedProgram.addRuleAsStr(rule[3])
-        result=parser.wait()
+        parser.communicate()
+        result = parser.returncode
         self.debugger.printMessage(f"Result parsing level {self.programCount}: {result}")
         self.debugger.printMessage(f"Parsing level {self.programCount} time  : {time.time()-start}")
         return parsedProgram if result==180 else None
@@ -153,8 +155,9 @@ class SubProgramParser:
                         continue
             print("Forall cannot be simplified:",line.strip())
             simplify=False
-
-        if childProcess.wait() != 0:
+        
+        childProcess.communicate()
+        if childProcess.returncode != 0:
             print(subprocess.getoutput(f"cat {FILE_UTIL.SIMPLIFIED_FORALL_FILE}"))
             print("Error happened computing well founded",childProcess.returncode)
             sys.exit(180)
@@ -206,8 +209,9 @@ class SubProgramParser:
             coherent, stream,spi_true,spi_undef,spi_false = self.wellfounded(childProcess.stdout)
             for line in stream:
                 pass
-
-            if childProcess.wait() != 0:
+            
+            childProcess.communicate()
+            if childProcess.returncode != 0:
                 print(subprocess.getoutput(f"cat {FILE_UTIL.OMITTED_FORALL_FILE}"))
                 print("Error happened computing well founded",childProcess.returncode)
                 sys.exit(180)
@@ -301,8 +305,8 @@ class SubProgramParser:
 
             # print("Encoding ...\n\n",subprocess.getoutput(f"cat {SubProgramParser.SIMPLIFIED_FORALL_FILE} {SubProgramParser.OMITTED_FORALL_FILE}")," \n")
             phi_i,extras = self.encodeResidual(stream,program.checkTight(),wellfounded_clauses)    
-            
-            if childProcess.wait() != 0:
+            childProcess.communicate()
+            if childProcess.returncode != 0:
                 print("Error happened computing well founded",childProcess.returncode)
                 sys.exit(180)
 
@@ -316,7 +320,7 @@ class SubProgramParser:
         return coherent,None,None,phi_i,[],[]
 
     def residualToCnf(self,disjunction,tight,wellfoundedClauses=[]):
-
+        self.debugger.printMessage(f"Writing intermediated cnf on {FILE_UTIL.QCIR_SUB_FORMULA_PREFIX}_{self.programCount}.qcir")
         f = open(f"{FILE_UTIL.QCIR_SUB_FORMULA_PREFIX}_{self.programCount}.qcir","w")
         childProcess = ExternalCalls.callPipeline(FILE_UTIL.GROUND_PROGRAM_FILE,disjunction,tight)
         variableMapping = {}
@@ -331,6 +335,7 @@ class SubProgramParser:
             self.clauseCount+=1
         for line in childProcess.stdout:
             line = line.decode("UTF-8").strip()
+            self.debugger.printMessage(line)
             fields = line.split(" ")
             if fields[0] != "p":
                 if fields[0] == "c":
@@ -382,7 +387,8 @@ class SubProgramParser:
         conjunction = ",".join(gates)
         f.write(f"{phi_i} = and({conjunction})")
         f.close()
-        if childProcess.wait() != 0:
+        childProcess.communicate()
+        if childProcess.returncode != 0:
             print("Error calling external pipeline")
             sys.exit(180)
         return phi_i,extras
@@ -500,10 +506,11 @@ class SubProgramParser:
             phi_i,extras=self.encodeResidual(stream,program.checkTight(),wellfounded_clauses)
             symbols = ",".join(current_symbols+extras if not addMovedSymbols else current_symbols+extras+self.movedSymbols) 
             f = open(FILE_UTIL.QBF_PROGRAM_FILE,"a")
-            f.write(f"{QCIR_FORMAT.EXISTS}({symbols})\n")
+            quant = QCIR_FORMAT.EXISTS if self.currentQuantifier != QASP_FORMAT.QFORALL else QCIR_FORMAT.FORALL
+            f.write(f"{quant}({symbols})\n")
             f.close()
-            
-        if childProcess.wait() != 0:
+        childProcess.communicate() 
+        if childProcess.returncode != 0:
             print("Normal pipeline")
             print("Error happened computing well founded",childProcess.returncode)
             sys.exit(180)
@@ -514,7 +521,7 @@ class SubProgramParser:
         self.stopEncoding=False
         self.encodedLevel = [None]
         f = open(self.qaspFile,"r")
-        currentQuantifier = None
+        self.currentQuantifier = None
         parsedProgram = None
         self.gates=[]
         
@@ -531,8 +538,8 @@ class SubProgramParser:
             if matchQuantifier:
                 newQuantifier = matchQuantifier.group(1)
                 self.debugger.printMessage(f"Found quantifier {newQuantifier}")
-                if not currentQuantifier is None:
-                    if newQuantifier == currentQuantifier:
+                if not self.currentQuantifier is None:
+                    if newQuantifier == self.currentQuantifier:
                         continue
         
                     parserFileHandler.close()
@@ -541,7 +548,7 @@ class SubProgramParser:
                         print("Error during parsing level",self.programCount)
                         sys.exit(180)
                     start_encoding_time=time.time()
-                    if currentQuantifier == QASP_FORMAT.QFORALL:
+                    if self.currentQuantifier == QASP_FORMAT.QFORALL:
                         start_time=time.time()
                         if not self.addUnsat is None:
                             parsedProgram.addParsedRule(None,None,[[False,SubProgramParser.AUX_PREDICATE+str(self.forallLevel)]])
@@ -568,7 +575,7 @@ class SubProgramParser:
                                     if len(currentSymbols) > 0:
                                         symbols = ",".join(currentSymbols) 
                                         f = open(FILE_UTIL.QBF_PROGRAM_FILE,"a")
-                                        f.write(f"{currentQuantifier}({symbols})\n")
+                                        f.write(f"{self.currentQuantifier}({symbols})\n")
                                         f.close()
                                         self.encodedLevel.append(SubProgramParser.SKIPPED)
                                         if len(subProgram.rules) > 0:
@@ -618,7 +625,7 @@ class SubProgramParser:
                                 self.gates.append(phi_i)
                                 self.encodedLevel.append(SubProgramParser.ENCODED_F)
                             
-                    elif currentQuantifier == QASP_FORMAT.QEXISTS:
+                    elif self.currentQuantifier == QASP_FORMAT.QEXISTS:
                         
                         start_time=time.time()
                         self.isLastQuantifierExists = True
@@ -728,22 +735,22 @@ class SubProgramParser:
                             self.encodedLevel.append(SubProgramParser.ENCODED_E)
 
                     else:
-                        if currentQuantifier == QASP_FORMAT.QCONSTRAINT:
+                        if self.currentQuantifier == QASP_FORMAT.QCONSTRAINT:
                             print("Error: New quantifier found after constraint")
                             sys.exit(180)
                         else:
-                            print("Error: Unknown quantifier",currentQuantifier)
+                            print("Error: Unknown quantifier",self.currentQuantifier)
                             sys.exit(180)
 
                     # print(f"Encoding time level {self.programCount}:{time.time()-start_encoding_time}")  
                 parserFileHandler=open(FILE_UTIL.ASP_PARSER_FILE,"w")
                 parsedProgram = ParsedProgram()
-                currentQuantifier = newQuantifier
+                self.currentQuantifier = newQuantifier
                 self.programCount += 1
                 continue
             
             #current line does not match quantifier
-            if currentQuantifier is None:
+            if self.currentQuantifier is None:
                 print("No Quantifier found yet: Skipping",line)
             else:
                 parserFileHandler.write(line)
@@ -758,7 +765,7 @@ class SubProgramParser:
                     print("Error during parsing level",self.programCount)
                     sys.exit(180)
             start_encoding_time=time.time()
-            if currentQuantifier == QASP_FORMAT.QCONSTRAINT:
+            if self.currentQuantifier == QASP_FORMAT.QCONSTRAINT:
                 start_time=time.time()
                 #encodedLevel contains the encodings strategy of previous level: 0 is a fake level
                 lastForall=None
@@ -868,6 +875,16 @@ class SubProgramParser:
                     finalizing.append(f"{next_} = or(-{self.gates[i-1]},{phi_c})")
                     phi_c = f"{next_}"
                 quiteCNF=False
+        if len(self.encodedLevel) == 1 and self.encodedLevel[0]:
+            if self.encodedLevel[0] == SubProgramParser.INCOHERENT_F:
+                print(f"{PYQASP_OUTPUT.EXTENDED}10")
+                sys.exit(10)
+            elif self.encodedLevel[1] == SubProgramParser.INCOHERENT_E:
+                print(f"{PYQASP_OUTPUT.EXTENDED}20")
+                sys.exit(20)
+            else:
+                print("Error: found only one level not incoherent")
+                sys.exit(180)
 
         finalQBF=open(FILE_UTIL.QBF_PROGRAM_FILE,"a")
         finalQBF.write(f"{QCIR_FORMAT.OUTPUT}({phi_c})\n")

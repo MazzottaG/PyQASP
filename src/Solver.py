@@ -2,53 +2,72 @@ from Executors import ExternalCalls
 from Option import FILE_UTIL,QUABS_OUTPUT,REGEX_UTIL,RAREQS_OUTPUT,PYQASP_OUTPUT,DEFAULT_PROPERTIES,DEPQBF_OUTPUT
 from Structures import SymbolTable
 from Converter import QCIRCnfToQDIMACS
-import re
+import re,sys
 
 class OutputBuilder:
     
-    def printOuput(self,symbolTable:SymbolTable,isFirstForall,stdout):
-        line = stdout.readline().decode("UTF-8").strip()
+    def printOuput(self,symbolTable:SymbolTable,isFirstForall,process):
+        line = process.stdout.readline().decode("UTF-8").strip()
         sat = False
         unsat = False
         while line:
+            print(line)
             if DEPQBF_OUTPUT.UNSAT in line:
                 unsat = True
             elif DEPQBF_OUTPUT.SAT in line:
                 sat=True
-            line = stdout.readline().decode("UTF-8").strip()
-        
-        if sat:
-            print(PYQASP_OUTPUT.SAT)
-        if unsat:
-            print(PYQASP_OUTPUT.UNSAT)
-        if not sat and not unsat:
-            print("No answer found")
+            line = process.stdout.readline().decode("UTF-8").strip()
+        process.communicate()
+        print(f"{PYQASP_OUTPUT.EXTENDED}{process.returncode}")
+        sys.exit(process.returncode)
+
+        # if sat:
+        #     print(PYQASP_OUTPUT.SAT)
+        # if unsat:
+        #     print(PYQASP_OUTPUT.UNSAT)
+        # if not sat and not unsat:
+        #     print("No answer found")
 
 class RareqsOutputBuilder(OutputBuilder):
     
-    def printOuput(self,symbolTable:SymbolTable,isFirstForall,stdout):
-        line = stdout.readline().decode("UTF-8")
+    def printOuput(self,symbolTable:SymbolTable,isFirstForall,process):
+        line = process.stdout.readline().decode("UTF-8")
         # if isFirstForall:
         #     print("Warning: ignoring model since the most external program is universally quantified")
         sat=False
+        unsat=False
         while line:
+            print(line)
             match = re.match(REGEX_UTIL.RAREQS_OUT,line)
             if match:
                 if match.group(1) == RAREQS_OUTPUT.SAT:
-                    print(PYQASP_OUTPUT.SAT)
+                    sat=True
                 elif match.group(1) == RAREQS_OUTPUT.UNSAT:
-                    print(PYQASP_OUTPUT.UNSAT)
-            line = stdout.readline().decode("UTF-8")
-            
+                    sat=False
+            line = process.stdout.readline().decode("UTF-8")
+        process.communicate()
+        print(f"{PYQASP_OUTPUT.EXTENDED}{process.returncode}")
+        sys.exit(process.returncode)
+
+        # if sat:
+        #     print(PYQASP_OUTPUT.SAT)
+        # elif unsat:
+        #     print(PYQASP_OUTPUT.UNSAT)
+        # else:
+        #     print("No answer found")
+
 class QuabsOutputBuilder(OutputBuilder):
     
-    def printOuput(self,symbolTable:SymbolTable,isFirstForall,stdout):
-        line = stdout.readline().decode("UTF-8").strip()
+    def printOuput(self,symbolTable:SymbolTable,isFirstForall,process):
+        line = process.stdout.readline().decode("UTF-8").strip()
         if isFirstForall:
             print("Warning: ignoring model since the most external program is universally quantified")
+        
         model = None
         sat=False
+        unsat=False
         while line:
+            print(line)
             fields = line.split(" ")
             if fields[0] == QUABS_OUTPUT.MODEL_START and model is None and not isFirstForall:
                 model=[]
@@ -58,23 +77,34 @@ class QuabsOutputBuilder(OutputBuilder):
                         var,level = data
                         if str(var) in fields:
                             model.append(atom)
+            
             if line.endswith(QUABS_OUTPUT.UNSAT):
-                print(PYQASP_OUTPUT.UNSAT)
-                return
-
-            if line.endswith(QUABS_OUTPUT.SAT):
+                unsat=True
+            elif line.endswith(QUABS_OUTPUT.SAT):
                 sat=True
 
-            line = stdout.readline().decode("UTF-8").strip()
-
-        if not isFirstForall and (not sat or model is None):
-            print(f"Warning: unexpected outcome model: {model} and sat: {sat}")
-        
-        if sat:
-            print(PYQASP_OUTPUT.SAT)
+            line = process.stdout.readline().decode("UTF-8").strip()
 
         if not model is None:
             print(". ".join(model))
+        
+        process.communicate()
+        print(f"{PYQASP_OUTPUT.EXTENDED}{process.returncode}")
+
+        sys.exit(process.returncode)
+
+        # if not isFirstForall and (not sat or model is None):
+        #     print(f"Warning: unexpected outcome model: {model} and sat: {sat}")
+        
+
+        # if sat:
+        #     print(PYQASP_OUTPUT.SAT)
+        # if unsat:
+        #     print(PYQASP_OUTPUT.UNSAT)
+        # if not sat and not unsat:
+        #     print("No answer found")
+        
+        
 
         
 class Solver:
@@ -82,9 +112,9 @@ class Solver:
     def __init__(self):
         self.outputBuilder = OutputBuilder()
 
-    def printOuput(self,symbolTable:SymbolTable,isFirstForall,stdout):
+    def printOuput(self,symbolTable:SymbolTable,isFirstForall,process):
         print("Output ...")
-        self.outputBuilder.printOuput(symbolTable,isFirstForall,stdout)
+        self.outputBuilder.printOuput(symbolTable,isFirstForall,process)
     
     def solve(self,symbolTable:SymbolTable,isFirstForall,qcirProps):
         print("Solving ...")
@@ -102,8 +132,8 @@ class Rareqs(Solver):
         cmds = [
             [FILE_UTIL.QCIR_CONV_PATH,FILE_UTIL.QBF_PROGRAM_FILE,"-prenex","-write-gq"],
             [FILE_UTIL.RAREQS_NN_PATH, "-"]]
-        stdout = ExternalCalls.callSolverPipeline(cmds)
-        self.outputBuilder.printOuput(symbolTable,isFirstForall,stdout)
+        pipeline = ExternalCalls.callSolverPipeline(cmds)
+        self.outputBuilder.printOuput(symbolTable,isFirstForall,pipeline[-1])
 
 class Depqbf(Solver):
     # 	public final static ShellCommand DEPQBF_COMMAND_TEMPLATE_BLO = new ShellCommand(
@@ -118,6 +148,7 @@ class Depqbf(Solver):
         cmds = []
         # if True and qcirProps.isQuiteCnf():
         if DEFAULT_PROPERTIES.SKIP_QCIR_CONV_FOR_QDIMACS and qcirProps.isQuiteCnf():
+            print("Mapping directly into cnf")
             QCIRCnfToQDIMACS().translate(qcirProps.getLastSymbol(),qcirProps.getClausesCount(),qcirProps.getLevelsCount())
             cmds = [
                 [FILE_UTIL.BLOQQER37_PATH,FILE_UTIL.QDIMACS_PROGRAM_FILE],
@@ -131,8 +162,8 @@ class Depqbf(Solver):
                 [FILE_UTIL.DEPQBF_PATH,"--qdo"]
             ]
 
-        stdout = ExternalCalls.callSolverPipeline(cmds)
-        self.outputBuilder.printOuput(symbolTable,isFirstForall,stdout)
+        pipeline = ExternalCalls.callSolverPipeline(cmds)
+        self.outputBuilder.printOuput(symbolTable,isFirstForall,pipeline[-1])
 
 class Quabs(Solver):
     
@@ -142,5 +173,5 @@ class Quabs(Solver):
 
     def solve(self,symbolTable:SymbolTable,isFirstForall,qcirProps):
         super().solve(symbolTable,isFirstForall,qcirProps)
-        stdout = ExternalCalls.callSolver([FILE_UTIL.QUABS_PATH,"--partial-assignment",FILE_UTIL.QBF_PROGRAM_FILE])
-        self.outputBuilder.printOuput(symbolTable,isFirstForall,stdout)
+        process = ExternalCalls.callSolver([FILE_UTIL.QUABS_PATH,"--partial-assignment",FILE_UTIL.QBF_PROGRAM_FILE])
+        self.outputBuilder.printOuput(symbolTable,isFirstForall,process)

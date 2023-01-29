@@ -37,6 +37,7 @@ argparser.add_argument('filename', metavar='file', type=str, help='Path to QASP 
 # argparser.add_argument('-g','--grounder', dest="groundername",  type=str, help='available grounders : '+str(GROUNDERS_DESC))
 argparser.add_argument('-s','--solver', dest="solvername",  type=str, help='available solvers : '+str(list(SOLVERS.keys())))
 argparser.add_argument('-pq','--print-qcir', dest="qcir_file",  type=str, help='output qcir filename')
+argparser.add_argument('-err','--error-log', dest="log_file",  type=str, help='external tools log filename')
 argparser.add_argument('--guess-check', dest="enable_guess_check", default=False, action='store_true')
 argparser.add_argument('--no-direct-cnf', dest="disable_skip_conv", default=False, action='store_true')
 argparser.add_argument('--stats', dest="stats", default=False, action='store_true',help="print encoded qbf formula's statistics")
@@ -60,9 +61,10 @@ if ns.stats:
 if ns.qcir_file:
     FILE_UTIL.QBF_PROGRAM_FILE=ns.qcir_file
 
-# if ns.logfile:
-#     FILE_UTIL.LOG_ERROR = ns.logfile
+if ns.log_file:
+    FILE_UTIL.LOG_ERROR = ns.log_file
 
+ExternalCalls.LOG_FILE_HANDLER = open(FILE_UTIL.LOG_ERROR,"w")
 grounder = GROUNDERS["dlv2"]
 # if ns.groundername:
 #     if ns.groundername not in GROUNDERS:
@@ -77,6 +79,9 @@ debugcmd = EmptyDebugCommand()
 if ns.debug_print:
     debug=Debugger()
     debugcmd=DebugCommand()
+
+ExternalCalls.debugger = debug
+ExternalCalls.debuggercmd = debugcmd
 
 parser = SubProgramParser(ns.filename,debug,debugcmd)
 props = parser.buildSubPrograms()
@@ -94,3 +99,5 @@ if ns.solvername:
         sys.exit(180)
     solver = SOLVERS[ns.solvername]
 solver.solve(parser.symbols,parser.encodedLevel[1] in [parser.ENCODED_F,parser.SKIPPED],props)
+
+ExternalCalls.LOG_FILE_HANDLER.close()

@@ -110,6 +110,7 @@ class DEPQBF_OUTPUT:
 class PYQASP_OUTPUT:
     SAT                         = "SATISFIABLE"
     UNSAT                       = "UNSATISFIABLE"
+    EXTENDED                    = "PyQasp::"
 
 class DEFAULT_PROPERTIES:
     GUESS_CHECK                 = False
