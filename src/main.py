@@ -87,10 +87,11 @@ parser = SubProgramParser(ns.filename,debug,debugcmd)
 props = parser.buildSubPrograms()
 if DEFAULT_PROPERTIES.PRINT_STATS:
     props.printProps()
-# with open("/home/giuseppe/PyQASP/symbols.json", "w") as outfile:
-#     json.dump(parser.symbols.factory, outfile)
+
 if ns.encode:
     props.printProps()
+    with open(FILE_UTIL.FACTORY_DUMP, "w") as outfile:
+        json.dump(parser.symbols.factory, outfile)
     sys.exit(0)
 solver = SOLVERS["quabs"]
 if ns.solvername:

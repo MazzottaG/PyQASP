@@ -49,6 +49,7 @@ class FILE_UTIL:
     LP2ACYC_PATH                = os.path.join(TOOL_FOLDER_PATH,"lp2acyc")   
 
     FILES_FOLDER_PATH           = os.path.join(DEFAULT_PATH,"resources","files")
+    FACTORY_DUMP                = os.path.join(FILES_FOLDER_PATH,"factory.json")
     ASP_PARSER_FILE             = os.path.join(FILES_FOLDER_PATH,"parsing.asp")
     TO_GROUND_PROGRAM_FILE      = os.path.join(FILES_FOLDER_PATH,"subprogram.asp")
     GROUND_PROGRAM_FILE         = os.path.join(FILES_FOLDER_PATH,"subprogram.lparse")

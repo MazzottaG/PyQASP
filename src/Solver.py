@@ -152,14 +152,14 @@ class Depqbf(Solver):
             QCIRCnfToQDIMACS().translate(qcirProps.getLastSymbol(),qcirProps.getClausesCount(),qcirProps.getLevelsCount())
             cmds = [
                 [FILE_UTIL.BLOQQER37_PATH,FILE_UTIL.QDIMACS_PROGRAM_FILE],
-                [FILE_UTIL.DEPQBF_PATH,"--qdo"]
+                [FILE_UTIL.DEPQBF_PATH]
             ]
         else:
             cmds = [
                 [FILE_UTIL.QCIR_CONV_PATH,FILE_UTIL.QBF_PROGRAM_FILE,"-prenex"],
                 [FILE_UTIL.FMLA_PATH,"-","-read-qcir","-write-dimacs"],
                 [FILE_UTIL.BLOQQER37_PATH],
-                [FILE_UTIL.DEPQBF_PATH,"--qdo"]
+                [FILE_UTIL.DEPQBF_PATH]
             ]
 
         pipeline = ExternalCalls.callSolverPipeline(cmds)
