@@ -115,6 +115,7 @@ class PYQASP_OUTPUT:
 
 class DEFAULT_PROPERTIES:
     GUESS_CHECK                 = False
+    NO_WF                       = False
     ONLY_CHOICE                 = True
     SKIP_QCIR_CONV_FOR_QDIMACS  = True
     PRINT_STATS                 = False

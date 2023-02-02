@@ -131,7 +131,8 @@ class Rareqs(Solver):
         super().solve(symbolTable,isFirstForall,qcirProps)
         cmds = [
             [FILE_UTIL.QCIR_CONV_PATH,FILE_UTIL.QBF_PROGRAM_FILE,"-prenex","-write-gq"],
-            [FILE_UTIL.RAREQS_NN_PATH, "-"]]
+            [FILE_UTIL.RAREQS_NN_PATH, "-"]
+        ]
         pipeline = ExternalCalls.callSolverPipeline(cmds)
         self.outputBuilder.printOuput(symbolTable,isFirstForall,pipeline[-1])
 

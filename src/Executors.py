@@ -27,7 +27,7 @@ class ExternalCalls:
         return subprocess.Popen([f"{FILE_UTIL.DLV2_PATH}",inputFilename,"--mode=idlv"],stdout=subprocess.PIPE,stderr=ExternalCalls.LOG_FILE_HANDLER).stdout
 
     def callGringo(inputFilename):
-        return subprocess.Popen([f"{FILE_UTIL.GRINGO_PATH}",inputFilename,"-o","smodels"],stdout=subprocess.PIPE,stderr=ExternalCalls.LOG_FILE_HANDLER).stdout
+        return subprocess.Popen([f"{FILE_UTIL.GRINGO_PATH}",inputFilename,"-o","smodels"],stdout=subprocess.PIPE,stderr=ExternalCalls.LOG_FILE_HANDLER)
 
     def callProgramParser(filename):
         return subprocess.Popen([f"{FILE_UTIL.ASP_PARSER_PATH}",filename], stdout=subprocess.PIPE,stderr=subprocess.PIPE)

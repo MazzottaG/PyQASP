@@ -413,6 +413,37 @@ class SubProgramParser:
         return self.residualToCnf(disjunction,tight,wellfoundedClauses)
         # print("\n")        
 
+    def encodeGringo(self,stream):
+        f=open(FILE_UTIL.GROUND_PROGRAM_FILE,"w")
+        disjunction = False
+        endProgram  = False
+        endTable    = False
+        coherent    = True
+        current_symbols = []
+        for line in stream:
+            line = line.decode("UTF-8").strip()
+            if line == "0":
+                if not endProgram:
+                    endProgram=True
+                else:
+                    endTable=True
+            elif not endProgram:
+                if line.strip() == "1 1 0 0":
+                    coherent=False
+                else:
+                    data = [int(x) for x in line.split(" ")]
+                    if data[LPARSE_FORMAT.RULE_TYPE_INDEX] == LPARSE_FORMAT.DISJCUNTIVE_RULE:
+                        disjunction = True
+            elif not endTable:
+                id_,lev,truth,added = self.symbols.addSymbol(line.split(" ")[1],self.programCount)
+                if added:
+                    current_symbols.append(str(id_))                
+
+            f.write(f"{line}\n")
+        f.close()
+        
+        return coherent,disjunction,current_symbols
+
     def wellfounded(self,stream):
         #reading well founded model
         true=None
@@ -463,58 +494,79 @@ class SubProgramParser:
         f.write("%Moved interface.\n")
         f.write("\n".join(movedInterface)+"\n")
         f.close()
-        
+    
     def ground(self,program,filename,addMovedSymbols,addMovedInterface):
         
         self.addInterface(program,filename,self.movedInterface if addMovedInterface else [])
         self.debugger.printMessage("-------------------------------------DLV2 "+str(self.programCount)+" ... -------------------------------------\n\n"+self.debugcmd.getOutput(f"cat {filename}")+" \n")
         self.debugger.printMessage("------------------------------------------------------------------------------------------")
         
-        childProcess = ExternalCalls.callDLV2(filename)
-        coherent,stream,true,undef,false = self.wellfounded(childProcess.stdout)
-        wellfounded_clauses=[]
-        current_symbols = []
-        # print("WF_T",true)
-        # print("WF_U",undef)
-        # print("WF_F",false)
-        if coherent:
-            for atom in true:
-                id_,lev,truth,added = self.symbols.addSymbol(atom,self.programCount)
-                if added:
-                    #wellfounded_clauses.append(f"or({id_})")
-                    current_symbols.append(str(id_))
-                self.symbols.assign(atom,SymbolTable.TRUE,self.programCount)
-                    
-            for atom in false:
-                id_,lev,truth,added = self.symbols.addSymbol(atom,self.programCount)
-                if added:
-                    current_symbols.append(str(id_))
-                self.symbols.assign(atom,SymbolTable.FALSE,self.programCount)
-                wellfounded_clauses.append(f"or({-id_})")
-                    
-            for atom in undef:
-                id_,lev,truth,added = self.symbols.addSymbol(atom,self.programCount)
-                if added:
-                    current_symbols.append(str(id_))
-        
-        
-        phi_i = None
-        if coherent:
-            if stream is None:
-                print("Error reading stream after wellfounded model")
+        if not DEFAULT_PROPERTIES.NO_WF:
+            childProcess = ExternalCalls.callDLV2(filename)
+            coherent,stream,true,undef,false = self.wellfounded(childProcess.stdout)
+            wellfounded_clauses=[]
+            current_symbols = []
+            # print("WF_T",true)
+            # print("WF_U",undef)
+            # print("WF_F",false)
+            if coherent:
+                for atom in true:
+                    id_,lev,truth,added = self.symbols.addSymbol(atom,self.programCount)
+                    if added:
+                        #wellfounded_clauses.append(f"or({id_})")
+                        current_symbols.append(str(id_))
+                    self.symbols.assign(atom,SymbolTable.TRUE,self.programCount)
+                        
+                for atom in false:
+                    id_,lev,truth,added = self.symbols.addSymbol(atom,self.programCount)
+                    if added:
+                        current_symbols.append(str(id_))
+                    self.symbols.assign(atom,SymbolTable.FALSE,self.programCount)
+                    wellfounded_clauses.append(f"or({-id_})")
+                        
+                for atom in undef:
+                    id_,lev,truth,added = self.symbols.addSymbol(atom,self.programCount)
+                    if added:
+                        current_symbols.append(str(id_))
+            
+            
+            phi_i = None
+            if coherent:
+                if stream is None:
+                    print("Error reading stream after wellfounded model")
+                    sys.exit(180)
+                phi_i,extras=self.encodeResidual(stream,program.checkTight(),wellfounded_clauses)
+                symbols = ",".join(current_symbols+extras if not addMovedSymbols else current_symbols+extras+self.movedSymbols) 
+                f = open(FILE_UTIL.QBF_PROGRAM_FILE,"a")
+                quant = QCIR_FORMAT.EXISTS if self.currentQuantifier != QASP_FORMAT.QFORALL else QCIR_FORMAT.FORALL
+                f.write(f"{quant}({symbols})\n")
+                f.close()
+            childProcess.communicate() 
+            if childProcess.returncode != 0:
+                print("Normal pipeline")
+                print("Error happened computing well founded",childProcess.returncode)
                 sys.exit(180)
-            phi_i,extras=self.encodeResidual(stream,program.checkTight(),wellfounded_clauses)
-            symbols = ",".join(current_symbols+extras if not addMovedSymbols else current_symbols+extras+self.movedSymbols) 
-            f = open(FILE_UTIL.QBF_PROGRAM_FILE,"a")
-            quant = QCIR_FORMAT.EXISTS if self.currentQuantifier != QASP_FORMAT.QFORALL else QCIR_FORMAT.FORALL
-            f.write(f"{quant}({symbols})\n")
-            f.close()
-        childProcess.communicate() 
-        if childProcess.returncode != 0:
-            print("Normal pipeline")
-            print("Error happened computing well founded",childProcess.returncode)
-            sys.exit(180)
-        return coherent,phi_i
+            return coherent,phi_i
+        else:
+            childProcess = ExternalCalls.callGringo(filename)
+
+            coherent, disjunction, current_symbols = self.encodeGringo(childProcess.stdout)
+            
+            childProcess.communicate() 
+            if childProcess.returncode != 0:
+                print("Normal pipeline")
+                print("Error happened computing well founded",childProcess.returncode)
+                sys.exit(180)
+            
+            phi_i = None
+            if coherent:
+                phi_i,extras=self.residualToCnf(disjunction,program.checkTight(),[])
+                symbols = ",".join(current_symbols+extras if not addMovedSymbols else current_symbols+extras+self.movedSymbols) 
+                f = open(FILE_UTIL.QBF_PROGRAM_FILE,"a")
+                quant = QCIR_FORMAT.EXISTS if self.currentQuantifier != QASP_FORMAT.QFORALL else QCIR_FORMAT.FORALL
+                f.write(f"{quant}({symbols})\n")
+                f.close()
+            return coherent,phi_i
         
     def buildSubPrograms(self):
         print("Parsing ...",self.qaspFile)

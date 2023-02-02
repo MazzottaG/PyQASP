@@ -34,7 +34,7 @@ GROUNDERS_DESC = {
 }
 argparser = argparse.ArgumentParser(description='QBF encoder')
 argparser.add_argument('filename', metavar='file', type=str, help='Path to QASP file')
-# argparser.add_argument('-g','--grounder', dest="groundername",  type=str, help='available grounders : '+str(GROUNDERS_DESC))
+argparser.add_argument('--no-wf', dest="disable_wf", default=False, action='store_true')
 argparser.add_argument('-s','--solver', dest="solvername",  type=str, help='available solvers : '+str(list(SOLVERS.keys())))
 argparser.add_argument('-pq','--print-qcir', dest="qcir_file",  type=str, help='output qcir filename')
 argparser.add_argument('-err','--error-log', dest="log_file",  type=str, help='external tools log filename')
@@ -48,6 +48,13 @@ ns = argparser.parse_args()
 
 if ns.enable_guess_check:
     DEFAULT_PROPERTIES.GUESS_CHECK = True
+
+if ns.disable_wf:
+    DEFAULT_PROPERTIES.NO_WF = True
+
+if DEFAULT_PROPERTIES.GUESS_CHECK and DEFAULT_PROPERTIES.NO_WF:
+    print("Guess and check optimizations are meant to be used together with well founded opt")
+    sys.exit(180)
 
 # if ns.disable_choice_check:
 #     DEFAULT_PROPERTIES.ONLY_CHOICE = False
