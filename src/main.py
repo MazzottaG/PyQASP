@@ -25,17 +25,18 @@ SOLVERS = {
 GROUNDERS = {
     #"gringo":GringoWapper(),
     #"idlv":IDLVWapper(),
-    "dlv2":DLV2Wapper()
+    # "dlv2":DLV2Wapper()
 }
 GROUNDERS_DESC = {
-    #"gringo":"Plain version of gringo grounder",
-    #"idlv":"Plain version of idlv grounder",
+    "gringo":"Plain version of gringo grounder",
+    "idlv":"Plain version of idlv grounder",
     "dlv2":"idlv + well founded model"
 }
 argparser = argparse.ArgumentParser(description='QBF encoder')
 argparser.add_argument('filename', metavar='file', type=str, help='Path to QASP file')
 argparser.add_argument('--no-wf', dest="disable_wf", default=False, action='store_true')
 argparser.add_argument('-s','--solver', dest="solvername",  type=str, help='available solvers : '+str(list(SOLVERS.keys())))
+argparser.add_argument('-g','--grounder', dest="groundername",  type=str, help='available grounders : '+str(list(GROUNDERS_DESC.keys())))
 argparser.add_argument('-pq','--print-qcir', dest="qcir_file",  type=str, help='output qcir filename')
 argparser.add_argument('-err','--error-log', dest="log_file",  type=str, help='external tools log filename')
 argparser.add_argument('--guess-check', dest="enable_guess_check", default=False, action='store_true')
@@ -46,18 +47,28 @@ argparser.add_argument('-d', "--debug-encoding", dest="debug_print", default=Fal
 
 ns = argparser.parse_args()
 
+grounder = "gringo"
+if ns.groundername:
+    if ns.groundername not in GROUNDERS_DESC:
+        print("Error: Unable to find solver")
+        sys.exit(180)
+    grounder = ns.groundername
+
 if ns.enable_guess_check:
     DEFAULT_PROPERTIES.GUESS_CHECK = True
 
 if ns.disable_wf:
     DEFAULT_PROPERTIES.NO_WF = True
+else:
+    if grounder != "dlv2":
+        print("Error: disable well optimization are not supported with plain gringo and idlv grounder")
+        print("run with --no-wf")
+        sys.exit(180)
 
 if DEFAULT_PROPERTIES.GUESS_CHECK and DEFAULT_PROPERTIES.NO_WF:
-    print("Guess and check optimizations are meant to be used together with well founded opt")
+    print("Guess&Check optimizations are meant to be used together with well founded opt")
+    print("run without --no-wf")
     sys.exit(180)
-
-# if ns.disable_choice_check:
-#     DEFAULT_PROPERTIES.ONLY_CHOICE = False
 
 if ns.disable_skip_conv:
     DEFAULT_PROPERTIES.SKIP_QCIR_CONV_FOR_QDIMACS = False
@@ -72,14 +83,6 @@ if ns.log_file:
     FILE_UTIL.LOG_ERROR = ns.log_file
 
 ExternalCalls.LOG_FILE_HANDLER = open(FILE_UTIL.LOG_ERROR,"w")
-grounder = GROUNDERS["dlv2"]
-# if ns.groundername:
-#     if ns.groundername not in GROUNDERS:
-#         print("Error: Unable to find grounder")
-#         sys.exit(180)
-#     grounder = GROUNDERS[ns.groundername]
-
-grounder.printName()
 
 debug = EmptyDebugger()
 debugcmd = EmptyDebugCommand()
@@ -90,15 +93,27 @@ if ns.debug_print:
 ExternalCalls.debugger = debug
 ExternalCalls.debuggercmd = debugcmd
 
-parser = SubProgramParser(ns.filename,debug,debugcmd)
+parser = SubProgramParser(ns.filename,debug,debugcmd,grounder)
 props = parser.buildSubPrograms()
 if DEFAULT_PROPERTIES.PRINT_STATS:
     props.printProps()
 
 if ns.encode:
     props.printProps()
-    with open(FILE_UTIL.FACTORY_DUMP, "w") as outfile:
-        json.dump(parser.symbols.factory, outfile)
+    # first=True
+    # with open(FILE_UTIL.FACTORY_DUMP, "w") as f:
+    #     f.write("{")
+    #     for predicate in parser.symbols.factory:
+    #         for atom,info in parser.symbols.factory[predicate].items():
+    #             if not first:
+    #                 f.write(",")
+    #             f.write("\""+atom+"\":"+str(info[0]))
+    #             first=False
+    #     f.write("}\n")
+    #     f.flush()
+
+    # with open(FILE_UTIL.FACTORY_DUMP, "w") as outfile:
+    #     json.dump(parser.symbols.factory, outfile)
     sys.exit(0)
 solver = SOLVERS["quabs"]
 if ns.solvername:
@@ -106,6 +121,9 @@ if ns.solvername:
         print("Error: Unable to find solver")
         sys.exit(180)
     solver = SOLVERS[ns.solvername]
-solver.solve(parser.symbols,parser.encodedLevel[1] in [parser.ENCODED_F,parser.SKIPPED],props)
+symbols=parser.symbols
+isFirstForall=parser.encodedLevel[1] in [parser.ENCODED_F,parser.SKIPPED]
+parser=None
+solver.solve(symbols,isFirstForall,props)
 
 ExternalCalls.LOG_FILE_HANDLER.close()

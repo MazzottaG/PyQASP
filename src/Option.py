@@ -39,9 +39,9 @@ class FILE_UTIL:
     GRINGO_PATH                 = os.path.join(TOOL_FOLDER_PATH,"gringo")        
     DLV2_PATH                   = os.path.join(TOOL_FOLDER_PATH,"dlv2")          
     
-    OLD_LPSHIFT_PATH                = os.path.join(TOOL_FOLDER_PATH,"lpshift-1.4")   
-    OLD_LP2NORMAL_PATH              = os.path.join(TOOL_FOLDER_PATH,"lp2normal-2.27")
-    OLD_LP2SAT_PATH                 = os.path.join(TOOL_FOLDER_PATH,"lp2sat-1.24")   
+    OLD_LPSHIFT_PATH            = os.path.join(TOOL_FOLDER_PATH,"lpshift-1.4")   
+    OLD_LP2NORMAL_PATH          = os.path.join(TOOL_FOLDER_PATH,"lp2normal-2.27")
+    OLD_LP2SAT_PATH             = os.path.join(TOOL_FOLDER_PATH,"lp2sat-1.24")   
 
     LPSHIFT_PATH                = os.path.join(TOOL_FOLDER_PATH,"lpshift")   
     LP2NORMAL_PATH              = os.path.join(TOOL_FOLDER_PATH,"lp2normal2")

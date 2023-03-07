@@ -2000,7 +2000,8 @@ def main():
             (Subsumed, Useless) = TrimJunk(p)
             p.Subsumed |= Subsumed
             assert(p.OutGlit > 0)
-            QuitEarly = (elapsed_time() > 7) or glo.MinSimplify
+            # QuitEarly = (elapsed_time() > 7) or glo.MinSimplify
+            QuitEarly = True or glo.MinSimplify
             MonoSubst = []
             if not QuitEarly:
                 p.OccurPol = set()

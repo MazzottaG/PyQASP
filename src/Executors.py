@@ -21,10 +21,11 @@ class ExternalCalls:
         return subprocess.Popen(cmd,stdout=subprocess.PIPE,stderr=ExternalCalls.LOG_FILE_HANDLER)
 
     def callDLV2(inputFilename):
+        ExternalCalls.debugger.printMessage(" ".join([f"{FILE_UTIL.DLV2_PATH}",inputFilename,"--pre=lparse"]))
         return subprocess.Popen([f"{FILE_UTIL.DLV2_PATH}",inputFilename,"--pre=lparse"],stdout=subprocess.PIPE,stderr=ExternalCalls.LOG_FILE_HANDLER)
 
     def callIDLV(inputFilename):
-        return subprocess.Popen([f"{FILE_UTIL.DLV2_PATH}",inputFilename,"--mode=idlv"],stdout=subprocess.PIPE,stderr=ExternalCalls.LOG_FILE_HANDLER).stdout
+        return subprocess.Popen([f"{FILE_UTIL.DLV2_PATH}",inputFilename,"--mode=idlv"],stdout=subprocess.PIPE,stderr=ExternalCalls.LOG_FILE_HANDLER)
 
     def callGringo(inputFilename):
         return subprocess.Popen([f"{FILE_UTIL.GRINGO_PATH}",inputFilename,"-o","smodels"],stdout=subprocess.PIPE,stderr=ExternalCalls.LOG_FILE_HANDLER)

@@ -1,6 +1,6 @@
 from Executors import ExternalCalls
 from Option import FILE_UTIL,REGEX_UTIL,QASP_FORMAT,LPARSE_FORMAT,QCIR_FORMAT,DEFAULT_PROPERTIES
-from PyAspParser.ProgramParser import *
+from PyAspParser.ProgramParserLight import *
 from Structures import SymbolTable
 from Builder import QCIRProps
 import os,re,sys,subprocess,time,json
@@ -37,6 +37,29 @@ class DebugCommand(EmptyDebugCommand):
     def getOutput(self,cmd):
         return subprocess.getoutput(cmd)
 
+class PredicateMap:
+    
+    def __init__(self):
+        self.predicatesToId={}
+        self.idToPred=[]
+        self.predicateCount=0
+        
+    def getPredicateId(self,predicate):
+        try:
+            id_=self.predicatesToId[predicate]
+            return self.predicatesToId[predicate]
+        except:
+            pred_id = self.predicateCount
+            self.predicatesToId[predicate] = self.predicateCount
+            self.predicateCount+=1
+            self.idToPred.append(predicate)
+            return pred_id
+    def getPredicate(pred_id):
+        try:
+            return self.idToPred[pred_id]
+        except:
+            return ""
+            
 class SubProgramParser:
 
     AUX_PREDICATE = "unsat_forall_"
@@ -52,7 +75,9 @@ class SubProgramParser:
     ENCODED_F    = 7
     ENCODED_E    = 8
     
-    def __init__(self,qaspFilename,debug,cmd):
+    def __init__(self,qaspFilename,debug,cmd,grounder):
+        self.predicateMap = PredicateMap()
+        self.grounder_backend=grounder
         self.programCount = 0
         self.currentQuantifier = None
         self.qaspFile = qaspFilename
@@ -75,6 +100,33 @@ class SubProgramParser:
         self.debugger=debug
         self.debugcmd=cmd
     
+    def parseRule(self,head,choiceBodyForHead,body):
+        body_numeric=None
+        if not body is None:
+            body_numeric=[]
+            for pred in body:
+                pred_id = self.predicateMap.getPredicateId(pred[1])
+                body_numeric.append([pred[0],pred_id])
+        
+        head_numeric = None
+        if not head is None:
+            head_numeric=[]
+            for pred in head:
+                head_numeric.append(self.predicateMap.getPredicateId(pred))
+
+        choiceBodyForHead_numeric=None 
+        if not choiceBodyForHead is None:
+            choiceBodyForHead_numeric={}
+            for h in choiceBodyForHead:
+                pred_h = self.predicateMap.getPredicateId(h)
+                for pred in choiceBodyForHead[h]:
+                    pred_b = self.predicateMap.getPredicateId(pred[1])
+                    try:
+                        choiceBodyForHead_numeric[pred_h].append([pred[0],pred_b])
+                    except:
+                        choiceBodyForHead_numeric[pred_h]=[[pred[0],pred_b]]
+        return head_numeric,choiceBodyForHead_numeric,body_numeric
+
     def parseProgram(self,filename):
         start=time.time()
         parsedProgram=ParsedProgram()
@@ -85,7 +137,8 @@ class SubProgramParser:
                 parsedProgram.facts.append(field[1])
             else:
                 rule=json.loads("{\"0\":"+field[1]+"}")["0"]
-                parsedProgram.addParsedRule(rule[0],rule[1],rule[2])
+                head,choiceForHead,body=self.parseRule(rule[0],rule[1],rule[2])
+                parsedProgram.addParsedRule(head,choiceForHead,body)
                 parsedProgram.addRuleAsStr(rule[3])
         parser.communicate()
         result = parser.returncode
@@ -190,7 +243,7 @@ class SubProgramParser:
                     #atoms of guess subrogram always true
                     moved_symbols.append(str(id_))
                     pushSubProgram.addRuleAsStr(f"{atom}.")
-                    pushSubProgram.addParsedRule([atom.split("(")[0]],None,None)
+                    pushSubProgram.addParsedRule([self.predicateMap.getPredicateId(atom.split("(")[0])],None,None)
                     self.symbols.assign(atom,SymbolTable.TRUE,self.programCount+1)
 
                 spi_handler.write(f"{atom}.\n")
@@ -202,25 +255,29 @@ class SubProgramParser:
                 spi_handler.write("{"+atom+"}.\n")
             
             spi_handler.close()
-            
-            self.debugger.printMessage("-------------------------------------DLV2 moved forall "+str(self.programCount)+" ... -------------------------------------\n\n"+self.debugcmd.getOutput(f"cat {SubProgramParser.OMITTED_FORALL_FILE}")+" \n")
-            self.debugger.printMessage("-----------------------------------------------------------------------------------------------------------")
-            childProcess = ExternalCalls.callDLV2(SubProgramParser.OMITTED_FORALL_FILE)
-            coherent, stream,spi_true,spi_undef,spi_false = self.wellfounded(childProcess.stdout)
-            for line in stream:
-                pass
-            
-            childProcess.communicate()
-            if childProcess.returncode != 0:
-                print(subprocess.getoutput(f"cat {FILE_UTIL.OMITTED_FORALL_FILE}"))
-                print("Error happened computing well founded",childProcess.returncode)
-                sys.exit(180)
+            spi_true = true
+            spi_undef = undef
+            spi_false = []
+
+            if len(spi) > 0:
+                self.debugger.printMessage("-------------------------------------DLV2 moved forall "+str(self.programCount)+" ... -------------------------------------\n\n"+self.debugcmd.getOutput(f"cat {SubProgramParser.OMITTED_FORALL_FILE}")+" \n")
+                self.debugger.printMessage("-----------------------------------------------------------------------------------------------------------")
+                childProcess = ExternalCalls.callDLV2(SubProgramParser.OMITTED_FORALL_FILE)
+                coherent, stream,spi_true,spi_undef,spi_false = self.wellfounded(childProcess.stdout)
+                for line in stream:
+                    pass
+                
+                childProcess.communicate()
+                if childProcess.returncode != 0:
+                    print(subprocess.getoutput(f"cat {FILE_UTIL.OMITTED_FORALL_FILE}"))
+                    print("Error happened computing well founded",childProcess.returncode)
+                    sys.exit(180)
             
             if coherent:
                 #adding constraint to pushed subprogram
                 moved_interface.append("%True")
                 for atom in spi_true:
-                    pred=atom.split("(")[0]
+                    pred=self.predicateMap.getPredicateId(atom.split("(")[0])
                     #every atom that is not in the factory is an atom defined in SPi so it is moved
                     id_,lev,truth,added = self.symbols.addSymbol(atom,self.programCount+1)
                     pushSubProgram.addRuleAsStr(f":- not {atom}.")
@@ -239,7 +296,7 @@ class SubProgramParser:
                 moved_interface.append("%False")
                 for atom in spi_false:
                     
-                    pred=atom.split("(")[0]
+                    pred=self.predicateMap.getPredicateId(atom.split("(")[0])
                     id_,lev,truth,added = self.symbols.addSymbol(atom,self.programCount+1)
                     pushSubProgram.addRuleAsStr(f":- {atom}.")
                     pushSubProgram.addParsedRule(None,None,[[False,pred]])
@@ -255,7 +312,7 @@ class SubProgramParser:
 
                 moved_interface.append("%Undef")
                 for atom in spi_undef:
-                    pred=atom.split("(")[0]
+                    pred=self.predicateMap.getPredicateId(atom.split("(")[0])
                     id_,lev,truth,added = self.symbols.addSymbol(atom,self.programCount+1)
                     if added or lev == self.programCount:
                         if lev == self.programCount:
@@ -272,7 +329,7 @@ class SubProgramParser:
         
         self.debugger.printMessage("-------------------------------------DLV2 entire forall "+str(self.programCount)+" ... -------------------------------------\n\n"+self.debugcmd.getOutput(f"cat {SubProgramParser.SIMPLIFIED_FORALL_FILE} {SubProgramParser.OMITTED_FORALL_FILE}")+" \n")
         self.debugger.printMessage("-----------------------------------------------------------------------------------------------------------")
-            
+
         childProcess = ExternalCalls.callDLV2MultipleInput([SubProgramParser.SIMPLIFIED_FORALL_FILE,SubProgramParser.OMITTED_FORALL_FILE])
         coherent, stream,true,undef,false = self.wellfounded(childProcess.stdout)
         
@@ -374,7 +431,6 @@ class SubProgramParser:
                             extras.append(str(v))
                             variableMapping[var]=v
                             rewrittenClause.append(str(v) if id_ >=0 else str(-v))
-
                     clause=",".join(rewrittenClause)
                     gate = self.symbols.addExtraSymbol()
                     f.write(f"{gate} = or({clause})\n")
@@ -413,7 +469,7 @@ class SubProgramParser:
         return self.residualToCnf(disjunction,tight,wellfoundedClauses)
         # print("\n")        
 
-    def encodeGringo(self,stream):
+    def encodeSmodels(self,stream):
         f=open(FILE_UTIL.GROUND_PROGRAM_FILE,"w")
         disjunction = False
         endProgram  = False
@@ -441,7 +497,9 @@ class SubProgramParser:
 
             f.write(f"{line}\n")
         f.close()
-        
+        # print("----------------------------- Grounded level -----------------------------")
+        # print(subprocess.getoutput(f"cat {FILE_UTIL.GROUND_PROGRAM_FILE} > ground.{self.programCount}"))
+        # print("--------------------------------------------------------------------------")
         return coherent,disjunction,current_symbols
 
     def wellfounded(self,stream):
@@ -476,7 +534,7 @@ class SubProgramParser:
 
     def addInterface(self,program,filename,movedInterface=[]):
         f=open(filename,"a")
-        program.labelPredicates()
+        program.labelPredicates(self.predicateMap)
         
         #TODO add check previously defined predicate: problem while reading programs with subprogram from previous level
         f.write("%Previous level.\n")
@@ -543,19 +601,27 @@ class SubProgramParser:
                 f.close()
             childProcess.communicate() 
             if childProcess.returncode != 0:
-                print("Normal pipeline")
                 print("Error happened computing well founded",childProcess.returncode)
                 sys.exit(180)
             return coherent,phi_i
         else:
-            childProcess = ExternalCalls.callGringo(filename)
 
-            coherent, disjunction, current_symbols = self.encodeGringo(childProcess.stdout)
+            # print("----------------------------- Grounded level -----------------------------")
+            # print(subprocess.getoutput(f"cat {filename} > level.{self.programCount}.lp"))
+            # print("--------------------------------------------------------------------------")
+            childProcess=None
+            if self.grounder_backend=="idlv":
+                print("Grounding using idlv")
+                childProcess = ExternalCalls.callIDLV(filename)
+            else:
+                print("Grounding using gringo")
+                childProcess = ExternalCalls.callGringo(filename)
+
+            coherent, disjunction, current_symbols = self.encodeSmodels(childProcess.stdout)
             
             childProcess.communicate() 
             if childProcess.returncode != 0:
-                print("Normal pipeline")
-                print("Error happened computing well founded",childProcess.returncode)
+                print("Error happened during grounding",childProcess.returncode)
                 sys.exit(180)
             
             phi_i = None
@@ -603,7 +669,7 @@ class SubProgramParser:
                     if self.currentQuantifier == QASP_FORMAT.QFORALL:
                         start_time=time.time()
                         if not self.addUnsat is None:
-                            parsedProgram.addParsedRule(None,None,[[False,SubProgramParser.AUX_PREDICATE+str(self.forallLevel)]])
+                            parsedProgram.addParsedRule(None,None,[[False,self.predicateMap.getPredicateId(SubProgramParser.AUX_PREDICATE+str(self.forallLevel))]])
                             parsedProgram.addRuleAsStr(f":- {SubProgramParser.AUX_PREDICATE+str(self.forallLevel)}.")
 
                         # print("-------------------------- Forall program -------------------------- ")
@@ -656,10 +722,10 @@ class SubProgramParser:
                                 break
                         else:
                             f = open(FILE_UTIL.TO_GROUND_PROGRAM_FILE,"w")
-                            for rulestr in parsedProgram.rules:
-                                f.write(f"{rulestr}\n")
                             for fact in parsedProgram.facts:
                                 f.write(f"{fact}\n")
+                            for rulestr in parsedProgram.rules:
+                                f.write(f"{rulestr}\n")
                             f.close()
                             coherent,phi_i = self.ground(parsedProgram,FILE_UTIL.TO_GROUND_PROGRAM_FILE,False,False)
                             if not coherent:
@@ -668,7 +734,7 @@ class SubProgramParser:
                                 self.gates.append(phi_i)
                                 self.gatesCount+=1
                                 f = open(f"{FILE_UTIL.QCIR_SUB_FORMULA_PREFIX}_{self.programCount}.qcir","w")
-                                f.write(f"{phi_i} = and()\n")
+                                f.write(f"{phi_i} = and( )\n")
                                 f.close()
                                 self.encodedLevel.append(SubProgramParser.INCOHERENT_F)
                                 self.stopEncoding=True
@@ -701,14 +767,15 @@ class SubProgramParser:
                                     rule = parsedProgram.parsed_rules[j]
                                     rulestr = parsedProgram.rules[j]
                                     # Hr:-Br. in SPi -> :-Br, not unsat.
-                                    lit = [True,SubProgramParser.AUX_PREDICATE+str(self.forallLevel)]
+                                    lit_str=[True,SubProgramParser.AUX_PREDICATE+str(self.forallLevel)]
+                                    lit = [True,self.predicateMap.getPredicateId(SubProgramParser.AUX_PREDICATE+str(self.forallLevel))]
                                     sep=","
                                     if rule[2] is None:
                                         rule[2] = []
                                         sep = ":-"
 
                                     rule[2].append(lit)
-                                    rulestr = f"{rulestr[:-1]}{sep} not {lit[1]}."
+                                    rulestr = f"{rulestr[:-1]}{sep} not {lit_str[1]}."
                                     augmentedExists.addParsedRule(rule[0],rule[1],rule[2])
                                     # augmentedExists.addRuleAsStr(rulestr,f)
                                     f.write(f"{rulestr}\n")
@@ -720,9 +787,10 @@ class SubProgramParser:
                                     head = rule[0]
                                     if head is None or len(head) == 0:
                                         #:-Br. in SPi -> :-Br, not unsat.
-                                        lit = [True,SubProgramParser.AUX_PREDICATE+str(self.forallLevel)]
+                                        lit = [True,self.predicateMap.getPredicateId(SubProgramParser.AUX_PREDICATE+str(self.forallLevel))]
+                                        lit_str = [True,SubProgramParser.AUX_PREDICATE+str(self.forallLevel)]
                                         rule[2].append(lit)
-                                        rulestr = f"{rulestr[:-1]}, not {lit[1]}."
+                                        rulestr = f"{rulestr[:-1]}, not {lit_str[1]}."
                                     
                                     augmentedExists.addParsedRule(rule[0],rule[1],rule[2])
                                     # augmentedExists.addRuleAsStr(rulestr,f)
@@ -737,7 +805,7 @@ class SubProgramParser:
                                 if rule[0] is None:
                                     rule[0]=[]
                                 if len(rule[0]) == 0:
-                                    rule[0].append(SubProgramParser.AUX_PREDICATE+str(self.forallLevel))
+                                    rule[0].append(self.predicateMap.getPredicateId(SubProgramParser.AUX_PREDICATE+str(self.forallLevel)))
                                     rulestr = SubProgramParser.AUX_PREDICATE+str(self.forallLevel)+rulestr
                                 augmentedExists.addParsedRule(rule[0],rule[1],rule[2])
                                 # augmentedExists.addRuleAsStr(rulestr,f)
@@ -777,8 +845,10 @@ class SubProgramParser:
                             self.gates.append(phi_i)
                             self.gatesCount+=1
                             f = open(f"{FILE_UTIL.QCIR_SUB_FORMULA_PREFIX}_{self.programCount}.qcir","w")
-                            f.write(f"{phi_i} = or()\n")
+                            f.write(f"{phi_i} = or( )\n")
                             f.close()
+                            self.clauseCount+=1
+
                             self.stopEncoding=True
                             print("Incoherent Exists",self.programCount)
                             break
@@ -857,9 +927,10 @@ class SubProgramParser:
                         head = rule[0]
                         if head is None or len(head) == 0:
                             #:-Br. in SPi -> :-Br, not unsat.
-                            lit = [True,SubProgramParser.AUX_PREDICATE+str(lastForall)]
+                            lit = [True,self.predicateMap.getPredicateId(SubProgramParser.AUX_PREDICATE+str(lastForall))]
+                            lit_str = [True,SubProgramParser.AUX_PREDICATE+str(lastForall)]
                             rule[2].append(lit)
-                            rulestr = f"{rulestr[:-1]}, not {lit[1]}."
+                            rulestr = f"{rulestr[:-1]}, not {lit_str[1]}."
                         augmentedExists.addParsedRule(rule[0],rule[1],rule[2])
                         # augmentedExists.addRuleAsStr(rulestr,f)
                         f.write(f"{rulestr}\n")
@@ -875,11 +946,12 @@ class SubProgramParser:
                             if rule[0] is None:
                                 rule[0]=[]
                             if len(rule[0]) == 0:
-                                rule[0].append(SubProgramParser.AUX_PREDICATE+str(self.forallLevel))
+                                rule[0].append(self.predicateMap.getPredicateId(SubProgramParser.AUX_PREDICATE+str(self.forallLevel)))
                                 rulestr = f"{SubProgramParser.AUX_PREDICATE+str(self.forallLevel)}{rulestr}"
                             augmentedExists.addParsedRule(rule[0],rule[1],rule[2])
                             # augmentedExists.addRuleAsStr(rulestr,f)
                             f.write(f"{rulestr}\n")
+                    augmentedExists.labelPredicates(self.predicateMap)
                     toGround=augmentedExists
                     # print("Augmented constraint with last forall")
                     # toGround.printProgram()
@@ -893,8 +965,9 @@ class SubProgramParser:
                     phi_i = self.symbols.addExtraSymbol()
                     self.gatesCount+=1
                     f = open(f"{FILE_UTIL.QCIR_SUB_FORMULA_PREFIX}_{self.programCount}.qcir","w")
-                    f.write(f"{phi_i} = or()\n")
+                    f.write(f"{phi_i} = or( )\n")
                     f.close()
+                    self.clauseCount+=1
                     self.encodedLevel.append(SubProgramParser.INCOHERENT_C)
                     print("Incoherent constraint")
                 else:
@@ -907,6 +980,7 @@ class SubProgramParser:
         phi_c=""
         quiteCNF=True
         finalizing=[]
+        
         
         for i in range(len(self.encodedLevel)-1,0,-1):
             if self.encodedLevel[i] in [SubProgramParser.INCOHERENT_C,SubProgramParser.INCOHERENT_E,SubProgramParser.INCOHERENT_F]:
