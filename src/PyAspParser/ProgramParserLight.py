@@ -80,7 +80,7 @@ class ParsedProgram:
             for h in choiceBodyForHead:
                 self.currentPreds.add(h)
                 for pred in choiceBodyForHead[h]:
-                    self.currentPreds.add(pred)
+                    self.currentPreds.add(pred[1])
         if not choiceBodyForHead is None:
             for h in choiceBodyForHead:
                 for pred in choiceBodyForHead[h]:

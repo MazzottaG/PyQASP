@@ -40,14 +40,14 @@ argparser.add_argument('-g','--grounder', dest="groundername",  type=str, help='
 argparser.add_argument('-pq','--print-qcir', dest="qcir_file",  type=str, help='output qcir filename')
 argparser.add_argument('-err','--error-log', dest="log_file",  type=str, help='external tools log filename')
 argparser.add_argument('--guess-check', dest="enable_guess_check", default=False, action='store_true')
-argparser.add_argument('--no-direct-cnf', dest="disable_skip_conv", default=False, action='store_true')
+# argparser.add_argument('--no-direct-cnf', dest="disable_skip_conv", default=False, action='store_true')
 argparser.add_argument('--stats', dest="stats", default=False, action='store_true',help="print encoded qbf formula's statistics")
 argparser.add_argument('-e', "--encoder-only", dest="encode", default=False, action='store_true',help="disable solver usage and print qcir on stdout")
 argparser.add_argument('-d', "--debug-encoding", dest="debug_print", default=False, action='store_true',help="enable encoding process debug")
 
 ns = argparser.parse_args()
 
-grounder = "gringo"
+grounder = "dlv2"
 if ns.groundername:
     if ns.groundername not in GROUNDERS_DESC:
         print("Error: Unable to find solver")
@@ -69,9 +69,6 @@ if DEFAULT_PROPERTIES.GUESS_CHECK and DEFAULT_PROPERTIES.NO_WF:
     print("Guess&Check optimizations are meant to be used together with well founded opt")
     print("run without --no-wf")
     sys.exit(180)
-
-if ns.disable_skip_conv:
-    DEFAULT_PROPERTIES.SKIP_QCIR_CONV_FOR_QDIMACS = False
 
 if ns.stats:
     DEFAULT_PROPERTIES.PRINT_STATS = True
@@ -100,27 +97,15 @@ if DEFAULT_PROPERTIES.PRINT_STATS:
 
 if ns.encode:
     props.printProps()
-    # first=True
-    # with open(FILE_UTIL.FACTORY_DUMP, "w") as f:
-    #     f.write("{")
-    #     for predicate in parser.symbols.factory:
-    #         for atom,info in parser.symbols.factory[predicate].items():
-    #             if not first:
-    #                 f.write(",")
-    #             f.write("\""+atom+"\":"+str(info[0]))
-    #             first=False
-    #     f.write("}\n")
-    #     f.flush()
-
-    # with open(FILE_UTIL.FACTORY_DUMP, "w") as outfile:
-    #     json.dump(parser.symbols.factory, outfile)
     sys.exit(0)
+
 solver = SOLVERS["quabs"]
 if ns.solvername:
     if ns.solvername not in SOLVERS:
         print("Error: Unable to find solver")
         sys.exit(180)
     solver = SOLVERS[ns.solvername]
+
 symbols=parser.symbols
 isFirstForall=parser.encodedLevel[1] in [parser.ENCODED_F,parser.SKIPPED]
 parser=None

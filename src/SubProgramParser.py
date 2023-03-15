@@ -101,6 +101,7 @@ class SubProgramParser:
         self.debugcmd=cmd
     
     def parseRule(self,head,choiceBodyForHead,body):
+        
         body_numeric=None
         if not body is None:
             body_numeric=[]
@@ -216,7 +217,7 @@ class SubProgramParser:
             sys.exit(180)
         
         if simplify:
-            #guess only choice after well founded 
+            # guess only choice after well founded 
             current_symbols=[]
             moved_symbols=[]
             moved_interface=[]
@@ -264,9 +265,6 @@ class SubProgramParser:
                 self.debugger.printMessage("-----------------------------------------------------------------------------------------------------------")
                 childProcess = ExternalCalls.callDLV2(SubProgramParser.OMITTED_FORALL_FILE)
                 coherent, stream,spi_true,spi_undef,spi_false = self.wellfounded(childProcess.stdout)
-                for line in stream:
-                    pass
-                
                 childProcess.communicate()
                 if childProcess.returncode != 0:
                     print(subprocess.getoutput(f"cat {FILE_UTIL.OMITTED_FORALL_FILE}"))
@@ -606,17 +604,14 @@ class SubProgramParser:
             return coherent,phi_i
         else:
 
-            # print("----------------------------- Grounded level -----------------------------")
-            # print(subprocess.getoutput(f"cat {filename} > level.{self.programCount}.lp"))
-            # print("--------------------------------------------------------------------------")
             childProcess=None
-            if self.grounder_backend=="idlv":
-                print("Grounding using idlv")
-                childProcess = ExternalCalls.callIDLV(filename)
-            else:
+            if self.grounder_backend=="gringo":
                 print("Grounding using gringo")
                 childProcess = ExternalCalls.callGringo(filename)
-
+            else:
+                print("Grounding using idlv")
+                childProcess = ExternalCalls.callIDLV(filename)
+                
             coherent, disjunction, current_symbols = self.encodeSmodels(childProcess.stdout)
             
             childProcess.communicate() 
@@ -643,7 +638,7 @@ class SubProgramParser:
         parsedProgram = None
         self.gates=[]
         
-        finalQBF=open(FILE_UTIL.QBF_PROGRAM_FILE,"w")
+        finalQBF = open(FILE_UTIL.QBF_PROGRAM_FILE,"w")
         finalQBF.write(f"{QCIR_FORMAT.HEADER}\n")
         finalQBF.close()
         
@@ -651,6 +646,7 @@ class SubProgramParser:
         for line in f:
             if len(line.strip()) == 0:
                 continue
+            
             matchQuantifier = re.match(REGEX_UTIL.QASP_QUANTIFIER,line)
             
             if matchQuantifier:
@@ -661,7 +657,7 @@ class SubProgramParser:
                         continue
         
                     parserFileHandler.close()
-                    parsedProgram=self.parseProgram(FILE_UTIL.ASP_PARSER_FILE)
+                    parsedProgram = self.parseProgram(FILE_UTIL.ASP_PARSER_FILE)
                     if parsedProgram is None:
                         print("Error during parsing level",self.programCount)
                         sys.exit(180)
@@ -672,9 +668,6 @@ class SubProgramParser:
                             parsedProgram.addParsedRule(None,None,[[False,self.predicateMap.getPredicateId(SubProgramParser.AUX_PREDICATE+str(self.forallLevel))]])
                             parsedProgram.addRuleAsStr(f":- {SubProgramParser.AUX_PREDICATE+str(self.forallLevel)}.")
 
-                        # print("-------------------------- Forall program -------------------------- ")
-                        # parsedProgram.printProgram()
-                        # print("-------------------------------------------------------------------- ")
                         self.pushSubProgram = None
                         self.addUnsat = None
                         self.movedSymbols = []
@@ -702,10 +695,6 @@ class SubProgramParser:
                                             self.addUnsat = True
                                             self.movedSymbols=movedSymbols
                                             self.movedInterface=movedInterface
-                                            # print("Forall",self.programCount,"removed")
-                                            # print("Moved subProgram")
-                                            # self.pushSubProgram.printProgram()
-                                            # print("---------------------------------------------------------------")
                                     else:
                                         self.encodedLevel.append(SubProgramParser.EMPTY)
                                         
@@ -800,7 +789,6 @@ class SubProgramParser:
                             ruleid = 0
                             for rule in self.pushSubProgram.parsed_rules:
                                 rulestr = self.pushSubProgram.rules[ruleid]
-
                                 #:-Br. in SPi -> unsat :-Br.
                                 if rule[0] is None:
                                     rule[0]=[]
@@ -951,12 +939,7 @@ class SubProgramParser:
                             augmentedExists.addParsedRule(rule[0],rule[1],rule[2])
                             # augmentedExists.addRuleAsStr(rulestr,f)
                             f.write(f"{rulestr}\n")
-                    augmentedExists.labelPredicates(self.predicateMap)
                     toGround=augmentedExists
-                    # print("Augmented constraint with last forall")
-                    # toGround.printProgram()
-                    # print("---------------------------------------------------------------")
-
                     f.close()
                     
 
@@ -1001,16 +984,16 @@ class SubProgramParser:
                     finalizing.append(f"{next_} = or(-{self.gates[i-1]},{phi_c})")
                     phi_c = f"{next_}"
                 quiteCNF=False
-        if len(self.encodedLevel) == 1 and self.encodedLevel[0]:
-            if self.encodedLevel[0] == SubProgramParser.INCOHERENT_F:
+        if len(self.encodedLevel) == 2:
+            if self.encodedLevel[1] == SubProgramParser.INCOHERENT_F:
                 print(f"{PYQASP_OUTPUT.EXTENDED}10")
                 sys.exit(10)
             elif self.encodedLevel[1] == SubProgramParser.INCOHERENT_E:
                 print(f"{PYQASP_OUTPUT.EXTENDED}20")
                 sys.exit(20)
-            else:
-                print("Error: found only one level not incoherent")
-                sys.exit(180)
+            # else:
+            #     print("Error: found only one level not incoherent")
+            #     sys.exit(180)
 
         finalQBF=open(FILE_UTIL.QBF_PROGRAM_FILE,"a")
         finalQBF.write(f"{QCIR_FORMAT.OUTPUT}({phi_c})\n")
