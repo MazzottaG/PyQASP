@@ -141,7 +141,7 @@ class ParsedProgram:
                 
     def addParsedRule(self,head,choiceBodyForHead,body):
         ruleIndex = len(self.parsed_rules)
-        self.parsed_rules.append([head,choiceBodyForHead,body])
+        # self.parsed_rules.append([head,choiceBodyForHead,body])
         
         if not body is None:
             for pred in body:
