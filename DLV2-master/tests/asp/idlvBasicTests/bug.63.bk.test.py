@@ -1,6 +1,0 @@
-input = """
-true.
-"""
-output = """
-{true}
-"""

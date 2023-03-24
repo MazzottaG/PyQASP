@@ -1,9 +1,0 @@
-%@exists
-a(1).a(2).a(3).
-b(1).b(2).b(3).
-1<={match(X,Y):a(X),b(Y)}<=1.
-%@forall
-dc(1..4).
-{c(X):dc(X)}.
-%@constraint
-:-match(X,Y),W=X+Y,W<Z,c(Z).
