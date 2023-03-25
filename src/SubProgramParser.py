@@ -1,5 +1,5 @@
 from Executors import ExternalCalls
-from Option import FILE_UTIL,REGEX_UTIL,QASP_FORMAT,LPARSE_FORMAT,QCIR_FORMAT,DEFAULT_PROPERTIES
+from Option import FILE_UTIL,REGEX_UTIL,QASP_FORMAT,LPARSE_FORMAT,QCIR_FORMAT,DEFAULT_PROPERTIES,PYQASP_OUTPUT
 from PyAspParser.ProgramParserLight import *
 from Structures import SymbolTable
 from Builder import QCIRProps
