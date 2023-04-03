@@ -15,14 +15,16 @@ Executable file is generated using pyinstaller
  ```
  ./clean-install.bash pyqasp
  ```
- It cleans and build a new executable file that is stored by default into dist folder
+ It cleans and build a new executable file, named **pyqasp**, that is stored by into **dist** folder
 
 ## Running PyQASP Solver
-Download the executable file located into dist folder and run it
+
+To run pyqasp using default setting 
 ```
-pyqasp myprogram.qasp
+./dist/pyqasp problem.aspq
 ```
+
 Use -h option to get available options
 ```
-pyqasp -h 
+./dist/pyqasp -h 
 ```
