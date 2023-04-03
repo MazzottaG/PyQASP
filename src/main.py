@@ -73,7 +73,7 @@ if DEFAULT_PROPERTIES.GUESS_CHECK and DEFAULT_PROPERTIES.NO_WF:
     print("run without --no-wf")
     sys.exit(180)
 
-if ns.aspstats or (ns.solvername and SOLVERS[ns.solvername] is None):
+if ns.aspstats or (not ns.solvername or SOLVERS[ns.solvername] is None):
     DEFAULT_PROPERTIES.PRINT_ASPSTATS = True
 
 if ns.stats:
@@ -118,6 +118,9 @@ if solver is None:
     if solver_name.endswith("-blo"):
         solver_name = solver_name.split("-blo")[0]
     solver = SOLVERS[solver_name]
+    print(solver_name,"selected as backend solver")
+else:
+    print(ns.solvername,"used as backend solver")
     # backend = loaded_model.predict([row])[0]
 symbols=parser.symbols
 # json_object = json.dumps(symbols.factory, indent=4)
