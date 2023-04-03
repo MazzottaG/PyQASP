@@ -1,4 +1,8 @@
 # -*- mode: python ; coding: utf-8 -*-
+from PyInstaller.utils.hooks import collect_submodules
+
+hiddenimports = []
+hiddenimports += collect_submodules('sklearn')
 
 
 block_cipher = None
@@ -9,7 +13,7 @@ a = Analysis(
     pathex=[],
     binaries=[],
     datas=[('resources', 'resources')],
-    hiddenimports=[],
+    hiddenimports=hiddenimports,
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],

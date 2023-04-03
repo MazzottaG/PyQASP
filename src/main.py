@@ -5,7 +5,8 @@ from Option import FILE_UTIL,QASP_FORMAT,DEFAULT_PROPERTIES
 #from AspParser import QASPParser
 from Solver import *
 from SubProgramParser import *
-import argparse,signal,subprocess,json
+import argparse,signal,subprocess,json,joblib,sys
+
 
 ExternalCalls.LOG_FILE_HANDLER = None
 def handler(signum, frame):
@@ -20,7 +21,8 @@ signal.signal(signal.SIGTERM, handler)
 SOLVERS = {
     "quabs":Quabs(),
     "depqbf":Depqbf(),
-    "rareqs":Rareqs()
+    "rareqs":Rareqs(),
+    "auto":None
 }
 GROUNDERS = {
     #"gringo":GringoWapper(),
@@ -42,6 +44,7 @@ argparser.add_argument('-err','--error-log', dest="log_file",  type=str, help='e
 argparser.add_argument('--guess-check', dest="enable_guess_check", default=False, action='store_true')
 # argparser.add_argument('--no-direct-cnf', dest="disable_skip_conv", default=False, action='store_true')
 argparser.add_argument('--stats', dest="stats", default=False, action='store_true',help="print encoded qbf formula's statistics")
+argparser.add_argument('--asp-stats', dest="aspstats", default=False, action='store_true',help="print smodels' statistics")
 argparser.add_argument('-e', "--encoder-only", dest="encode", default=False, action='store_true',help="disable solver usage and print qcir on stdout")
 argparser.add_argument('-d', "--debug-encoding", dest="debug_print", default=False, action='store_true',help="enable encoding process debug")
 
@@ -70,6 +73,9 @@ if DEFAULT_PROPERTIES.GUESS_CHECK and DEFAULT_PROPERTIES.NO_WF:
     print("run without --no-wf")
     sys.exit(180)
 
+if ns.aspstats or (ns.solvername and SOLVERS[ns.solvername] is None):
+    DEFAULT_PROPERTIES.PRINT_ASPSTATS = True
+
 if ns.stats:
     DEFAULT_PROPERTIES.PRINT_STATS = True
 
@@ -91,22 +97,36 @@ ExternalCalls.debugger = debug
 ExternalCalls.debuggercmd = debugcmd
 
 parser = SubProgramParser(ns.filename,debug,debugcmd,grounder)
-props = parser.buildSubPrograms()
+props,aspstats = parser.buildSubPrograms()
 if DEFAULT_PROPERTIES.PRINT_STATS:
     props.printProps()
 
-if ns.encode:
-    props.printProps()
-    sys.exit(0)
+if ns.aspstats:
+    print("@ASPSTATS",aspstats.getFeature())
+    aspstats.print()
 
-solver = SOLVERS["quabs"]
+solver = SOLVERS["auto"]
 if ns.solvername:
     if ns.solvername not in SOLVERS:
         print("Error: Unable to find solver")
         sys.exit(180)
     solver = SOLVERS[ns.solvername]
-
+if solver is None:
+    estimator   = joblib.load(FILE_UTIL.ESTIMATOR_FILE)
+    backend = estimator.predict([aspstats.getPredicationFeature()])
+    solver_name = backend[0].split(".bash")[0]
+    if solver_name.endswith("-blo"):
+        solver_name = solver_name.split("-blo")[0]
+    solver = SOLVERS[solver_name]
+    # backend = loaded_model.predict([row])[0]
 symbols=parser.symbols
+# json_object = json.dumps(symbols.factory, indent=4)
+ 
+# with open("symbols.json", "w") as outfile:
+#     outfile.write(json_object)
+
+if ns.encode:
+    sys.exit(0)
 isFirstForall=parser.encodedLevel[1] in [parser.ENCODED_F,parser.SKIPPED]
 parser=None
 solver.solve(symbols,isFirstForall,props)

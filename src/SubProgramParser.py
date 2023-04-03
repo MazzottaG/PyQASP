@@ -3,6 +3,8 @@ from Option import FILE_UTIL,REGEX_UTIL,QASP_FORMAT,LPARSE_FORMAT,QCIR_FORMAT,DE
 from PyAspParser.ProgramParserLight import *
 from Structures import SymbolTable
 from Builder import QCIRProps
+from StatsAsp import *
+
 import os,re,sys,subprocess,time,json
 
 ASP_TO_JSON_RULE_PREFIX=0
@@ -76,6 +78,8 @@ class SubProgramParser:
     ENCODED_E    = 8
     
     def __init__(self,qaspFilename,debug,cmd,grounder):
+        
+        self.aspstats = StatsAsp() if DEFAULT_PROPERTIES.PRINT_ASPSTATS else EmptyStats()
         self.predicateMap = PredicateMap()
         self.grounder_backend=grounder
         self.programCount = 0
@@ -396,8 +400,12 @@ class SubProgramParser:
                 if fields[0] == "c":
                     #propositional atoms not present in the factory, at this point, are meant to be atoms added by external pipeline (_acyc_*)
                     addExtra = "(" not in fields[2] and len(self.symbols.getPredicateDomain(fields[2]))==0
-                    
+                    # id_=None
+                    # if not addExtra:
                     id_,level,truth,added = self.symbols.addSymbol(fields[2],self.programCount)
+                    # else:
+                    #     id_=self.symbols.addExtraSymbol()
+                            
                     current_id = int(fields[1])
                     variableMapping[current_id]=id_
                     if added and addExtra:
@@ -457,6 +465,7 @@ class SubProgramParser:
                 end=True
             elif not end:
                 data = [int(x) for x in line.split(" ")]
+                self.aspstats.analyzeRule(data)
                 if data[LPARSE_FORMAT.RULE_TYPE_INDEX] == LPARSE_FORMAT.DISJCUNTIVE_RULE:
                     disjunction = True
             f.write(f"{line}\n")
@@ -733,7 +742,7 @@ class SubProgramParser:
                                 self.encodedLevel.append(SubProgramParser.ENCODED_F)
                             
                     elif self.currentQuantifier == QASP_FORMAT.QEXISTS:
-                        
+                            
                         start_time=time.time()
                         self.isLastQuantifierExists = True
                         addMovedSymbols=False
@@ -941,8 +950,8 @@ class SubProgramParser:
                             f.write(f"{rulestr}\n")
                     toGround=augmentedExists
                     f.close()
-                    
 
+                
                 coherent,phi_i = self.ground(toGround,FILE_UTIL.TO_GROUND_PROGRAM_FILE,addMovedSymbols,addMovedInterface)
                 if not coherent:
                     phi_i = self.symbols.addExtraSymbol()
@@ -1008,11 +1017,44 @@ class SubProgramParser:
             finalQBF.write(f"{line.strip()}\n")
         finalQBF.close()
         
+        TOTAL_F = 0
+        TOTAL_E = 0
+        if True:
+            FORALL = {}
+            EXISTS = {}
+            for i in range(1,len(self.encodedLevel)):
+                if self.encodedLevel[i] in [SubProgramParser.ENCODED_F,SubProgramParser.INCOHERENT_F,SubProgramParser.SKIPPED]:
+                    FORALL[i]=0
+                else:
+                    EXISTS[i]=0
+            atomsCount = 0
+            for predicate in self.symbols.factory:
+                predicateSet = self.symbols.factory[predicate]
+                atomsCount+=len(predicateSet)
+                for lit,info in predicateSet.items():
+                    try:
+                        FORALL[info[1]]+=1
+                    except:
+                        EXISTS[info[1]]+=1
+            
+            for i in FORALL:
+                TOTAL_F+=FORALL[i]
+            for i in EXISTS:
+                TOTAL_E+=EXISTS[i]
+            self.aspstats.setQUniversal(len(FORALL))
+            self.aspstats.setQExistential(len(EXISTS))
+            self.aspstats.setQLevels(len(self.encodedLevel)-1)
+        
+        self.aspstats.setUniversals(TOTAL_F)
+        self.aspstats.setExistentials(TOTAL_E)
+        
+        self.aspstats.setAtomSize(atomsCount)
+
         props = QCIRProps()
         props.clauseCount = self.clauseCount
         props.variablesCount = variablesCount
         props.quiteCNF = quiteCNF
         props.levelsCount=self.programCount
         props.lastSymbol=self.symbols.idCounter-1
-        return props
+        return props,self.aspstats
 

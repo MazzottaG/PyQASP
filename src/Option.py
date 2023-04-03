@@ -7,7 +7,9 @@ class PyQASPOptions:
 
 class LPARSE_FORMAT:
     SIMPLE_RULE=1
+    CONSTRAINT_RULE=2
     CHOICE_RULE=3
+    WEIGHT_RULE=5
     DISJCUNTIVE_RULE=8
 
     RULE_TYPE_INDEX=0
@@ -27,6 +29,9 @@ class FILE_UTIL:
     ASP_PROGRAM_PARSER_PATH     = os.path.join(DEFAULT_PATH,"resources","asp-parser","ProgramParser") 
     OLD_TOOL_FOLDER_PATH        = os.path.join(DEFAULT_PATH,"resources","old-tool")
     TOOL_FOLDER_PATH            = os.path.join(DEFAULT_PATH,"resources","tools")
+    MODELS_FOLDER               = os.path.join(DEFAULT_PATH,"resources","selector_model")
+
+    ESTIMATOR_FILE              = os.path.join(MODELS_FOLDER,"uniquely-augmented_random-forest.joblib")
     
     QUABS_PATH                  = os.path.join(TOOL_FOLDER_PATH,"quabs")
     DEPQBF_PATH                 = os.path.join(TOOL_FOLDER_PATH,"depqbf")
@@ -59,7 +64,7 @@ class FILE_UTIL:
     QCIR_SUB_FORMULA_PREFIX     = os.path.join(FILES_FOLDER_PATH,"subformula")
     
     LOG_ERROR                   = os.path.join(FILES_FOLDER_PATH,"log.err")
-
+    
     
 class DIMACS_FORMAT:
     DIMACS_COMMENT_VAR_INDEX    = 1
@@ -119,3 +124,5 @@ class DEFAULT_PROPERTIES:
     ONLY_CHOICE                 = True
     SKIP_QCIR_CONV_FOR_QDIMACS  = True
     PRINT_STATS                 = False
+    PRINT_ASPSTATS              = False
+    
