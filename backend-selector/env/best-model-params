@@ -1,0 +1,5 @@
+{
+    'bootstrap': True, 
+    'criterion': 'gini', 
+    'n_estimators': 100, 
+}
