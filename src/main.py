@@ -110,7 +110,8 @@ if ns.solvername:
     solver = SOLVERS[ns.solvername]
 if solver is None:
     print("Currently disabled ...")
-    exit(180)
+    sys.exit(180)
+
     # estimator   = joblib.load(FILE_UTIL.ESTIMATOR_FILE)
     # backend = estimator.predict([aspstats.getPredicationFeature()])
     # solver_name = backend[0].split(".bash")[0]
