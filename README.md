@@ -9,7 +9,7 @@ Executable file is generated using pyinstaller
 ```
  sudo pip install pyinstaller
  sudo pip install joblib
- sudo pip install scikit-learn
+ sudo pip install scikit-learn==1.2.2
  ```
  From repository root run
  ```
