@@ -1,11 +1,9 @@
 from grounder import *
 from Option import FILE_UTIL,QASP_FORMAT,DEFAULT_PROPERTIES
-#from Builder import QCIRBuilder
-#from Structures import SymbolTable
-#from AspParser import QASPParser
 from Solver import *
 from SubProgramParser import *
-import argparse,signal,subprocess,json,joblib,sys
+import argparse,signal,subprocess,json,sys
+# import joblib
 
 
 ExternalCalls.LOG_FILE_HANDLER = None
@@ -16,7 +14,6 @@ def handler(signum, frame):
     sys.exit(180)
     
 signal.signal(signal.SIGTERM, handler)
-#signal.signal(signal.SIGKILL, handler)
 
 SOLVERS = {
     "quabs":Quabs(),
@@ -112,13 +109,15 @@ if ns.solvername:
         sys.exit(180)
     solver = SOLVERS[ns.solvername]
 if solver is None:
-    estimator   = joblib.load(FILE_UTIL.ESTIMATOR_FILE)
-    backend = estimator.predict([aspstats.getPredicationFeature()])
-    solver_name = backend[0].split(".bash")[0]
-    if solver_name.endswith("-blo"):
-        solver_name = solver_name.split("-blo")[0]
-    solver = SOLVERS[solver_name]
-    print(solver_name,"selected as backend solver")
+    print("Currently disabled ...")
+    exit(180)
+    # estimator   = joblib.load(FILE_UTIL.ESTIMATOR_FILE)
+    # backend = estimator.predict([aspstats.getPredicationFeature()])
+    # solver_name = backend[0].split(".bash")[0]
+    # if solver_name.endswith("-blo"):
+    #     solver_name = solver_name.split("-blo")[0]
+    # solver = SOLVERS[solver_name]
+    # print(solver_name,"selected as backend solver")
 else:
     print(ns.solvername,"used as backend solver")
     # backend = loaded_model.predict([row])[0]
