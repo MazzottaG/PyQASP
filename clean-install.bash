@@ -7,4 +7,4 @@ rm -rf dist
 rm -rf build
 rm $exec_name".spec"
 
-pyinstaller --onefile --add-data "resources:resources" --collect-submodules "sklearn" --name $exec_name src/main.py
+pyinstaller --onefile --add-data "resources:resources" --name $exec_name src/main.py

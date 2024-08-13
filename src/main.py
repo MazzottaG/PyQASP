@@ -5,7 +5,8 @@ from Option import FILE_UTIL,QASP_FORMAT,DEFAULT_PROPERTIES
 #from AspParser import QASPParser
 from Solver import *
 from SubProgramParser import *
-import argparse,signal,subprocess,json,joblib,sys
+import argparse,signal,subprocess,json,sys
+# import joblib
 
 
 ExternalCalls.LOG_FILE_HANDLER = None
@@ -22,7 +23,7 @@ SOLVERS = {
     "quabs":Quabs(),
     "depqbf":Depqbf(),
     "rareqs":Rareqs(),
-    "auto":None
+    #"auto":None
 }
 GROUNDERS = {
     #"gringo":GringoWapper(),
@@ -105,22 +106,22 @@ if ns.aspstats:
     print("@ASPSTATS",aspstats.getFeature())
     aspstats.print()
 
-solver = SOLVERS["auto"]
+solver = SOLVERS["quabs"]
 if ns.solvername:
     if ns.solvername not in SOLVERS:
         print("Error: Unable to find solver")
         sys.exit(180)
     solver = SOLVERS[ns.solvername]
-if solver is None:
-    estimator   = joblib.load(FILE_UTIL.ESTIMATOR_FILE)
-    backend = estimator.predict([aspstats.getPredicationFeature()])
-    solver_name = backend[0].split(".bash")[0]
-    if solver_name.endswith("-blo"):
-        solver_name = solver_name.split("-blo")[0]
-    solver = SOLVERS[solver_name]
-    print(solver_name,"selected as backend solver")
-else:
-    print(ns.solvername,"used as backend solver")
+# if solver is None:
+#     estimator   = joblib.load(FILE_UTIL.ESTIMATOR_FILE)
+#     backend = estimator.predict([aspstats.getPredicationFeature()])
+#     solver_name = backend[0].split(".bash")[0]
+#     if solver_name.endswith("-blo"):
+#         solver_name = solver_name.split("-blo")[0]
+#     solver = SOLVERS[solver_name]
+#     print(solver_name,"selected as backend solver")
+# else:
+print(ns.solvername,"used as backend solver")
     # backend = loaded_model.predict([row])[0]
 symbols=parser.symbols
 # json_object = json.dumps(symbols.factory, indent=4)
