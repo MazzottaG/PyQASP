@@ -1,5 +1,5 @@
 from Executors import ExternalCalls
-from Option import FILE_UTIL,QUABS_OUTPUT,REGEX_UTIL,RAREQS_OUTPUT,PYQASP_OUTPUT,DEFAULT_PROPERTIES,DEPQBF_OUTPUT
+from Option import FILE_UTIL,QUABS_OUTPUT,REGEX_UTIL,RAREQS_OUTPUT,PYQASP_OUTPUT,DEFAULT_PROPERTIES,DEPQBF_OUTPUT,QCIR_FORMAT
 from Structures import SymbolTable
 from Converter import QCIRCnfToQDIMACS
 import re,sys
@@ -66,8 +66,9 @@ class QuabsOutputBuilder(OutputBuilder):
         model = None
         sat=False
         unsat=False
+        model_var = []
         while line:
-            print(line)
+            #print(line)
             fields = line.split(" ")
             if fields[0] == QUABS_OUTPUT.MODEL_START and model is None and not isFirstForall:
                 model=[]
@@ -75,8 +76,14 @@ class QuabsOutputBuilder(OutputBuilder):
                 for predicate,domain in factory.items():
                     for atom,data in domain.items():
                         var,level = data
+                        if level > 1:
+                            continue
                         if str(var) in fields:
-                            model.append(atom)
+                            model.append(f"{atom}")
+                            model_var.append(var)
+                        else:
+                            model_var.append(-var)
+                            model.append(f"not {atom}")
             
             if line.endswith(QUABS_OUTPUT.UNSAT):
                 unsat=True
@@ -89,9 +96,7 @@ class QuabsOutputBuilder(OutputBuilder):
             print(". ".join(model))
         
         process.communicate()
-        print(f"{PYQASP_OUTPUT.EXTENDED}{process.returncode}")
-
-        sys.exit(process.returncode)
+        return process.returncode,model_var
 
         # if not isFirstForall and (not sat or model is None):
         #     print(f"Warning: unexpected outcome model: {model} and sat: {sat}")
@@ -175,4 +180,42 @@ class Quabs(Solver):
     def solve(self,symbolTable:SymbolTable,isFirstForall,qcirProps):
         super().solve(symbolTable,isFirstForall,qcirProps)
         process = ExternalCalls.callSolver([FILE_UTIL.QUABS_PATH,"--partial-assignment",FILE_UTIL.QBF_PROGRAM_FILE])
-        self.outputBuilder.printOuput(symbolTable,isFirstForall,process)
+        exit_code,model = self.outputBuilder.printOuput(symbolTable,isFirstForall,process)
+        print(f"{PYQASP_OUTPUT.EXTENDED}{exit_code}")
+
+
+
+class QuabsEnumerator(Solver):
+    
+    def __init__(self):
+        super().__init__()
+        self.outputBuilder = QuabsOutputBuilder()
+
+    def solve(self,symbolTable:SymbolTable,isFirstForall,qcirProps):
+        super().solve(symbolTable,isFirstForall,qcirProps)
+        exit_code = 10
+        SAT = False
+        while exit_code == 10:
+            process= ExternalCalls.callSolver([FILE_UTIL.QUABS_PATH,"--partial-assignment",FILE_UTIL.QBF_PROGRAM_FILE])
+            exit_code, model = self.outputBuilder.printOuput(symbolTable,isFirstForall,process)
+            if exit_code == 10:
+                SAT=True
+                with open(FILE_UTIL.WORKING_QBF_PROGRAM_FILE,"w") as g:
+                    add_gate = True
+                    with open(FILE_UTIL.QBF_PROGRAM_FILE, "r") as f:
+                        for line in f:
+                            line = line.strip()
+                            if QCIR_FORMAT.AND_GATE in line and add_gate:
+                                add_gate=False
+
+                                model_gate = symbolTable.addExtraSymbol()
+                                model_clause = ",".join([str(-v) for v in model])
+                                print(f"{model_gate} = {QCIR_FORMAT.OR_GATE}({model_clause})",file=g)
+                                print(f"{line[:-1]},{model_gate})",file=g)
+                            else:
+                                print(line,file=g)
+
+                ExternalCalls.callFileCopy(FILE_UTIL.WORKING_QBF_PROGRAM_FILE,FILE_UTIL.QBF_PROGRAM_FILE)
+
+        if not SAT:
+            print(PYQASP_OUTPUT.UNSAT)

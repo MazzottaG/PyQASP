@@ -77,6 +77,9 @@ class ExternalCalls:
 
     def callFileAppend(source,destination):
         subprocess.getoutput(f"cat {source} >> {destination}")
+    
+    def callFileCopy(source,destination):
+        subprocess.getoutput(f"cp {source} {destination}")
 
     def callSolver(cmd:list):
         return subprocess.Popen(cmd,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
