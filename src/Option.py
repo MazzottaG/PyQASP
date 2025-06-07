@@ -52,6 +52,7 @@ class FILE_UTIL:
     LP2NORMAL_PATH              = os.path.join(TOOL_FOLDER_PATH,"lp2normal2")
     LP2SAT_PATH                 = os.path.join(TOOL_FOLDER_PATH,"lp2sat")   
     LP2ACYC_PATH                = os.path.join(TOOL_FOLDER_PATH,"lp2acyc")   
+    LP2ATOMIC_PATH                = os.path.join(TOOL_FOLDER_PATH,"lp2atomic")   
 
     FILES_FOLDER_PATH           = os.path.join(DEFAULT_PATH,"resources","files")
     FACTORY_DUMP                = os.path.join(FILES_FOLDER_PATH,"factory.json")

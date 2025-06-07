@@ -63,13 +63,13 @@ class ExternalCalls:
             lp2normal = subprocess.Popen([f"{FILE_UTIL.LP2NORMAL_PATH}","-e",filename],stdout=subprocess.PIPE,stderr=ExternalCalls.LOG_FILE_HANDLER)
         if tight:
             ExternalCalls.debugger.printMessage(" | lp2sat -b")
-            logging.info(f"\tNo Lp2Acyc")
+            logging.info(f"\tNo Lp2atomic")
             lp2sat = subprocess.Popen([f"{FILE_UTIL.LP2SAT_PATH}","-b"],stdin=lp2normal.stdout,stdout=subprocess.PIPE,stderr=ExternalCalls.LOG_FILE_HANDLER)
             #lp2sat = subprocess.Popen([f"{FILE_UTIL.LP2SAT_PATH}"],stdin=lp2normal.stdout,stdout=subprocess.PIPE,stderr=ExternalCalls.LOG_FILE_HANDLER)
         else:
-            ExternalCalls.debugger.printMessage(" | lp2acyc | lp2sat -b")
+            ExternalCalls.debugger.printMessage(" | lp2atomic | lp2sat -b")
             logging.info(f"\tUsing Lp2Acyc")
-            lp2acyc = subprocess.Popen([f"{FILE_UTIL.LP2ACYC_PATH}"],stdin=lp2normal.stdout,stdout=subprocess.PIPE,stderr=ExternalCalls.LOG_FILE_HANDLER)
+            lp2acyc = subprocess.Popen([f"{FILE_UTIL.LP2ATOMIC_PATH}"],stdin=lp2normal.stdout,stdout=subprocess.PIPE,stderr=ExternalCalls.LOG_FILE_HANDLER)
             lp2sat = subprocess.Popen([f"{FILE_UTIL.LP2SAT_PATH}","-b"],stdin=lp2acyc.stdout,stdout=subprocess.PIPE,stderr=ExternalCalls.LOG_FILE_HANDLER)
             #lp2sat = subprocess.Popen([f"{FILE_UTIL.LP2SAT_PATH}"],stdin=lp2acyc.stdout,stdout=subprocess.PIPE,stderr=ExternalCalls.LOG_FILE_HANDLER)
 

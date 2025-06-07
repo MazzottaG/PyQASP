@@ -36,6 +36,7 @@ GROUNDERS_DESC = {
 argparser = argparse.ArgumentParser(description='QBF encoder')
 argparser.add_argument('filename', metavar='file', type=str, help='Path to QASP file')
 argparser.add_argument('--no-wf', dest="disable_wf", default=False, action='store_true')
+argparser.add_argument('--enumerate', dest="enum", default=False, action='store_true')
 argparser.add_argument('-s','--solver', dest="solvername",  type=str, help='available solvers : '+str(list(SOLVERS.keys())))
 argparser.add_argument('-g','--grounder', dest="groundername",  type=str, help='available grounders : '+str(list(GROUNDERS_DESC.keys())))
 argparser.add_argument('-pq','--print-qcir', dest="qcir_file",  type=str, help='output qcir filename')
@@ -132,7 +133,10 @@ if ns.encode:
     sys.exit(0)
 isFirstForall=parser.encodedLevel[1] in [parser.ENCODED_F,parser.SKIPPED]
 parser=None
-
-solver.solve(symbols,isFirstForall,props)
+if not ns.enum:
+    solver.solve(symbols,isFirstForall,props)
+else:
+    solver = QuabsEnumerator()
+    solver.solve(symbols,isFirstForall,props)
 
 ExternalCalls.LOG_FILE_HANDLER.close()
