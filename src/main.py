@@ -5,8 +5,7 @@ from Option import FILE_UTIL,QASP_FORMAT,DEFAULT_PROPERTIES
 #from AspParser import QASPParser
 from Solver import *
 from SubProgramParser import *
-import argparse,signal,subprocess,json,joblib,sys
-
+import argparse,signal,subprocess,json,sys
 
 ExternalCalls.LOG_FILE_HANDLER = None
 def handler(signum, frame):
@@ -105,13 +104,14 @@ if ns.aspstats:
     print("@ASPSTATS",aspstats.getFeature())
     aspstats.print()
 
-solver = SOLVERS["auto"]
+solver = SOLVERS["quabs"]
 if ns.solvername:
     if ns.solvername not in SOLVERS:
         print("Error: Unable to find solver")
         sys.exit(180)
     solver = SOLVERS[ns.solvername]
 if solver is None:
+    import joblib
     estimator   = joblib.load(FILE_UTIL.ESTIMATOR_FILE)
     backend = estimator.predict([aspstats.getPredicationFeature()])
     solver_name = backend[0].split(".bash")[0]
@@ -132,6 +132,7 @@ if ns.encode:
     sys.exit(0)
 isFirstForall=parser.encodedLevel[1] in [parser.ENCODED_F,parser.SKIPPED]
 parser=None
+
 solver.solve(symbols,isFirstForall,props)
 
 ExternalCalls.LOG_FILE_HANDLER.close()
