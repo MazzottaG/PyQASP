@@ -1,7 +1,7 @@
 from Structures import SymbolTable
 from Builder import QCIRBuilder
 from grounder import *
-from Option import FILE_UTIL,REGEX_UTIL,QASP_FORMAT,ASP_PARSER_FORMAT
+from Option import FILE_UTIL,REGEX_UTIL,QASP_FORMAT,ASP_PARSER_FORMAT,DEFAULT_PROPERTIES
 import subprocess
 import time
 from antlr4 import *
@@ -23,6 +23,7 @@ class QASPParser:
         self.listener = ASPCore2Listener(ASPCore2Parser.NAF)
         self.program=[]
         self.threshold=100
+        self.debug = DEFAULT_PROPERTIES.debug
 
     def parseRule(self,rule):
         if len(rule.strip())>0:
@@ -107,7 +108,7 @@ class QASPParser:
         return self.qcirBuilder.getProps()
     
     def parse(self):
-        print(f"Parsing {self.qasp_filename} ...")
+        self.debug.printMessage(f"Parsing {self.qasp_filename} ...")
 
         fileHandler = open(self.qasp_filename,"r")
         
@@ -143,13 +144,13 @@ class QASPParser:
                 self.parseRule(line)
                 toGroundFileHandler.write(f"{line}")
             else:
-                print(f"Skipping not quantifed rule {line}")
+                self.debug.printMessage(f"Skipping not quantifed rule {line}")
 
             
         if not stop:
             if currentQuantifier == QASP_FORMAT.QCONSTRAINT:
                 self.parseProgram()
-                print("Encoding Level",level)
+                self.debug.printMessage("Encoding Level "+level)
                 predicates=self.addDomainsInternal(toGroundFileHandler)
                 toGroundFileHandler.close()
                 self.transform(level,currentQuantifier,predicates)

@@ -1,5 +1,5 @@
 from grounder import *
-from Option import FILE_UTIL,QASP_FORMAT,DEFAULT_PROPERTIES
+from Option import FILE_UTIL,QASP_FORMAT,DEFAULT_PROPERTIES,Debugger,DebugCommand
 #from Builder import QCIRBuilder
 #from Structures import SymbolTable
 #from AspParser import QASPParser
@@ -36,6 +36,7 @@ GROUNDERS_DESC = {
 argparser = argparse.ArgumentParser(description='QBF encoder')
 argparser.add_argument('filename', metavar='file', type=str, help='Path to QASP file')
 argparser.add_argument('--no-wf', dest="disable_wf", default=False, action='store_true')
+argparser.add_argument('--sat', dest="only_sat", default=False, action='store_true')
 argparser.add_argument('--enumerate', dest="enum", default=False, action='store_true')
 argparser.add_argument('-s','--solver', dest="solvername",  type=str, help='available solvers : '+str(list(SOLVERS.keys())))
 argparser.add_argument('-g','--grounder', dest="groundername",  type=str, help='available grounders : '+str(list(GROUNDERS_DESC.keys())))
@@ -68,6 +69,9 @@ else:
         print("run with --no-wf")
         sys.exit(180)
 
+if ns.only_sat:
+    DEFAULT_PROPERTIES.SATISFIABILITY = True
+
 if DEFAULT_PROPERTIES.GUESS_CHECK and DEFAULT_PROPERTIES.NO_WF:
     print("Guess&Check optimizations are meant to be used together with well founded opt")
     print("run without --no-wf")
@@ -87,16 +91,15 @@ if ns.log_file:
 
 ExternalCalls.LOG_FILE_HANDLER = open(FILE_UTIL.LOG_ERROR,"w")
 
-debug = EmptyDebugger()
-debugcmd = EmptyDebugCommand()
+
 if ns.debug_print:
-    debug=Debugger()
-    debugcmd=DebugCommand()
+    DEFAULT_PROPERTIES.debug=Debugger()
+    DEFAULT_PROPERTIES.debugcmd=DebugCommand()
 
-ExternalCalls.debugger = debug
-ExternalCalls.debuggercmd = debugcmd
+ExternalCalls.debugger = DEFAULT_PROPERTIES.debug
+ExternalCalls.debuggercmd = DEFAULT_PROPERTIES.debugcmd
 
-parser = SubProgramParser(ns.filename,debug,debugcmd,grounder)
+parser = SubProgramParser(ns.filename,grounder)
 props,aspstats = parser.buildSubPrograms()
 if DEFAULT_PROPERTIES.PRINT_STATS:
     props.printProps()
@@ -119,9 +122,9 @@ if solver is None:
     if solver_name.endswith("-blo"):
         solver_name = solver_name.split("-blo")[0]
     solver = SOLVERS[solver_name]
-    print(solver_name,"selected as backend solver")
+    DEFAULT_PROPERTIES.debug.printMessage(solver_name+" selected as backend solver")
 else:
-    print(ns.solvername,"used as backend solver")
+    DEFAULT_PROPERTIES.debug.printMessage(ns.solvername+" used as backend solver")
     # backend = loaded_model.predict([row])[0]
 symbols=parser.symbols
 # json_object = json.dumps(symbols.factory, indent=4)
@@ -133,7 +136,7 @@ if ns.encode:
     sys.exit(0)
 isFirstForall=parser.encodedLevel[1] in [parser.ENCODED_F,parser.SKIPPED]
 parser=None
-if not ns.enum:
+if not ns.enum or ns.only_sat:
     solver.solve(symbols,isFirstForall,props)
 else:
     solver = QuabsEnumerator()

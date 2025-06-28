@@ -21,23 +21,6 @@ ASP_TO_JSON_SEPARATOR="@"
 #     def run(self):
 #         for line in self.process.stdout:
 #             print(line.decode("utf-8"))
-        
-class EmptyDebugger:
-    def printMessage(self,message):
-        return
-
-class Debugger:
-    def printMessage(self,message):
-        print(message)
-        return
-
-class EmptyDebugCommand:
-    def getOutput(self,cmd):
-        return ""
-
-class DebugCommand(EmptyDebugCommand):
-    def getOutput(self,cmd):
-        return subprocess.getoutput(cmd)
 
 class PredicateMap:
     
@@ -77,7 +60,7 @@ class SubProgramParser:
     ENCODED_F    = 7
     ENCODED_E    = 8
     
-    def __init__(self,qaspFilename,debug,cmd,grounder):
+    def __init__(self,qaspFilename,grounder):
         
         self.aspstats = StatsAsp() if DEFAULT_PROPERTIES.PRINT_ASPSTATS else EmptyStats()
         self.predicateMap = PredicateMap()
@@ -101,8 +84,8 @@ class SubProgramParser:
         self.clauseCount = 0
         self.gatesCount = 0
 
-        self.debugger=debug
-        self.debugcmd=cmd
+        self.debugger=DEFAULT_PROPERTIES.debug
+        self.debugcmd=DEFAULT_PROPERTIES.debugcmd
     
     def parseRule(self,head,choiceBodyForHead,body):
         
@@ -211,7 +194,7 @@ class SubProgramParser:
                     #is a fact 
                     if data[LPARSE_FORMAT.BODY_SIZE_INDEX] == 0:
                         continue
-            print("Forall cannot be simplified:",line.strip())
+            self.debugger.printMessage("Forall cannot be simplified: "+line.strip())
             simplify=False
         
         childProcess.communicate()
@@ -615,10 +598,10 @@ class SubProgramParser:
 
             childProcess=None
             if self.grounder_backend=="gringo":
-                print("Grounding using gringo")
+                self.debugger.printMessage("Grounding using gringo")
                 childProcess = ExternalCalls.callGringo(filename)
             else:
-                print("Grounding using idlv")
+                self.debugger.printMessage("Grounding using idlv")
                 childProcess = ExternalCalls.callIDLV(filename)
                 
             coherent, disjunction, current_symbols = self.encodeSmodels(childProcess.stdout)
@@ -639,7 +622,7 @@ class SubProgramParser:
             return coherent,phi_i
         
     def buildSubPrograms(self):
-        print("Parsing ...",self.qaspFile)
+        self.debugger.printMessage("Parsing ... "+self.qaspFile)
         self.stopEncoding=False
         self.encodedLevel = [None]
         f = open(self.qaspFile,"r")
@@ -708,7 +691,7 @@ class SubProgramParser:
                                         self.encodedLevel.append(SubProgramParser.EMPTY)
                                         
                             else:
-                                print("Incoherent forall",self.programCount)
+                                self.debugger.printMessage("Incoherent forall "+str(self.programCount))
                                 phi_i=self.symbols.addExtraSymbol()
                                 self.gates.append(phi_i)
                                 self.gatesCount+=1
@@ -727,7 +710,7 @@ class SubProgramParser:
                             f.close()
                             coherent,phi_i = self.ground(parsedProgram,FILE_UTIL.TO_GROUND_PROGRAM_FILE,False,False)
                             if not coherent:
-                                print("Incoherent forall",self.programCount)
+                                self.debugger.printMessage("Incoherent forall "+str(self.programCount))
                                 phi_i=self.symbols.addExtraSymbol()
                                 self.gates.append(phi_i)
                                 self.gatesCount+=1
@@ -847,7 +830,7 @@ class SubProgramParser:
                             self.clauseCount+=1
 
                             self.stopEncoding=True
-                            print("Incoherent Exists",self.programCount)
+                            self.debugger.printMessage("Incoherent Exists "+str(self.programCount))
                             break
                         else:
                             self.gates.append(phi_i)
@@ -870,7 +853,7 @@ class SubProgramParser:
             
             #current line does not match quantifier
             if self.currentQuantifier is None:
-                print("No Quantifier found yet: Skipping",line)
+                self.debugger.printMessage("No Quantifier found yet: Skipping "+line)
             else:
                 parserFileHandler.write(line)
                 
@@ -961,7 +944,7 @@ class SubProgramParser:
                     f.close()
                     self.clauseCount+=1
                     self.encodedLevel.append(SubProgramParser.INCOHERENT_C)
-                    print("Incoherent constraint")
+                    self.debugger.printMessage("Incoherent constraint")
                 else:
                     self.encodedLevel.append(SubProgramParser.ENCODED_C)
                 self.gates.append(phi_i)
@@ -995,10 +978,10 @@ class SubProgramParser:
                 quiteCNF=False
         if len(self.encodedLevel) == 2:
             if self.encodedLevel[1] == SubProgramParser.INCOHERENT_F:
-                print(f"{PYQASP_OUTPUT.EXTENDED}10")
+                self.debugger.printMessage(f"{PYQASP_OUTPUT.EXTENDED}10")
                 sys.exit(10)
             elif self.encodedLevel[1] == SubProgramParser.INCOHERENT_E:
-                print(f"{PYQASP_OUTPUT.EXTENDED}20")
+                self.debugger.printMessage(f"{PYQASP_OUTPUT.EXTENDED}20")
                 sys.exit(20)
             # else:
             #     print("Error: found only one level not incoherent")

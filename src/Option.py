@@ -1,4 +1,4 @@
-import sys,os
+import sys,os,subprocess
 
 class PyQASPOptions:
     DLV2 = 0
@@ -120,6 +120,23 @@ class PYQASP_OUTPUT:
     UNSAT                       = "UNSATISFIABLE"
     EXTENDED                    = "PyQasp::"
 
+class EmptyDebugger:
+    def printMessage(self,message):
+        return
+
+class Debugger:
+    def printMessage(self,message):
+        print(message)
+        return
+
+class EmptyDebugCommand:
+    def getOutput(self,cmd):
+        return ""
+
+class DebugCommand(EmptyDebugCommand):
+    def getOutput(self,cmd):
+        return subprocess.getoutput(cmd)
+
 class DEFAULT_PROPERTIES:
     GUESS_CHECK                 = False
     NO_WF                       = False
@@ -127,4 +144,7 @@ class DEFAULT_PROPERTIES:
     SKIP_QCIR_CONV_FOR_QDIMACS  = True
     PRINT_STATS                 = False
     PRINT_ASPSTATS              = False
+    SATISFIABILITY              = False
+    debug                       = EmptyDebugger()
+    debugcmd                    = EmptyDebugCommand()
     

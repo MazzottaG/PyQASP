@@ -105,7 +105,7 @@ class QCIRBuilder:
             if len(vars_)>0:
                 self.qbfFileHandler.write(f"{quant}({vars_})\n")
         else:
-            print("Warning: empty program found at level",level)
+            # print("Warning: empty program found at level",level)
             self.addVerum(quantifier)
     
     def getProps(self):
