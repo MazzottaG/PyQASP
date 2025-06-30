@@ -96,6 +96,13 @@ if ns.debug_print:
     DEFAULT_PROPERTIES.debug=Debugger()
     DEFAULT_PROPERTIES.debugcmd=DebugCommand()
 
+SOLVERS = {
+    "quabs":Quabs(),
+    "depqbf":Depqbf(),
+    "rareqs":Rareqs(),
+    "auto":None
+}
+
 ExternalCalls.debugger = DEFAULT_PROPERTIES.debug
 ExternalCalls.debuggercmd = DEFAULT_PROPERTIES.debugcmd
 
@@ -122,9 +129,9 @@ if solver is None:
     if solver_name.endswith("-blo"):
         solver_name = solver_name.split("-blo")[0]
     solver = SOLVERS[solver_name]
-    DEFAULT_PROPERTIES.debug.printMessage(solver_name+" selected as backend solver")
+    DEFAULT_PROPERTIES.debug.printMessage(str(solver_name)+" selected as backend solver")
 else:
-    DEFAULT_PROPERTIES.debug.printMessage(ns.solvername+" used as backend solver")
+    DEFAULT_PROPERTIES.debug.printMessage(str(ns.solvername)+" used as backend solver")
     # backend = loaded_model.predict([row])[0]
 symbols=parser.symbols
 # json_object = json.dumps(symbols.factory, indent=4)
@@ -136,10 +143,13 @@ if ns.encode:
     sys.exit(0)
 isFirstForall=parser.encodedLevel[1] in [parser.ENCODED_F,parser.SKIPPED]
 parser=None
+exist_code = None
 if not ns.enum or ns.only_sat:
-    solver.solve(symbols,isFirstForall,props)
+    exist_code = solver.solve(symbols,isFirstForall,props)
 else:
     solver = QuabsEnumerator()
-    solver.solve(symbols,isFirstForall,props)
+    exist_code = solver.solve(symbols,isFirstForall,props)
 
 ExternalCalls.LOG_FILE_HANDLER.close()
+
+sys.exit(exist_code)

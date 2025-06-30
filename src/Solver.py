@@ -22,7 +22,7 @@ class OutputBuilder:
             line = process.stdout.readline().decode("UTF-8").strip()
         process.communicate()
         self.debug.printMessage(f"{PYQASP_OUTPUT.EXTENDED}{process.returncode}")
-        sys.exit(process.returncode)
+        return process.returncode,None
 
         # if sat:
         #     print(PYQASP_OUTPUT.SAT)
@@ -53,7 +53,7 @@ class RareqsOutputBuilder(OutputBuilder):
             line = process.stdout.readline().decode("UTF-8")
         process.communicate()
         self.debug.printMessage(f"{PYQASP_OUTPUT.EXTENDED}{process.returncode}")
-        sys.exit(process.returncode)
+        return process.returncode,None
 
         # if sat:
         #     print(PYQASP_OUTPUT.SAT)
@@ -131,10 +131,11 @@ class Solver:
 
     def printOuput(self,symbolTable:SymbolTable,isFirstForall,process):
         self.debug.printMessage("Output ...")
-        self.outputBuilder.printOuput(symbolTable,isFirstForall,process)
+        return self.outputBuilder.printOuput(symbolTable,isFirstForall,process)
     
     def solve(self,symbolTable:SymbolTable,isFirstForall,qcirProps):
         self.debug.printMessage("Solving ...")
+        return None
         
 class Rareqs(Solver):
     # public final static ShellCommand RARE_QS_COMMAND_TEMPLATE = new ShellCommand(
@@ -151,7 +152,8 @@ class Rareqs(Solver):
             [FILE_UTIL.RAREQS_NN_PATH, "-"]
         ]
         pipeline = ExternalCalls.callSolverPipeline(cmds)
-        self.outputBuilder.printOuput(symbolTable,isFirstForall,pipeline[-1])
+        exit_code,model = self.outputBuilder.printOuput(symbolTable,isFirstForall,pipeline[-1])
+        return exit_code
 
 class Depqbf(Solver):
     # 	public final static ShellCommand DEPQBF_COMMAND_TEMPLATE_BLO = new ShellCommand(
@@ -181,7 +183,8 @@ class Depqbf(Solver):
             ]
 
         pipeline = ExternalCalls.callSolverPipeline(cmds)
-        self.outputBuilder.printOuput(symbolTable,isFirstForall,pipeline[-1])
+        exit_code,model = self.outputBuilder.printOuput(symbolTable,isFirstForall,pipeline[-1])
+        return exit_code
 
 class Quabs(Solver):
     
@@ -198,6 +201,7 @@ class Quabs(Solver):
         process = ExternalCalls.callSolver(command)
         exit_code,model = self.outputBuilder.printOuput(symbolTable,isFirstForall,process)
         self.debug.printMessage(f"{PYQASP_OUTPUT.EXTENDED}{exit_code}")
+        return exit_code
 
 
 
@@ -236,3 +240,6 @@ class QuabsEnumerator(Solver):
 
         if not SAT:
             self.debug.printMessage(PYQASP_OUTPUT.UNSAT)
+            return 20
+        else:
+            return 10

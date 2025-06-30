@@ -194,7 +194,7 @@ class SubProgramParser:
                     #is a fact 
                     if data[LPARSE_FORMAT.BODY_SIZE_INDEX] == 0:
                         continue
-            self.debugger.printMessage("Forall cannot be simplified: "+line.strip())
+            self.debugger.printMessage("Forall cannot be simplified: "+str(line.strip()))
             simplify=False
         
         childProcess.communicate()
@@ -622,7 +622,7 @@ class SubProgramParser:
             return coherent,phi_i
         
     def buildSubPrograms(self):
-        self.debugger.printMessage("Parsing ... "+self.qaspFile)
+        self.debugger.printMessage("Parsing ... "+str(self.qaspFile))
         self.stopEncoding=False
         self.encodedLevel = [None]
         f = open(self.qaspFile,"r")
@@ -853,7 +853,7 @@ class SubProgramParser:
             
             #current line does not match quantifier
             if self.currentQuantifier is None:
-                self.debugger.printMessage("No Quantifier found yet: Skipping "+line)
+                self.debugger.printMessage("No Quantifier found yet: Skipping "+str(line))
             else:
                 parserFileHandler.write(line)
                 

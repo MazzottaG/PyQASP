@@ -150,7 +150,7 @@ class QASPParser:
         if not stop:
             if currentQuantifier == QASP_FORMAT.QCONSTRAINT:
                 self.parseProgram()
-                self.debug.printMessage("Encoding Level "+level)
+                self.debug.printMessage("Encoding Level "+str(level))
                 predicates=self.addDomainsInternal(toGroundFileHandler)
                 toGroundFileHandler.close()
                 self.transform(level,currentQuantifier,predicates)
