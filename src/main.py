@@ -38,6 +38,7 @@ argparser.add_argument('filename', metavar='file', type=str, help='Path to QASP 
 argparser.add_argument('--no-wf', dest="disable_wf", default=False, action='store_true')
 argparser.add_argument('--sat', dest="only_sat", default=False, action='store_true')
 argparser.add_argument('--enumerate', dest="enum", default=False, action='store_true')
+argparser.add_argument('--count-qans', dest="counting", default=False, action='store_true')
 argparser.add_argument('-s','--solver', dest="solvername",  type=str, help='available solvers : '+str(list(SOLVERS.keys())))
 argparser.add_argument('-g','--grounder', dest="groundername",  type=str, help='available grounders : '+str(list(GROUNDERS_DESC.keys())))
 argparser.add_argument('-pq','--print-qcir', dest="qcir_file",  type=str, help='output qcir filename')
@@ -82,6 +83,8 @@ if ns.aspstats or (not ns.solvername or SOLVERS[ns.solvername] is None):
 
 if ns.stats:
     DEFAULT_PROPERTIES.PRINT_STATS = True
+if ns.counting:
+    DEFAULT_PROPERTIES.COUNTING = True
 
 if ns.qcir_file:
     FILE_UTIL.QBF_PROGRAM_FILE=ns.qcir_file
@@ -144,7 +147,7 @@ if ns.encode:
 isFirstForall=parser.encodedLevel[1] in [parser.ENCODED_F,parser.SKIPPED]
 parser=None
 exist_code = None
-if not ns.enum or ns.only_sat:
+if (not ns.enum and not ns.counting) or ns.only_sat:
     exist_code = solver.solve(symbols,isFirstForall,props)
 else:
     solver = QuabsEnumerator()

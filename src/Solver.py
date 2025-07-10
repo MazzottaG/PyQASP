@@ -101,7 +101,7 @@ class QuabsOutputBuilder(OutputBuilder):
 
             line = process.stdout.readline().decode("UTF-8").strip()
 
-        if not model is None:
+        if not model is None and not DEFAULT_PROPERTIES.COUNTING:
             json.dump({"literals":model}, sys.stdout)
             print()
             # print(". ".join(model))
@@ -216,11 +216,13 @@ class QuabsEnumerator(Solver):
         exit_code = 10
         SAT = False
         models=[]
+        count_models=0
         while exit_code == 10:
             process= ExternalCalls.callSolver([FILE_UTIL.QUABS_PATH,"--partial-assignment","--preprocessing","0",FILE_UTIL.QBF_PROGRAM_FILE])
             exit_code, model = self.outputBuilder.printOuput(symbolTable,isFirstForall,process)
             if exit_code == 10:
                 SAT=True
+                count_models += 1
                 with open(FILE_UTIL.WORKING_QBF_PROGRAM_FILE,"w") as g:
                     add_gate = True
                     with open(FILE_UTIL.QBF_PROGRAM_FILE, "r") as f:
@@ -238,6 +240,9 @@ class QuabsEnumerator(Solver):
 
                 ExternalCalls.callFileCopy(FILE_UTIL.WORKING_QBF_PROGRAM_FILE,FILE_UTIL.QBF_PROGRAM_FILE)
 
+        if DEFAULT_PROPERTIES.COUNTING:
+            suffix = "s" if count_models > 1 else ""
+            print("Found",count_models,f"quantified answer set{suffix}")
         if not SAT:
             self.debug.printMessage(PYQASP_OUTPUT.UNSAT)
             return 20

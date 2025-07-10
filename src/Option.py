@@ -139,6 +139,7 @@ class DebugCommand(EmptyDebugCommand):
 
 class DEFAULT_PROPERTIES:
     GUESS_CHECK                 = False
+    COUNTING                    = False
     NO_WF                       = False
     ONLY_CHOICE                 = True
     SKIP_QCIR_CONV_FOR_QDIMACS  = True
