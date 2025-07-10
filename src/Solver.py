@@ -242,7 +242,7 @@ class QuabsEnumerator(Solver):
 
         if DEFAULT_PROPERTIES.COUNTING:
             suffix = "s" if count_models > 1 else ""
-            print("Found",count_models,f"quantified answer set{suffix}")
+            print(f"Quantified Answer Set{suffix}:",count_models)
         if not SAT:
             self.debug.printMessage(PYQASP_OUTPUT.UNSAT)
             return 20
