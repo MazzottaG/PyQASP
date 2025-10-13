@@ -8,6 +8,11 @@ from SubProgramParser import *
 import argparse,signal,subprocess,json,sys
 
 ExternalCalls.LOG_FILE_HANDLER = None
+
+def exiting(returncode):
+    FILE_UTIL.cleanup()
+    sys.exit(returncode)
+    
 def handler(signum, frame):
     print('Sig term', signum)
     if not ExternalCalls.LOG_FILE_HANDLER is None:
@@ -37,6 +42,8 @@ argparser = argparse.ArgumentParser(description='QBF encoder')
 argparser.add_argument('filename', metavar='file', type=str, help='Path to QASP file')
 argparser.add_argument('--no-wf', dest="disable_wf", default=False, action='store_true')
 argparser.add_argument('--sat', dest="only_sat", default=False, action='store_true')
+argparser.add_argument('--minimize-pred', dest="min_predicate",  type=str, help='predicate of first level: simulate global weak constraint ":~p(X). [X]"')
+argparser.add_argument('--maximize-pred', dest="max_predicate",  type=str, help='predicate of first level: simulate global weak constraint ":~p(X). [X]"')
 argparser.add_argument('--enumerate', dest="enum", default=False, action='store_true')
 argparser.add_argument('--count-qans', dest="counting", default=False, action='store_true')
 argparser.add_argument('-s','--solver', dest="solvername",  type=str, help='available solvers : '+str(list(SOLVERS.keys())))
@@ -118,6 +125,8 @@ if ns.aspstats:
     print("@ASPSTATS",aspstats.getFeature())
     aspstats.print()
 
+
+
 solver = SOLVERS["quabs"]
 if ns.solvername:
     if ns.solvername not in SOLVERS:
@@ -144,9 +153,29 @@ symbols=parser.symbols
 
 if ns.encode:
     sys.exit(0)
+
+
+
 isFirstForall=parser.encodedLevel[1] in [parser.ENCODED_F,parser.SKIPPED]
 parser=None
 exist_code = None
+
+if ns.min_predicate:
+    # from WeakSolver import QuabsWithWeak
+    # solver = QuabsWithWeak(ns.min_predicate)
+    from PredSumSolver import QuabsWithWeakAggr
+    solver = QuabsWithWeakAggr(ns.min_predicate,True)
+    solver.solve(symbols,isFirstForall,props)
+    exiting(0)
+
+if ns.max_predicate:
+    # from WeakSolver import QuabsWithWeak
+    # solver = QuabsWithWeak(ns.min_predicate)
+    from PredSumSolver import QuabsWithWeakAggr
+    solver = QuabsWithWeakAggr(ns.max_predicate,False)
+    solver.solve(symbols,isFirstForall,props)
+    exiting(0)
+    
 if (not ns.enum and not ns.counting) or ns.only_sat:
     exist_code = solver.solve(symbols,isFirstForall,props)
 else:

@@ -61,12 +61,17 @@ class FILE_UTIL:
     GROUND_PROGRAM_FILE         = os.path.join(FILES_FOLDER_PATH,"subprogram.lparse")
     QBF_PROGRAM_FILE            = os.path.join(FILES_FOLDER_PATH,"formula.qcir")
     WORKING_QBF_PROGRAM_FILE    = os.path.join(FILES_FOLDER_PATH,"working_formula.qcir")
+    TMP_QBF_PROGRAM_FILE        = os.path.join(FILES_FOLDER_PATH,"tmp_formula.qcir")
     QDIMACS_PROGRAM_FILE        = os.path.join(FILES_FOLDER_PATH,"formula.qdimacs")
     GATES_PROGRAM_FILE          = os.path.join(FILES_FOLDER_PATH,"builder.qcir")
     QCIR_SUB_FORMULA_PREFIX     = os.path.join(FILES_FOLDER_PATH,"subformula")
     
     LOG_ERROR                   = os.path.join(FILES_FOLDER_PATH,"log.err")
-    
+    def cleanup():
+        print("Cleaning up working directory")
+        for file in [FILE_UTIL.FACTORY_DUMP, FILE_UTIL.ASP_PARSER_FILE, FILE_UTIL.TO_GROUND_PROGRAM_FILE, FILE_UTIL.GROUND_PROGRAM_FILE, FILE_UTIL.QBF_PROGRAM_FILE, FILE_UTIL.TMP_QBF_PROGRAM_FILE, FILE_UTIL.QDIMACS_PROGRAM_FILE, FILE_UTIL.GATES_PROGRAM_FILE, FILE_UTIL.QCIR_SUB_FORMULA_PREFIX]:
+            if os.path.exists(file):
+                os.remove(file)
     
 class DIMACS_FORMAT:
     DIMACS_COMMENT_VAR_INDEX    = 1
