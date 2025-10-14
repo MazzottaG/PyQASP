@@ -6,6 +6,7 @@ from Option import FILE_UTIL,QASP_FORMAT,DEFAULT_PROPERTIES,Debugger,DebugComman
 from Solver import *
 from SubProgramParser import *
 import argparse,signal,subprocess,json,sys
+from PyAspParser.WeakParser import translate_weak
 
 ExternalCalls.LOG_FILE_HANDLER = None
 
@@ -47,6 +48,7 @@ argparser.add_argument('--maximize-pred', dest="max_predicate",  type=str, help=
 argparser.add_argument('--enumerate', dest="enum", default=False, action='store_true')
 argparser.add_argument('--count-qans', dest="counting", default=False, action='store_true')
 argparser.add_argument('-s','--solver', dest="solvername",  type=str, help='available solvers : '+str(list(SOLVERS.keys())))
+argparser.add_argument('-w','--global-weak', dest="globalweak",  type=str, help='Path of file containing global weak constraints')
 argparser.add_argument('-g','--grounder', dest="groundername",  type=str, help='available grounders : '+str(list(GROUNDERS_DESC.keys())))
 argparser.add_argument('-pq','--print-qcir', dest="qcir_file",  type=str, help='output qcir filename')
 argparser.add_argument('-err','--error-log', dest="log_file",  type=str, help='external tools log filename')
@@ -117,7 +119,13 @@ ExternalCalls.debugger = DEFAULT_PROPERTIES.debug
 ExternalCalls.debuggercmd = DEFAULT_PROPERTIES.debugcmd
 
 parser = SubProgramParser(ns.filename,grounder)
-props,aspstats = parser.buildSubPrograms()
+
+weakrules = []
+weakpred = None
+if ns.globalweak:
+    weakrules,weakpred = translate_weak(ns.globalweak)
+    
+props,aspstats = parser.buildSubPrograms(weakrules,weakpred)
 if DEFAULT_PROPERTIES.PRINT_STATS:
     props.printProps()
 
@@ -146,6 +154,7 @@ else:
     DEFAULT_PROPERTIES.debug.printMessage(str(ns.solvername)+" used as backend solver")
     # backend = loaded_model.predict([row])[0]
 symbols=parser.symbols
+        
 # json_object = json.dumps(symbols.factory, indent=4)
  
 # with open("symbols.json", "w") as outfile:
@@ -160,11 +169,11 @@ isFirstForall=parser.encodedLevel[1] in [parser.ENCODED_F,parser.SKIPPED]
 parser=None
 exist_code = None
 
-if ns.min_predicate:
+if ns.min_predicate or not weakpred is None:
     # from WeakSolver import QuabsWithWeak
     # solver = QuabsWithWeak(ns.min_predicate)
     from PredSumSolver import QuabsWithWeakAggr
-    solver = QuabsWithWeakAggr(ns.min_predicate,True)
+    solver = QuabsWithWeakAggr(ns.min_predicate if ns.min_predicate else weakpred,True)
     solver.solve(symbols,isFirstForall,props)
     exiting(0)
 

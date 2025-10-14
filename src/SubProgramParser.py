@@ -621,7 +621,8 @@ class SubProgramParser:
                 f.close()
             return coherent,phi_i
         
-    def buildSubPrograms(self):
+    def buildSubPrograms(self,weakrules,weakpred):
+        self.symbols.set_weak_pred(weakpred)
         self.debugger.printMessage("Parsing ... "+str(self.qaspFile))
         self.stopEncoding=False
         self.encodedLevel = [None]
@@ -849,6 +850,9 @@ class SubProgramParser:
                 parsedProgram = ParsedProgram()
                 self.currentQuantifier = newQuantifier
                 self.programCount += 1
+                if self.programCount == 1:
+                    for rule in weakrules:
+                        parserFileHandler.write(rule)
                 continue
             
             #current line does not match quantifier

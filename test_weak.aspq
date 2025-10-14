@@ -1,0 +1,9 @@
+%@exists
+{a;b;c}.
+:-a,b,c.
+:-not a,not b, not c.
+%@forall
+{d} :- b,c.
+{e} :- a,c.
+%@constraint
+:-d.

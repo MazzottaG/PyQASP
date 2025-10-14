@@ -11,7 +11,13 @@ class SymbolTable:
         self.factory={}
         self.idCounter=2
         self.idToAtom=[SymbolTable.UNDEF,SymbolTable.UNDEF]
+        self.weak_pred=None
+    def set_weak_pred(self,pred):
+        self.weak_pred=pred
         
+    def get_weak_pred(self):
+        return self.weak_pred
+
     def addExtraSymbol(self):
         self.idCounter+=1
         self.idToAtom.append(SymbolTable.UNDEF)
