@@ -20,9 +20,9 @@ class RuleBuilder(ASPCore2Listener):
         self.readingWeights=False
         self.weaktokens = []
         self.ignoring_tokens=[ASPCore2Parser.SQUARE_OPEN,ASPCore2Parser.SQUARE_CLOSED,ASPCore2Parser.WCONS]
-        self.forbidden=[ASPCore2Parser.AT]
         self.rules=[]
         self.last_index=[]
+        self.foundLevel = False
 
     def getRuleAsStr(self):
         return " ".join(self.weaktokens)
@@ -116,6 +116,9 @@ class RuleBuilder(ASPCore2Listener):
         if not self.weights is None:
             # print("body:"," ".join(self.weaktokens))
             # print("weights:",self.weights)
+            
+            if not self.foundLevel:
+                self.weights = [self.weights[0],"1"]+self.weights[1:]
             terms = ",".join(self.weights)
             body = " ".join(self.weaktokens)
             self.rules.append(f"{self.WEAK_PRED}("+terms+"):-"+body)
@@ -178,9 +181,9 @@ class RuleBuilder(ASPCore2Listener):
     def visitTerminal(self, node:TerminalNode):
         if node.symbol.type in self.ignoring_tokens:
             return
-        if node.symbol.type in self.forbidden:
-            print("Priority Levels not supported yet")
-            sys.exit(180)
+        if node.symbol.type == ASPCore2Parser.AT:
+            self.foundLevel = True
+            return
 
         if self.weights is None:
             self.weaktokens.append(str(node))
