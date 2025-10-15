@@ -5,6 +5,9 @@ from PyAspParser.ASPCore2Parser import ASPCore2Parser
 from PyAspParser.ASPCore2Lexer import ASPCore2Lexer
 # from ASPCore2Listener import ASPCore2Listener
 # from ASPCore2Parser import ASPCore2Parser
+# from ASPCore2Lexer import ASPCore2Lexer
+# from ASPCore2Listener import ASPCore2Listener
+# from ASPCore2Parser import ASPCore2Parser
 import sys
 
 
@@ -19,6 +22,7 @@ class RuleBuilder(ASPCore2Listener):
         self.ignoring_tokens=[ASPCore2Parser.SQUARE_OPEN,ASPCore2Parser.SQUARE_CLOSED,ASPCore2Parser.WCONS]
         self.forbidden=[ASPCore2Parser.AT]
         self.rules=[]
+        self.last_index=[]
 
     def getRuleAsStr(self):
         return " ".join(self.weaktokens)
@@ -119,7 +123,55 @@ class RuleBuilder(ASPCore2Listener):
         else:
             print("Ignored rule:"," ".join(self.weaktokens))
             
+    def enterTerm_(self, ctx:ASPCore2Parser.Term_Context):
+        if not self.weights is None:
+            self.last_index.append(len(self.weights))
+        else:
+            self.last_index.append(len(self.weaktokens))
+        # print("Reading Term_",self.weaktokens,self.weights,self.last_index)
+
+    def enterExpr(self, ctx:ASPCore2Parser.Term_Context):
+        if not self.weights is None:
+            self.last_index.append(len(self.weights))
+        else:
+            self.last_index.append(len(self.weaktokens))
+        # print("Reading Expr",self.weaktokens,self.weights,self.last_index)
         
+
+    def shrink(self,size,array):
+        term = []
+        while len(array)>size:
+            term.append(array.pop())
+        return "".join(reversed(term))
+
+    def exitTerm_(self, ctx:ASPCore2Parser.Term_Context):
+        if len(self.last_index)<=0:
+            sys.exit(180)
+
+        length = self.last_index.pop()
+        if not self.weights is None:
+            term = self.shrink(length,self.weights)
+            self.weights.append(term)
+        else:
+            term = self.shrink(length,self.weaktokens)
+            self.weaktokens.append(term)
+        # print("Read Term_",self.weaktokens,self.weights,self.last_index)
+        
+    def exitExpr(self, ctx:ASPCore2Parser.Term_Context):
+        if len(self.last_index)<=0:
+            sys.exit(180)
+
+        length = self.last_index.pop()
+        if not self.weights is None:
+            term = self.shrink(length,self.weights)
+            self.weights.append(term)
+        else:
+            term = self.shrink(length,self.weaktokens)
+            self.weaktokens.append(term)
+        # print("Read Expr",self.weaktokens,self.weights,self.last_index)
+
+
+
     def visitErrorNode(self, node:ErrorNode):
         self.error = True
 
@@ -147,3 +199,5 @@ def translate_weak(filename):
     parser.addParseListener(listener)
     parser.program()
     return listener.rules,listener.WEAK_PRED
+
+# print(translate_weak("../../weak.lp"))
