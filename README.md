@@ -4,9 +4,8 @@
 * joblib
 * scikit-learn
 ## Build Executable from source
-Executable file is generated using pyinstaller 
+pyqasp can be installed as a python module 
 ```
- sudo pip install pyinstaller
  sudo pip install joblib
  sudo pip install scikit-learn==1.2.2
  ```
@@ -14,7 +13,7 @@ Executable file is generated using pyinstaller
  ```
  pip install .
  ```
- It cleans and build a new executable file, named **pyqasp**, that is stored by into **dist** folder
+ It cleans and installs **pyqasp**
 
 ## Running PyQASP Solver
 
