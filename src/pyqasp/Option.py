@@ -68,7 +68,18 @@ class FILE_UTIL:
     
     LOG_ERROR                   = FILES_FOLDER_PATH.joinpath("log.err")
     
-    
+    def rename(tempdir):
+        print(tempdir)
+        FILE_UTIL.FACTORY_DUMP                = os.path.join(tempdir,"factory.json")
+        FILE_UTIL.ASP_PARSER_FILE             = os.path.join(tempdir,"parsing.asp")
+        FILE_UTIL.TO_GROUND_PROGRAM_FILE      = os.path.join(tempdir,"subprogram.asp")
+        FILE_UTIL.GROUND_PROGRAM_FILE         = os.path.join(tempdir,"subprogram.lparse")
+        FILE_UTIL.QBF_PROGRAM_FILE            = os.path.join(tempdir,"formula.qcir")
+        FILE_UTIL.WORKING_QBF_PROGRAM_FILE    = os.path.join(tempdir,"working_formula.qcir")
+        FILE_UTIL.QDIMACS_PROGRAM_FILE        = os.path.join(tempdir,"formula.qdimacs")
+        FILE_UTIL.GATES_PROGRAM_FILE          = os.path.join(tempdir,"builder.qcir")
+        FILE_UTIL.QCIR_SUB_FORMULA_PREFIX     = os.path.join(tempdir,"subformula")
+
 class DIMACS_FORMAT:
     DIMACS_COMMENT_VAR_INDEX    = 1
     DIMACS_COMMENT_ATOM_INDEX   = 2
