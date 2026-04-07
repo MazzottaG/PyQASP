@@ -1,4 +1,4 @@
-import sys,os,subprocess
+import sys,os,subprocess,tempfile
 from importlib.resources import files, as_file
 
 class PyQASPOptions:
@@ -68,6 +68,19 @@ class FILE_UTIL:
     QCIR_SUB_FORMULA_PREFIX     = FILES_FOLDER_PATH.joinpath("subformula")
     
     LOG_ERROR                   = FILES_FOLDER_PATH.joinpath("log.err")
+    def rename(tempdir):
+        print(tempdir)
+        FILE_UTIL.FACTORY_DUMP                = os.path.join(tempdir,"factory.json")
+        FILE_UTIL.ASP_PARSER_FILE             = os.path.join(tempdir,"parsing.asp")
+        FILE_UTIL.TO_GROUND_PROGRAM_FILE      = os.path.join(tempdir,"subprogram.asp")
+        FILE_UTIL.GROUND_PROGRAM_FILE         = os.path.join(tempdir,"subprogram.lparse")
+        FILE_UTIL.QBF_PROGRAM_FILE            = os.path.join(tempdir,"formula.qcir")
+        FILE_UTIL.WORKING_QBF_PROGRAM_FILE    = os.path.join(tempdir,"working_formula.qcir")
+        FILE_UTIL.TMP_QBF_PROGRAM_FILE        = os.path.join(tempdir,"tmp_formula.qcir")
+        FILE_UTIL.QDIMACS_PROGRAM_FILE        = os.path.join(tempdir,"formula.qdimacs")
+        FILE_UTIL.GATES_PROGRAM_FILE          = os.path.join(tempdir,"builder.qcir")
+        FILE_UTIL.QCIR_SUB_FORMULA_PREFIX     = os.path.join(tempdir,"subformula")
+        
     def cleanup():
         print("Cleaning up working directory")
         for file in [FILE_UTIL.FACTORY_DUMP, FILE_UTIL.ASP_PARSER_FILE, FILE_UTIL.TO_GROUND_PROGRAM_FILE, FILE_UTIL.GROUND_PROGRAM_FILE, FILE_UTIL.QBF_PROGRAM_FILE, FILE_UTIL.TMP_QBF_PROGRAM_FILE, FILE_UTIL.QDIMACS_PROGRAM_FILE, FILE_UTIL.GATES_PROGRAM_FILE, FILE_UTIL.QCIR_SUB_FORMULA_PREFIX]:
