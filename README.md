@@ -19,12 +19,12 @@ Executable file is generated using pyinstaller
 
 ## Running PyQASP Solver
 
-To run pyqasp using default setting 
+To run pyqasp use the following command 
 ```
-./dist/pyqasp problem.aspq
+pyqasp -s quabs -g gringo --no-wf -w global_weak.lp problem.aspq
 ```
 
 Use -h option to get available options
 ```
-./dist/pyqasp -h 
+pyqasp -h 
 ```
