@@ -1,4 +1,5 @@
-import sys,json,scc,re
+import sys,json,re
+from pyqasp.PyAspParser import scc
 
 class ProgramDependency:
     

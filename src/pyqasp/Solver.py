@@ -1,7 +1,7 @@
-from Executors import ExternalCalls
-from Option import FILE_UTIL,QUABS_OUTPUT,REGEX_UTIL,RAREQS_OUTPUT,PYQASP_OUTPUT,DEFAULT_PROPERTIES,DEPQBF_OUTPUT,QCIR_FORMAT
-from Structures import SymbolTable
-from Converter import QCIRCnfToQDIMACS
+from pyqasp.Executors import ExternalCalls
+from pyqasp.Option import FILE_UTIL,QUABS_OUTPUT,REGEX_UTIL,RAREQS_OUTPUT,PYQASP_OUTPUT,DEFAULT_PROPERTIES,DEPQBF_OUTPUT,QCIR_FORMAT
+from pyqasp.Structures import SymbolTable
+from pyqasp.Converter import QCIRCnfToQDIMACS
 import re,sys,json
 
 class OutputBuilder:

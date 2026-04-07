@@ -1,6 +1,6 @@
-from Option import FILE_UTIL,DIMACS_FORMAT,QCIR_FORMAT,QASP_FORMAT,DEFAULT_PROPERTIES
-from Executors import ExternalCalls
-from Structures import SymbolTable
+from pyqasp.Option import FILE_UTIL,DIMACS_FORMAT,QCIR_FORMAT,QASP_FORMAT,DEFAULT_PROPERTIES
+from pyqasp.Executors import ExternalCalls
+from pyqasp.Structures import SymbolTable
 import sys,time
 class QCIRProps:
     def __init__(self):

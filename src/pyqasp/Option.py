@@ -1,4 +1,5 @@
 import sys,os,subprocess
+from importlib.resources import files, as_file
 
 class PyQASPOptions:
     DLV2 = 0
@@ -21,51 +22,51 @@ class LPARSE_FORMAT:
     SEPARATOR = " "
 
 class FILE_UTIL:
-    DEFAULT_PATH                = sys._MEIPASS
-    # DEFAULT_PATH                = ""
-    ASP_PARSER_PATH             = os.path.join(DEFAULT_PATH,"resources","asp-parser","aspToJson") 
+    # DEFAULT_PATH                = sys._MEIPASS
+    DEFAULT_PATH                = files("pyqasp")
+    ASP_PARSER_PATH             = DEFAULT_PATH.joinpath("resources","asp-parser","aspToJson") 
     # ASP_PARSER_PATH             = os.path.join(DEFAULT_PATH,"resources","asp-parser","ruleToJson") 
-    ASP_RULE_PARSER_PATH        = os.path.join(DEFAULT_PATH,"resources","asp-parser","ParserByRule") 
-    ASP_PROGRAM_PARSER_PATH     = os.path.join(DEFAULT_PATH,"resources","asp-parser","ProgramParser") 
-    OLD_TOOL_FOLDER_PATH        = os.path.join(DEFAULT_PATH,"resources","old-tool")
-    TOOL_FOLDER_PATH            = os.path.join(DEFAULT_PATH,"resources","tools")
-    MODELS_FOLDER               = os.path.join(DEFAULT_PATH,"resources","selector_model")
+    ASP_RULE_PARSER_PATH        = DEFAULT_PATH.joinpath("resources","asp-parser","ParserByRule") 
+    ASP_PROGRAM_PARSER_PATH     = DEFAULT_PATH.joinpath("resources","asp-parser","ProgramParser") 
+    OLD_TOOL_FOLDER_PATH        = DEFAULT_PATH.joinpath("resources","old-tool")
+    TOOL_FOLDER_PATH            = DEFAULT_PATH.joinpath("resources","tools")
+    MODELS_FOLDER               = DEFAULT_PATH.joinpath("resources","selector_model")
 
-    ESTIMATOR_FILE              = os.path.join(MODELS_FOLDER,"uniquely-augmented_random-forest.joblib")
+    ESTIMATOR_FILE              = MODELS_FOLDER.joinpath("uniquely-augmented_random-forest.joblib")
     
-    QUABS_PATH                  = os.path.join(TOOL_FOLDER_PATH,"quabs")
-    DEPQBF_PATH                 = os.path.join(TOOL_FOLDER_PATH,"depqbf")
-    RAREQS_NN_PATH              = os.path.join(TOOL_FOLDER_PATH,"rareqs-nn")
+    QUABS_PATH                  = TOOL_FOLDER_PATH.joinpath("quabs")
+    DEPQBF_PATH                 = TOOL_FOLDER_PATH.joinpath("depqbf")
+    RAREQS_NN_PATH              = TOOL_FOLDER_PATH.joinpath("rareqs-nn")
     
-    QCIR_CONV_PATH              = os.path.join(TOOL_FOLDER_PATH,"qcir-conv.py")
-    BLOQQER37_PATH              = os.path.join(TOOL_FOLDER_PATH,"bloqqer37")
-    FMLA_PATH                   = os.path.join(TOOL_FOLDER_PATH,"fmla")
+    QCIR_CONV_PATH              = TOOL_FOLDER_PATH.joinpath("qcir-conv.py")
+    BLOQQER37_PATH              = TOOL_FOLDER_PATH.joinpath("bloqqer37")
+    FMLA_PATH                   = TOOL_FOLDER_PATH.joinpath("fmla")
     
-    GRINGO_PATH                 = os.path.join(TOOL_FOLDER_PATH,"gringo")        
-    DLV2_PATH                   = os.path.join(TOOL_FOLDER_PATH,"dlv2")          
+    GRINGO_PATH                 = TOOL_FOLDER_PATH.joinpath("gringo")        
+    DLV2_PATH                   = TOOL_FOLDER_PATH.joinpath("dlv2")          
     
-    OLD_LPSHIFT_PATH            = os.path.join(TOOL_FOLDER_PATH,"lpshift-1.4")   
-    OLD_LP2NORMAL_PATH          = os.path.join(TOOL_FOLDER_PATH,"lp2normal-2.27")
-    OLD_LP2SAT_PATH             = os.path.join(TOOL_FOLDER_PATH,"lp2sat-1.24")   
+    OLD_LPSHIFT_PATH            = TOOL_FOLDER_PATH.joinpath("lpshift-1.4")   
+    OLD_LP2NORMAL_PATH          = TOOL_FOLDER_PATH.joinpath("lp2normal-2.27")
+    OLD_LP2SAT_PATH             = TOOL_FOLDER_PATH.joinpath("lp2sat-1.24")   
 
-    LPSHIFT_PATH                = os.path.join(TOOL_FOLDER_PATH,"lpshift")   
-    LP2NORMAL_PATH              = os.path.join(TOOL_FOLDER_PATH,"lp2normal2")
-    LP2SAT_PATH                 = os.path.join(TOOL_FOLDER_PATH,"lp2sat")   
-    LP2ACYC_PATH                = os.path.join(TOOL_FOLDER_PATH,"lp2acyc")   
-    LP2ATOMIC_PATH                = os.path.join(TOOL_FOLDER_PATH,"lp2atomic")   
+    LPSHIFT_PATH                = TOOL_FOLDER_PATH.joinpath("lpshift")   
+    LP2NORMAL_PATH              = TOOL_FOLDER_PATH.joinpath("lp2normal2")
+    LP2SAT_PATH                 = TOOL_FOLDER_PATH.joinpath("lp2sat")   
+    LP2ACYC_PATH                = TOOL_FOLDER_PATH.joinpath("lp2acyc")   
+    LP2ATOMIC_PATH                = TOOL_FOLDER_PATH.joinpath("lp2atomic")   
 
-    FILES_FOLDER_PATH           = os.path.join(DEFAULT_PATH,"resources","files")
-    FACTORY_DUMP                = os.path.join(FILES_FOLDER_PATH,"factory.json")
-    ASP_PARSER_FILE             = os.path.join(FILES_FOLDER_PATH,"parsing.asp")
-    TO_GROUND_PROGRAM_FILE      = os.path.join(FILES_FOLDER_PATH,"subprogram.asp")
-    GROUND_PROGRAM_FILE         = os.path.join(FILES_FOLDER_PATH,"subprogram.lparse")
-    QBF_PROGRAM_FILE            = os.path.join(FILES_FOLDER_PATH,"formula.qcir")
-    WORKING_QBF_PROGRAM_FILE    = os.path.join(FILES_FOLDER_PATH,"working_formula.qcir")
-    QDIMACS_PROGRAM_FILE        = os.path.join(FILES_FOLDER_PATH,"formula.qdimacs")
-    GATES_PROGRAM_FILE          = os.path.join(FILES_FOLDER_PATH,"builder.qcir")
-    QCIR_SUB_FORMULA_PREFIX     = os.path.join(FILES_FOLDER_PATH,"subformula")
+    FILES_FOLDER_PATH           = DEFAULT_PATH.joinpath("resources","files")
+    FACTORY_DUMP                = FILES_FOLDER_PATH.joinpath("factory.json")
+    ASP_PARSER_FILE             = FILES_FOLDER_PATH.joinpath("parsing.asp")
+    TO_GROUND_PROGRAM_FILE      = FILES_FOLDER_PATH.joinpath("subprogram.asp")
+    GROUND_PROGRAM_FILE         = FILES_FOLDER_PATH.joinpath("subprogram.lparse")
+    QBF_PROGRAM_FILE            = FILES_FOLDER_PATH.joinpath("formula.qcir")
+    WORKING_QBF_PROGRAM_FILE    = FILES_FOLDER_PATH.joinpath("working_formula.qcir")
+    QDIMACS_PROGRAM_FILE        = FILES_FOLDER_PATH.joinpath("formula.qdimacs")
+    GATES_PROGRAM_FILE          = FILES_FOLDER_PATH.joinpath("builder.qcir")
+    QCIR_SUB_FORMULA_PREFIX     = FILES_FOLDER_PATH.joinpath("subformula")
     
-    LOG_ERROR                   = os.path.join(FILES_FOLDER_PATH,"log.err")
+    LOG_ERROR                   = FILES_FOLDER_PATH.joinpath("log.err")
     
     
 class DIMACS_FORMAT:
