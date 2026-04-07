@@ -3,7 +3,6 @@
 ## Required python packages
 * joblib
 * scikit-learn
-* pyinstaller
 ## Build Executable from source
 Executable file is generated using pyinstaller 
 ```
@@ -13,18 +12,18 @@ Executable file is generated using pyinstaller
  ```
  From repository root run
  ```
- ./clean-install.bash pyqasp
+ pip install .
  ```
  It cleans and build a new executable file, named **pyqasp**, that is stored by into **dist** folder
 
 ## Running PyQASP Solver
 
-To run pyqasp using default setting 
+To run pyqasp use the following command 
 ```
-./dist/pyqasp problem.aspq
+pyqasp -s quabs -g gringo --no-wf problem.aspq
 ```
 
 Use -h option to get available options
 ```
-./dist/pyqasp -h 
+pyqasp -h 
 ```
