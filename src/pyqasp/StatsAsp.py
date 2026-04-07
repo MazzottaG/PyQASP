@@ -1,4 +1,4 @@
-from Option import LPARSE_FORMAT
+from pyqasp.Option import LPARSE_FORMAT
 import subprocess,math
 
 class EmptyStats:

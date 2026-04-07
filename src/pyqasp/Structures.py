@@ -1,4 +1,4 @@
-from Executors import ExternalCalls
+from pyqasp.Executors import ExternalCalls
 import os,sys,logging
 
 class SymbolTable:

@@ -1,8 +1,8 @@
 
 from antlr4 import *
-from PyAspParser.ASPCore2Listener import ASPCore2Listener
-from PyAspParser.ASPCore2Parser import ASPCore2Parser
-from PyAspParser.ASPCore2Lexer import ASPCore2Lexer
+from pyqasp.PyAspParser.ASPCore2Listener import ASPCore2Listener
+from pyqasp.PyAspParser.ASPCore2Parser import ASPCore2Parser
+from pyqasp.PyAspParser.ASPCore2Lexer import ASPCore2Lexer
 # from ASPCore2Listener import ASPCore2Listener
 # from ASPCore2Parser import ASPCore2Parser
 # from ASPCore2Lexer import ASPCore2Lexer

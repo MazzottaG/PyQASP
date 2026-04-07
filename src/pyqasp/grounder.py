@@ -1,6 +1,6 @@
-from Executors import ExternalCalls
+from pyqasp.Executors import ExternalCalls
 import sys,re
-from Option import LPARSE_FORMAT,FILE_UTIL,REGEX_UTIL,DEFAULT_PROPERTIES
+from pyqasp.Option import LPARSE_FORMAT,FILE_UTIL,REGEX_UTIL,DEFAULT_PROPERTIES
 
 class BasicGrounder:
     zeroLine = r'0'

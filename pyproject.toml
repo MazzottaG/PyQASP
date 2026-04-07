@@ -1,0 +1,38 @@
+[build-system]
+requires = ["hatchling>=1.26"]
+build-backend = "hatchling.build"
+
+[project]
+name = "pyqasp"
+version = "0.0.1"
+description = "ASP(Q) solver based on optimized translation in QBF"
+readme = "README.md"
+requires-python = ">=3.13"
+authors = [
+  { name = "Giuseppe Mazzotta", email = "giuseppe.mazzotta@unical.it" }
+]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Operating System :: OS Independent"
+]
+license = "MIT"
+
+[project.urls]
+Homepage = "https://github.com/MazzottaG/PASPTools.git/mpe"
+
+[project.scripts]
+pyqasp_opt = "pyqasp.__main__:run"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/pyqasp"]
+
+[tool.hatch.build.targets.wheel.force-include]
+"src/pyqasp/resources" = "pyqasp/resources"
+
+[tool.hatch.build.targets.sdist]
+include = [
+  "/src",
+  "/README.md",
+  "/pyproject.toml"
+]
+

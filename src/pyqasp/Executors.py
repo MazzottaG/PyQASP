@@ -1,6 +1,6 @@
 import subprocess,os,sys
 import logging
-from Option import FILE_UTIL
+from pyqasp.Option import FILE_UTIL
 
 class ExternalCalls:
     # Suggested pipeline

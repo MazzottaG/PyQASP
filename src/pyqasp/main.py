@@ -1,12 +1,12 @@
-from grounder import *
-from Option import FILE_UTIL,QASP_FORMAT,DEFAULT_PROPERTIES,Debugger,DebugCommand
+from pyqasp.grounder import *
+from pyqasp.Option import FILE_UTIL,QASP_FORMAT,DEFAULT_PROPERTIES,Debugger,DebugCommand
 #from Builder import QCIRBuilder
 #from Structures import SymbolTable
 #from AspParser import QASPParser
-from Solver import *
-from SubProgramParser import *
+from pyqasp.Solver import *
+from pyqasp.SubProgramParser import *
 import argparse,signal,subprocess,json,sys
-from PyAspParser.WeakParser import translate_weak
+from pyqasp.PyAspParser.WeakParser import translate_weak
 
 ExternalCalls.LOG_FILE_HANDLER = None
 
