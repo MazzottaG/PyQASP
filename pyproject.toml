@@ -8,6 +8,12 @@ version = "0.0.1"
 description = "ASP(Q) solver based on optimized translation in QBF"
 readme = "README.md"
 requires-python = ">=3.13"
+dependencies = [
+    "clingo>=5.7.1",
+    "scikit-learn>=1.2.2",
+    "joblib",
+    "antlr4-python3-runtime"
+]
 authors = [
   { name = "Giuseppe Mazzotta", email = "giuseppe.mazzotta@unical.it" }
 ]

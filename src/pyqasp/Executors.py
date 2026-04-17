@@ -53,14 +53,14 @@ class ExternalCalls:
         lp2sat    = None
         
         if uselpshift:
-            ExternalCalls.debugger.printMessage("lpshift filename | lp2normal -e")
+            ExternalCalls.debugger.printMessage("lpshift filename | lp2normal")
             logging.info(f"\tUsing Lp2Shifth")
             lpshift = subprocess.Popen([f"{FILE_UTIL.LPSHIFT_PATH}",filename],stdout=subprocess.PIPE,stderr=ExternalCalls.LOG_FILE_HANDLER)
-            lp2normal = subprocess.Popen([f"{FILE_UTIL.LP2NORMAL_PATH}","-e"],stdin=lpshift.stdout,stdout=subprocess.PIPE,stderr=ExternalCalls.LOG_FILE_HANDLER)
+            lp2normal = subprocess.Popen([f"{FILE_UTIL.LP2NORMAL_PATH}"],stdin=lpshift.stdout,stdout=subprocess.PIPE,stderr=ExternalCalls.LOG_FILE_HANDLER)
         else:
-            ExternalCalls.debugger.printMessage("lp2normal -e filename")
+            ExternalCalls.debugger.printMessage("lp2normal filename")
             logging.info(f"\tNo Lp2Shifth")
-            lp2normal = subprocess.Popen([f"{FILE_UTIL.LP2NORMAL_PATH}","-e",filename],stdout=subprocess.PIPE,stderr=ExternalCalls.LOG_FILE_HANDLER)
+            lp2normal = subprocess.Popen([f"{FILE_UTIL.LP2NORMAL_PATH}",filename],stdout=subprocess.PIPE,stderr=ExternalCalls.LOG_FILE_HANDLER)
         if tight:
             ExternalCalls.debugger.printMessage(" | lp2sat -b")
             logging.info(f"\tNo Lp2atomic")
