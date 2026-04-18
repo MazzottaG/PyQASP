@@ -23,7 +23,4 @@ print_res(model,exit_code)
 model,exit_code = solver.solve([("o(1)",True),("o(2)",True)])
 print("Enforce","{}")
 print_res(model,exit_code)
-import time
-
-time.sleep(30)
 solver.close()
