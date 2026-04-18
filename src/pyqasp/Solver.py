@@ -77,7 +77,6 @@ class QuabsOutputBuilder(OutputBuilder):
         unsat=False
         model_var = []
         while line:
-            #print(line)
             fields = line.split(" ")
             if fields[0] == QUABS_OUTPUT.MODEL_START and model is None and not isFirstForall:
                 model=[]
@@ -133,10 +132,80 @@ class Solver:
         self.debug.printMessage("Output ...")
         return self.outputBuilder.printOuput(symbolTable,isFirstForall,process)
     
-    def solve(self,symbolTable:SymbolTable,isFirstForall,qcirProps):
+    def solve(self,symbolTable:SymbolTable,isFirstForall,qcirProps,assumptions=None):
+        print("Ignoring assumption",assumptions)
         self.debug.printMessage("Solving ...")
         return None
+
+class QuabsShot(Solver):
+    
+    def __init__(self):
+        super().__init__()
+        self.outputBuilder = QuabsOutputBuilder()
+
+    def solve(self,symbolTable:SymbolTable,isFirstForall,qcirProps,assumptions=None):
         
+        with open(FILE_UTIL.WORKING_QBF_PROGRAM_FILE,"w") as g:
+            add_gate = True
+            with open(FILE_UTIL.QBF_PROGRAM_FILE, "r") as f:
+                for line in f:
+                    line = line.strip()
+                    if QCIR_FORMAT.AND_GATE in line and add_gate:
+                        add_gate=False
+                        gates = []
+                        for atom,negated in assumptions:
+                            id_,lev = symbolTable.getSymbol(atom)
+                            if lev > 1:
+                                raise Exception("Error: Assumption atoms should appear in the first program")
+                            unit_gate = symbolTable.addExtraSymbol()
+                            lit = id_ if not negated else -id_
+                            print(f"{unit_gate} = {QCIR_FORMAT.OR_GATE}({lit})",file=g)
+                            gates.append(str(unit_gate))
+                        if len(gates) > 0:
+                            new_gates = ",".join(gates)
+                            print(f"{line[:-1]},{new_gates})",file=g)
+                        else:
+                            print(line,file=g)
+
+                    else:
+                        print(line,file=g)
+        cmd = [FILE_UTIL.QUABS_PATH]
+        if not isFirstForall:
+            print("First program is existential")
+            cmd.append("--partial-assignment")
+            cmd.append("--preprocessing")
+            cmd.append("0")
+        cmd.append(FILE_UTIL.WORKING_QBF_PROGRAM_FILE)
+        if isFirstForall:
+            self.debug.printMessage("Warning: ignoring model since the most external program is universally quantified")
+
+        process= ExternalCalls.callSolver(cmd)
+        model = None
+        sat=False
+        unsat=False
+        for line in process.stdout:
+            line = line.decode("UTF-8").strip()
+            fields = line.split(" ")
+            if fields[0] == QUABS_OUTPUT.MODEL_START and model is None and not isFirstForall:
+                model=[]
+                factory = symbolTable.getFactory()
+                for predicate,domain in factory.items():
+                    for atom,data in domain.items():
+                        var,level = data
+                        if level > 1:
+                            continue
+                        if str(var) in fields:
+                            model.append(f"{atom}")
+                        else:
+                            model.append(f"not {atom}")
+            if line.endswith(QUABS_OUTPUT.UNSAT):
+                unsat=True
+            elif line.endswith(QUABS_OUTPUT.SAT):
+                sat=True
+
+        process.communicate()
+        return {"literals":model} if sat and not isFirstForall else None, 10 if sat else (20 if unsat else None)
+           
 class Rareqs(Solver):
     # public final static ShellCommand RARE_QS_COMMAND_TEMPLATE = new ShellCommand(
 	# 		"%s $file -prenex -write-gq | %s -",
@@ -145,7 +214,7 @@ class Rareqs(Solver):
         super().__init__()
         self.outputBuilder = RareqsOutputBuilder()
     
-    def solve(self,symbolTable:SymbolTable,isFirstForall,qcirProps):
+    def solve(self,symbolTable:SymbolTable,isFirstForall,qcirProps,assumptions=None):
         super().solve(symbolTable,isFirstForall,qcirProps)
         cmds = [
             [FILE_UTIL.QCIR_CONV_PATH,FILE_UTIL.QBF_PROGRAM_FILE,"-prenex","-write-gq"],
@@ -163,7 +232,7 @@ class Depqbf(Solver):
     def __init__(self):
         super().__init__()
     
-    def solve(self,symbolTable:SymbolTable,isFirstForall,qcirProps):
+    def solve(self,symbolTable:SymbolTable,isFirstForall,qcirProps,assumptions=None):
         super().solve(symbolTable,isFirstForall,qcirProps)
         cmds = []
         # if True and qcirProps.isQuiteCnf():
@@ -192,7 +261,7 @@ class Quabs(Solver):
         super().__init__()
         self.outputBuilder = QuabsOutputBuilder()
 
-    def solve(self,symbolTable:SymbolTable,isFirstForall,qcirProps):
+    def solve(self,symbolTable:SymbolTable,isFirstForall,qcirProps,assumptions=None):
         super().solve(symbolTable,isFirstForall,qcirProps)
         command = [FILE_UTIL.QUABS_PATH,"--partial-assignment","--preprocessing","0",FILE_UTIL.QBF_PROGRAM_FILE] 
         if DEFAULT_PROPERTIES.SATISFIABILITY:
@@ -211,7 +280,7 @@ class QuabsEnumerator(Solver):
         super().__init__()
         self.outputBuilder = QuabsOutputBuilder()
 
-    def solve(self,symbolTable:SymbolTable,isFirstForall,qcirProps):
+    def solve(self,symbolTable:SymbolTable,isFirstForall,qcirProps,assumptions=None):
         super().solve(symbolTable,isFirstForall,qcirProps)
         exit_code = 10
         SAT = False
@@ -248,3 +317,4 @@ class QuabsEnumerator(Solver):
             return 20
         else:
             return 10
+        

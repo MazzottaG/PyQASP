@@ -38,6 +38,15 @@ class SymbolTable:
 
         return [var,lev] if value != SymbolTable.FALSE else [-var,lev]
 
+    def getSymbol(self,atom):
+        predicate = atom.split("(")[0]
+        if predicate not in self.factory:
+            self.factory[predicate]={}
+
+        if atom not in self.factory[predicate]:
+            return None,None
+        return self.factory[predicate][atom]
+    
     def addSymbol(self,atom,level):
         
         predicate = atom.split("(")[0]
