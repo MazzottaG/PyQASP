@@ -76,6 +76,7 @@ class FILE_UTIL:
         FILE_UTIL.GROUND_PROGRAM_FILE         = os.path.join(tempdir,"subprogram.lparse")
         FILE_UTIL.QBF_PROGRAM_FILE            = os.path.join(tempdir,"formula.qcir")
         FILE_UTIL.WORKING_QBF_PROGRAM_FILE    = os.path.join(tempdir,"working_formula.qcir")
+        FILE_UTIL.ASSUMPTION_QBF_PROGRAM_FILE = os.path.join(tempdir,"assumption_formula.qcir")
         FILE_UTIL.QDIMACS_PROGRAM_FILE        = os.path.join(tempdir,"formula.qdimacs")
         FILE_UTIL.GATES_PROGRAM_FILE          = os.path.join(tempdir,"builder.qcir")
         FILE_UTIL.QCIR_SUB_FORMULA_PREFIX     = os.path.join(tempdir,"subformula")

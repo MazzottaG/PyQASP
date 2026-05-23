@@ -142,12 +142,18 @@ class QuabsShot(Solver):
     def __init__(self):
         super().__init__()
         self.outputBuilder = QuabsOutputBuilder()
+        self.qbf_file = FILE_UTIL.QBF_PROGRAM_FILE
+    
+    def set_qbf_file(self,filename):
+        self.qbf_file = filename
+
 
     def solve(self,symbolTable:SymbolTable,isFirstForall,qcirProps,assumptions=None):
         
-        with open(FILE_UTIL.WORKING_QBF_PROGRAM_FILE,"w") as g:
+        with open(FILE_UTIL.ASSUMPTION_QBF_PROGRAM_FILE,"w") as g:
             add_gate = True
-            with open(FILE_UTIL.QBF_PROGRAM_FILE, "r") as f:
+            print("Adding ussumption to",self.qbf_file)
+            with open(self.qbf_file, "r") as f:
                 for line in f:
                     line = line.strip()
                     if QCIR_FORMAT.AND_GATE in line and add_gate:
@@ -155,8 +161,9 @@ class QuabsShot(Solver):
                         gates = []
                         for atom,negated in assumptions:
                             id_,lev = symbolTable.getSymbol(atom)
-                            if lev > 1:
-                                raise Exception("Error: Assumption atoms should appear in the first program")
+                            if lev is None or lev > 1:
+                                continue
+                                # raise Exception("Error: Assumption atoms should appear in the first program")
                             unit_gate = symbolTable.addExtraSymbol()
                             lit = id_ if not negated else -id_
                             print(f"{unit_gate} = {QCIR_FORMAT.OR_GATE}({lit})",file=g)
@@ -175,7 +182,7 @@ class QuabsShot(Solver):
             cmd.append("--partial-assignment")
             cmd.append("--preprocessing")
             cmd.append("0")
-        cmd.append(FILE_UTIL.WORKING_QBF_PROGRAM_FILE)
+        cmd.append(FILE_UTIL.ASSUMPTION_QBF_PROGRAM_FILE)
         if isFirstForall:
             self.debug.printMessage("Warning: ignoring model since the most external program is universally quantified")
 

@@ -56,11 +56,11 @@ class ExternalCalls:
             ExternalCalls.debugger.printMessage("lpshift filename | lp2normal")
             logging.info(f"\tUsing Lp2Shifth")
             lpshift = subprocess.Popen([f"{FILE_UTIL.LPSHIFT_PATH}",filename],stdout=subprocess.PIPE,stderr=ExternalCalls.LOG_FILE_HANDLER)
-            lp2normal = subprocess.Popen([f"{FILE_UTIL.LP2NORMAL_PATH}"],stdin=lpshift.stdout,stdout=subprocess.PIPE,stderr=ExternalCalls.LOG_FILE_HANDLER)
+            lp2normal = subprocess.Popen([f"{FILE_UTIL.LP2NORMAL_PATH}","-e"],stdin=lpshift.stdout,stdout=subprocess.PIPE,stderr=ExternalCalls.LOG_FILE_HANDLER)
         else:
             ExternalCalls.debugger.printMessage("lp2normal filename")
             logging.info(f"\tNo Lp2Shifth")
-            lp2normal = subprocess.Popen([f"{FILE_UTIL.LP2NORMAL_PATH}",filename],stdout=subprocess.PIPE,stderr=ExternalCalls.LOG_FILE_HANDLER)
+            lp2normal = subprocess.Popen([f"{FILE_UTIL.LP2NORMAL_PATH}","-e",filename],stdout=subprocess.PIPE,stderr=ExternalCalls.LOG_FILE_HANDLER)
         if tight:
             ExternalCalls.debugger.printMessage(" | lp2sat -b")
             logging.info(f"\tNo Lp2atomic")
@@ -100,3 +100,41 @@ class ExternalCalls:
             sys.exit(180)
 
         return steps
+    
+    def callGroundingPipeline(filename,uselpshift=False,tight=False):
+        gringo    = None
+        lpshift   = None
+        lp2normal = None
+        # lp2acyc   = None
+        lp2atomic = None
+        lp2sat    = None
+        
+        gringo = subprocess.Popen([f"{FILE_UTIL.GRINGO_PATH}",filename,"-o","smodels"],stdout=subprocess.PIPE,stderr=ExternalCalls.LOG_FILE_HANDLER)
+        if uselpshift:
+            ExternalCalls.debugger.printMessage("lpshift filename | lp2normal")
+            logging.info(f"\tUsing Lp2Shifth")
+            lpshift = subprocess.Popen([f"{FILE_UTIL.LPSHIFT_PATH}"],stdin=gringo.stdout,stdout=subprocess.PIPE,stderr=ExternalCalls.LOG_FILE_HANDLER)
+            lp2normal = subprocess.Popen([f"{FILE_UTIL.LP2NORMAL_PATH}","-e"],stdin=lpshift.stdout,stdout=subprocess.PIPE,stderr=ExternalCalls.LOG_FILE_HANDLER)
+        else:
+            ExternalCalls.debugger.printMessage("lp2normal filename")
+            logging.info(f"\tNo Lp2Shifth")
+            lp2normal = subprocess.Popen([f"{FILE_UTIL.LP2NORMAL_PATH}","-e"],stdin=gringo.stdout,stdout=subprocess.PIPE,stderr=ExternalCalls.LOG_FILE_HANDLER)
+        
+        if tight:
+            ExternalCalls.debugger.printMessage(" | lp2sat -b")
+            # logging.info(f"\tNo Lp2Acyc")
+            logging.info(f"\tNo Lp2Atomic")
+            lp2sat = subprocess.Popen([f"{FILE_UTIL.LP2SAT_PATH}","-b"],stdin=lp2normal.stdout,stdout=subprocess.PIPE,stderr=ExternalCalls.LOG_FILE_HANDLER)
+            #lp2sat = subprocess.Popen([f"{FILE_UTIL.LP2SAT_PATH}"],stdin=lp2normal.stdout,stdout=subprocess.PIPE,stderr=ExternalCalls.LOG_FILE_HANDLER)
+        else:
+            # ExternalCalls.debugger.printMessage(" | lp2acyc | lp2sat -b")
+            ExternalCalls.debugger.printMessage(" | lp2atomic | lp2sat -b")
+            # logging.info(f"\tUsing Lp2Acyc")
+            logging.info(f"\tUsing Lp2Atomic")
+            # lp2acyc = subprocess.Popen([f"{FILE_UTIL.LP2ACYC_PATH}"],stdin=lp2normal.stdout,stdout=subprocess.PIPE,stderr=ExternalCalls.LOG_FILE_HANDLER)
+            lp2atomic = subprocess.Popen([f"{FILE_UTIL.LP2ATOMIC_PATH}"],stdin=lp2normal.stdout,stdout=subprocess.PIPE,stderr=ExternalCalls.LOG_FILE_HANDLER)
+            lp2sat = subprocess.Popen([f"{FILE_UTIL.LP2SAT_PATH}","-b"],stdin=lp2atomic.stdout,stdout=subprocess.PIPE,stderr=ExternalCalls.LOG_FILE_HANDLER)
+            #lp2sat = subprocess.Popen([f"{FILE_UTIL.LP2SAT_PATH}"],stdin=lp2acyc.stdout,stdout=subprocess.PIPE,stderr=ExternalCalls.LOG_FILE_HANDLER)
+
+        return lp2sat
+
