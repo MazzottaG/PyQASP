@@ -23,16 +23,13 @@ classifiers = [
 license = "MIT"
 
 [project.urls]
-Homepage = "https://github.com/MazzottaG/PASPTools.git/mpe"
+Homepage = "https://github.com/MazzottaG/PyQASP.git"
 
 [project.scripts]
 pyqasp = "pyqasp.__main__:run"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/pyqasp"]
-
-[tool.hatch.build.targets.wheel.force-include]
-"src/pyqasp/resources" = "pyqasp/resources"
 
 [tool.hatch.build.targets.sdist]
 include = [
